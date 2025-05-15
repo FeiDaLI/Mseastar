@@ -1,0 +1,176 @@
+@startuml Shared Pointer Class Diagram
+
+' Utility templates
+class "is_smart_ptr<T>" as is_smart_ptr << template >> {
+  +std::false_type
+}
+
+class "is_smart_ptr<std::unique_ptr<T>>" as is_smart_ptr_specialized << template >> {
+  +std::true_type
+}
+
+class "indirect_equal_to<Pointer, Equal>" as indirect_equal_to << template >> {
+  -Equal _eq
+  +indirect_equal_to(Equal eq = Equal())
+  +bool operator()(const Pointer& i1, const Pointer& i2) const
+}
+
+class "indirect_less<Pointer, Less>" as indirect_less << template >> {
+  -Less _cmp
+  +indirect_less(Less cmp = Less())
+  +bool operator()(const Pointer& i1, const Pointer& i2) const
+}
+
+class "indirect_hash<Pointer, Hash>" as indirect_hash << template >> {
+  -Hash _h
+  +indirect_hash(Hash h = Hash())
+  +size_t operator()(const Pointer& p) const
+}
+
+' Lightweight shared pointer section
+class "enable_lw_shared_from_this<T>" as enable_lw_shared_from_this << template >> {
+  #shared_ptr_counter_type _count
+  #enable_lw_shared_from_this()
+  #enable_lw_shared_from_this(enable_lw_shared_from_this&&)
+  #enable_lw_shared_from_this(const enable_lw_shared_from_this&)
+  #enable_lw_shared_from_this& operator=(const enable_lw_shared_from_this&)
+  #enable_lw_shared_from_this& operator=(enable_lw_shared_from_this&&)
+  +lw_shared_ptr<T> shared_from_this()
+  +lw_shared_ptr<const T> shared_from_this() const
+  -T* to_value()
+  -T* to_internal_object()
+}
+
+class "shared_ptr_no_esft<T>" as shared_ptr_no_esft << template >> {
+  -shared_ptr_counter_type _count
+  -T _value
+  +shared_ptr_no_esft()
+  +shared_ptr_no_esft(const T& x)
+  +shared_ptr_no_esft(T&& x)
+  +template<typename... A> shared_ptr_no_esft(A&&... a)
+  -T* to_value()
+  -shared_ptr_no_esft* to_internal_object()
+}
+
+class "shared_ptr_impl<T>" as shared_ptr_impl << template >> {
+  ' Conditional type based on T
+}
+
+class "lw_shared_ptr<T>" as lw_shared_ptr << template >> {
+  -shared_ptr_impl<T>* _p
+  +using element_type = T
+  +lw_shared_ptr()
+  +lw_shared_ptr(std::nullptr_t)
+  +lw_shared_ptr(const lw_shared_ptr& x)
+  +lw_shared_ptr(lw_shared_ptr&& x)
+  +~lw_shared_ptr()
+  +lw_shared_ptr& operator=(const lw_shared_ptr& x)
+  +lw_shared_ptr& operator=(lw_shared_ptr&& x)
+  +lw_shared_ptr& operator=(std::nullptr_t)
+  +lw_shared_ptr& operator=(T&& x)
+  +T& operator*() const
+  +T* operator->() const
+  +T* get() const
+  +long int use_count() const
+  +operator lw_shared_ptr<const T>() const
+  +explicit operator bool() const
+  +bool owned() const
+  -lw_shared_ptr(shared_ptr_impl<T>* p)
+  -template<typename... A> static lw_shared_ptr make(A&&... a)
+}
+
+' Regular shared pointer section
+class "shared_ptr_count_base" as shared_ptr_count_base {
+  +virtual ~shared_ptr_count_base()
+  +shared_ptr_counter_type count
+}
+
+class "shared_ptr_count_for<T>" as shared_ptr_count_for << template >> {
+  +T data
+  +template<typename... A> shared_ptr_count_for(A&&... a)
+}
+
+class "enable_shared_from_this<T>" as enable_shared_from_this << template >> {
+  +shared_ptr<T> shared_from_this()
+  +shared_ptr<const T> shared_from_this() const
+}
+
+class "shared_ptr<T>" as shared_ptr << template >> {
+  -shared_ptr_count_base* _b
+  -T* _p
+  +using element_type = T
+  +shared_ptr()
+  +shared_ptr(std::nullptr_t)
+  +shared_ptr(const shared_ptr& x)
+  +shared_ptr(shared_ptr&& x)
+  +template<typename U> shared_ptr(const shared_ptr<U>& x)
+  +template<typename U> shared_ptr(shared_ptr<U>&& x)
+  +~shared_ptr()
+  +shared_ptr& operator=(const shared_ptr& x)
+  +shared_ptr& operator=(shared_ptr&& x)
+  +shared_ptr& operator=(std::nullptr_t)
+  +template<typename U> shared_ptr& operator=(const shared_ptr<U>& x)
+  +template<typename U> shared_ptr& operator=(shared_ptr<U>&& x)
+  +explicit operator bool() const
+  +T& operator*() const
+  +T* operator->() const
+  +T* get() const
+  +long use_count() const
+  -explicit shared_ptr(shared_ptr_count_for<T>* b)
+  -shared_ptr(shared_ptr_count_base* b, T* p)
+  -explicit shared_ptr(enable_shared_from_this<std::remove_const_t<T>>* p)
+}
+
+class "shared_ptr_make_helper<T, bool>" as shared_ptr_make_helper << template >> {
+}
+
+class "shared_ptr_make_helper<T, false>" as shared_ptr_make_helper_false << template >> {
+  +template<typename... A> static shared_ptr<T> make(A&&... a)
+}
+
+class "shared_ptr_make_helper<T, true>" as shared_ptr_make_helper_true << template >> {
+  +template<typename... A> static shared_ptr<T> make(A&&... a)
+}
+
+' Helper classes for hash/comparison
+class "shared_ptr_equal_by_value<T>" as shared_ptr_equal_by_value << template >> {
+}
+
+class "shared_ptr_value_hash<T>" as shared_ptr_value_hash << template >> {
+}
+
+' Relationships
+is_smart_ptr_specialized --|> is_smart_ptr
+
+shared_ptr_impl ..> enable_lw_shared_from_this : conditionally selects
+shared_ptr_impl ..> shared_ptr_no_esft : conditionally selects
+
+lw_shared_ptr o-- shared_ptr_impl : contains
+
+enable_lw_shared_from_this <|-- "T" : is inherited by (when used)
+enable_lw_shared_from_this ..> lw_shared_ptr : returns
+
+shared_ptr_count_for --|> shared_ptr_count_base
+enable_shared_from_this --|> shared_ptr_count_base : private inheritance
+
+shared_ptr o-- shared_ptr_count_base : contains
+shared_ptr ..> enable_shared_from_this : friends
+
+shared_ptr_make_helper_false --|> shared_ptr_make_helper
+shared_ptr_make_helper_true --|> shared_ptr_make_helper
+
+shared_ptr_make_helper ..> shared_ptr : creates
+shared_ptr_make_helper_false ..> shared_ptr_count_for : creates
+shared_ptr_make_helper_true ..> enable_shared_from_this : uses
+
+shared_ptr_equal_by_value --> indirect_equal_to : specializes
+shared_ptr_value_hash --> indirect_hash : specializes
+
+' Function-like relationships through free functions
+lw_shared_ptr <.. "make_lw_shared<T>" : creates
+shared_ptr <.. "make_shared<T>" : creates
+shared_ptr <.. "static_pointer_cast<T, U>" : creates
+shared_ptr <.. "dynamic_pointer_cast<T, U>" : creates
+shared_ptr <.. "const_pointer_cast<T, U>" : creates
+
+@enduml 

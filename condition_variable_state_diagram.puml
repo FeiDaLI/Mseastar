@@ -1,0 +1,46 @@
+@startuml
+
+' 定义样式
+skinparam state {
+    BackgroundColor White
+    BorderColor Black
+    ArrowColor Black
+}
+
+' 定义状态
+[*] --> Running : 线程启动
+
+state "Running" as running {
+    state "等待条件" as waiting {
+        state "等待超时" as timeout
+        state "等待被通知" as notified
+    }
+    
+    state "执行临界区" as critical_section
+    state "检查条件" as check_condition
+}
+
+' 定义转换
+Running --> check_condition : 获取互斥锁
+check_condition --> critical_section : 条件满足
+check_condition --> waiting : 条件不满足
+
+waiting --> critical_section : notify_one()/notify_all()
+waiting --> timeout : wait_for()/wait_until()超时
+timeout --> check_condition : 重新检查条件
+notified --> check_condition : 重新检查条件
+
+critical_section --> [*] : 释放互斥锁
+
+' 添加注释
+note right of waiting
+  线程在等待条件满足时
+  会释放互斥锁
+end note
+
+note right of critical_section
+  线程在临界区执行时
+  持有互斥锁
+end note
+
+@enduml 

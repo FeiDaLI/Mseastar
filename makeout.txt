@@ -1,0 +1,442 @@
+In file included from test/../include/future/futurize.hh:2,
+                 from test/../include/future/future.hh:3,
+                 from test/future_promise_test.cc:2:
+test/../include/future/promise.hh:188:13: error: redefinition of ‘void promise<T>::migrated()’
+  188 | inline void promise<T...>::migrated() noexcept {
+      |             ^~~~~~~~~~~~~
+test/../include/future/promise.hh:142:10: note: ‘void promise<T>::migrated()’ previously declared here
+  142 |     void migrated() noexcept{
+      |          ^~~~~~~~
+In file included from test/../include/future/future.hh:3,
+                 from test/future_promise_test.cc:2:
+test/../include/future/futurize.hh: In static member function ‘static futurize<T>::type futurize<T>::apply(Func&&, std::tuple<_Args2 ...>&&)’:
+test/../include/future/futurize.hh:22:30: error: ‘::apply’ has not been declared
+   22 |             return convert(::apply(std::forward<Func>(func), std::move(args)));
+      |                              ^~~~~
+test/../include/future/futurize.hh:22:30: note: suggested alternatives:
+In file included from /usr/include/c++/10/ranges:46,
+                 from /usr/include/c++/10/bits/ranges_algobase.h:38,
+                 from /usr/include/c++/10/bits/ranges_uninitialized.h:36,
+                 from /usr/include/c++/10/memory:69,
+                 from /home/lifd/googletest/googletest/include/gtest/gtest.h:55,
+                 from test/future_promise_test.cc:1:
+/usr/include/c++/10/tuple:1733:5: note:   ‘std::apply’
+ 1733 |     apply(_Fn&& __f, _Tuple&& __t)
+      |     ^~~~~
+In file included from /usr/include/boost/mpl/aux_/include_preprocessed.hpp:37,
+                 from /usr/include/boost/mpl/apply_fwd.hpp:31,
+                 from /usr/include/boost/mpl/apply.hpp:22,
+                 from /usr/include/boost/mpl/aux_/iter_fold_impl.hpp:19,
+                 from /usr/include/boost/mpl/iter_fold.hpp:21,
+                 from /usr/include/boost/variant/detail/initializer.hpp:28,
+                 from /usr/include/boost/variant/variant.hpp:30,
+                 from /usr/include/boost/variant.hpp:17,
+                 from test/../include/future/promise.hh:8,
+                 from test/../include/future/futurize.hh:2,
+                 from test/../include/future/future.hh:3,
+                 from test/future_promise_test.cc:2:
+/usr/include/boost/mpl/aux_/preprocessed/gcc/apply_fwd.hpp:18:8: note:   ‘boost::mpl::apply’
+   18 | struct apply;
+      |        ^~~~~
+In file included from /usr/include/boost/move/utility_core.hpp:31,
+                 from /usr/include/boost/move/utility.hpp:29,
+                 from /usr/include/boost/optional/optional.hpp:46,
+                 from /usr/include/boost/optional.hpp:15,
+                 from test/../include/future/promise.hh:7,
+                 from test/../include/future/futurize.hh:2,
+                 from test/../include/future/future.hh:3,
+                 from test/future_promise_test.cc:2:
+/usr/include/boost/move/detail/meta_utils.hpp:47:8: note:   ‘boost::move_detail::apply’
+   47 | struct apply
+      |        ^~~~~
+In file included from test/../include/future/future.hh:3,
+                 from test/future_promise_test.cc:2:
+test/../include/future/futurize.hh: In static member function ‘static futurize<T>::type futurize<T>::make_exception_future(Arg&&)’:
+test/../include/future/futurize.hh:49:18: error: ‘::make_exception_future’ has not been declared
+   49 |         return ::make_exception_future<T>(std::forward<Arg>(arg));
+      |                  ^~~~~~~~~~~~~~~~~~~~~
+test/../include/future/futurize.hh:49:41: error: expected primary-expression before ‘>’ token
+   49 |         return ::make_exception_future<T>(std::forward<Arg>(arg));
+      |                                         ^
+test/../include/future/futurize.hh: At global scope:
+test/../include/future/futurize.hh:59:83: error: return type ‘using type = class future<>’ {aka ‘class future<>’} is incomplete
+   59 |     static inline type apply(Func&& func, std::tuple<FuncArgs...>&& args) noexcept{
+      |                                                                                   ^
+test/../include/future/futurize.hh:64:71: error: return type ‘using type = class future<>’ {aka ‘class future<>’} is incomplete
+   64 |     static inline type apply(Func&& func, FuncArgs&&... args) noexcept{
+      |                                                                       ^
+test/../include/future/futurize.hh:67:54: error: return type ‘using type = class future<>’ {aka ‘class future<>’} is incomplete
+   67 |     static inline type from_tuple(value_type&& value){ return make_ready_future<>();}
+      |                                                      ^
+test/../include/future/futurize.hh: In static member function ‘static void futurize<void>::from_tuple(futurize<void>::value_type&&)’:
+test/../include/future/futurize.hh:67:63: error: ‘make_ready_future’ was not declared in this scope
+   67 |     static inline type from_tuple(value_type&& value){ return make_ready_future<>();}
+      |                                                               ^~~~~~~~~~~~~~~~~~~
+test/../include/future/futurize.hh: At global scope:
+test/../include/future/futurize.hh:68:59: error: return type ‘using type = class future<>’ {aka ‘class future<>’} is incomplete
+   68 |     static inline type from_tuple(const value_type& value){ return make_ready_future<>();}
+      |                                                           ^
+test/../include/future/futurize.hh: In static member function ‘static void futurize<void>::from_tuple(const value_type&)’:
+test/../include/future/futurize.hh:68:68: error: ‘make_ready_future’ was not declared in this scope
+   68 |     static inline type from_tuple(const value_type& value){ return make_ready_future<>();}
+      |                                                                    ^~~~~~~~~~~~~~~~~~~
+test/../include/future/futurize.hh: At global scope:
+test/../include/future/futurize.hh:71:49: error: return type ‘using type = class future<>’ {aka ‘class future<>’} is incomplete
+   71 |     static type make_exception_future(Arg&& arg){
+      |                                                 ^
+test/../include/future/futurize.hh: In static member function ‘static void futurize<void>::make_exception_future(Arg&&)’:
+test/../include/future/futurize.hh:72:18: error: ‘::make_exception_future’ has not been declared
+   72 |         return ::make_exception_future<>(std::forward<Arg>(arg));
+      |                  ^~~~~~~~~~~~~~~~~~~~~
+test/../include/future/futurize.hh:72:40: error: expected primary-expression before ‘>’ token
+   72 |         return ::make_exception_future<>(std::forward<Arg>(arg));
+      |                                        ^
+test/../include/future/futurize.hh: In static member function ‘static futurize<future<T ...> >::type futurize<future<T ...> >::make_exception_future(Arg&&)’:
+test/../include/future/futurize.hh:106:18: error: ‘::make_exception_future’ has not been declared
+  106 |         return ::make_exception_future<Args...>(std::forward<Arg>(arg));
+      |                  ^~~~~~~~~~~~~~~~~~~~~
+test/../include/future/futurize.hh:106:44: error: expected primary-expression before ‘...’ token
+  106 |         return ::make_exception_future<Args...>(std::forward<Arg>(arg));
+      |                                            ^~~
+test/../include/future/futurize.hh:106:44: error: expected ‘;’ before ‘...’ token
+  106 |         return ::make_exception_future<Args...>(std::forward<Arg>(arg));
+      |                                            ^~~
+      |                                            ;
+test/../include/future/futurize.hh:106:44: error: expected primary-expression before ‘...’ token
+  106 |         return ::make_exception_future<Args...>(std::forward<Arg>(arg));
+      |                                            ^~~
+test/../include/future/futurize.hh: At global scope:
+test/../include/future/futurize.hh:180:10: error: ‘is_future’ was not declared in this scope; did you mean ‘future’?
+  180 | requires(is_future<std::invoke_result_t<Func, FuncArgs...>>)
+      |          ^~~~~~~~~
+      |          future
+test/../include/future/futurize.hh:180:58: error: expected primary-expression before ‘>’ token
+  180 | requires(is_future<std::invoke_result_t<Func, FuncArgs...>>)
+      |                                                          ^~
+test/../include/future/futurize.hh:180:60: error: expected primary-expression before ‘)’ token
+  180 | requires(is_future<std::invoke_result_t<Func, FuncArgs...>>)
+      |                                                            ^
+test/../include/future/futurize.hh: In function ‘auto do_void_futurize_apply(Func&&, FuncArgs&& ...)’:
+test/../include/future/futurize.hh:186:16: error: there are no arguments to ‘make_exception_future’ that depend on a template parameter, so a declaration of ‘make_exception_future’ must be available [-fpermissive]
+  186 |         return make_exception_future(std::current_exception());
+      |                ^~~~~~~~~~~~~~~~~~~~~
+test/../include/future/futurize.hh:186:16: note: (if you use ‘-fpermissive’, G++ will accept your code, but allowing the use of an undeclared name is deprecated)
+test/../include/future/futurize.hh: At global scope:
+test/../include/future/futurize.hh:193:11: error: ‘is_future_v’ was not declared in this scope
+  193 | requires(!is_future_v<std::invoke_result_t<Func, FuncArgs...>>)
+      |           ^~~~~~~~~~~
+test/../include/future/futurize.hh:193:61: error: expected primary-expression before ‘>’ token
+  193 | requires(!is_future_v<std::invoke_result_t<Func, FuncArgs...>>)
+      |                                                             ^~
+test/../include/future/futurize.hh:193:22: warning: logical not is only applied to the left hand side of comparison [-Wlogical-not-parentheses]
+  193 | requires(!is_future_v<std::invoke_result_t<Func, FuncArgs...>>)
+      |                      ^
+test/../include/future/futurize.hh:193:63: error: expected primary-expression before ‘)’ token
+  193 | requires(!is_future_v<std::invoke_result_t<Func, FuncArgs...>>)
+      |                                                               ^
+test/../include/future/futurize.hh: In function ‘auto do_void_futurize_apply_tuple(Func&&, std::tuple<_UTypes ...>&&)’:
+test/../include/future/futurize.hh:198:16: error: there are no arguments to ‘make_ready_future’ that depend on a template parameter, so a declaration of ‘make_ready_future’ must be available [-fpermissive]
+  198 |         return make_ready_future<>();
+      |                ^~~~~~~~~~~~~~~~~~~
+test/../include/future/futurize.hh:200:16: error: there are no arguments to ‘make_exception_future’ that depend on a template parameter, so a declaration of ‘make_exception_future’ must be available [-fpermissive]
+  200 |         return make_exception_future(std::current_exception());
+      |                ^~~~~~~~~~~~~~~~~~~~~
+test/../include/future/futurize.hh: At global scope:
+test/../include/future/futurize.hh:205:14: error: ‘is_future_v’ was not declared in this scope
+  205 |     requires is_future_v<std::invoke_result_t<Func, FuncArgs...>>
+      |              ^~~~~~~~~~~
+test/../include/future/futurize.hh:205:5: error: expression must be enclosed in parentheses
+  205 |     requires is_future_v<std::invoke_result_t<Func, FuncArgs...>>
+      |     ^~~~~~~~
+test/../include/future/futurize.hh:205:14: error: ‘is_future_v’ does not name a type
+  205 |     requires is_future_v<std::invoke_result_t<Func, FuncArgs...>>
+      |              ^~~~~~~~~~~
+In file included from test/future_promise_test.cc:2:
+test/../include/future/future.hh:21:78: error: ‘auto’ parameter not permitted in this context
+   21 |  template <typename Func, typename Result = futurize_t<std::result_of_t<Func(future)>>>
+      |                                                                              ^~~~~~
+test/../include/future/future.hh:37:11: error: declaration of ‘using future_state = class future_state<T ...>’ changes meaning of ‘future_state’ [-fpermissive]
+   37 |     using future_state = future_state<T...>;
+      |           ^~~~~~~~~~~~
+In file included from test/../include/future/future.hh:2,
+                 from test/future_promise_test.cc:2:
+test/../include/future/future_state.hh:7:8: note: ‘future_state’ declared here as ‘class future_state<T ...>’
+    7 | struct future_state {
+      |        ^~~~~~~~~~~~
+In file included from test/future_promise_test.cc:2:
+test/../include/future/future.hh:183:19: error: expected identifier before ‘requires’
+  183 |     GCC6_CONCEPT( requires seastar::CanApply<Func, T...> )
+      |                   ^~~~~~~~
+test/../include/future/future.hh:183:19: error: expected ‘,’ or ‘...’ before ‘requires’
+test/../include/future/future.hh:184:5: error: expected constructor, destructor, or type conversion before ‘Result’
+  184 |     Result
+      |     ^~~~~~
+test/../include/future/future.hh: In member function ‘void future<T>::wait()’:
+test/../include/future/future.hh:175:15: error: unable to find numeric literal operator ‘operator""s’
+  175 |         sleep(1s);
+      |               ^~
+test/../include/future/future.hh:175:15: note: use ‘-fext-numeric-literals’ to enable more built-in suffixes
+test/../include/future/future.hh: In member function ‘Result future<T>::then_wrapped(Func&&)’:
+test/../include/future/future.hh:222:29: error: there are no arguments to ‘need_preempt’ that depend on a template parameter, so a declaration of ‘need_preempt’ must be available [-fpermissive]
+  222 |         if (available() && !need_preempt()) {
+      |                             ^~~~~~~~~~~~
+test/../include/future/future.hh: In lambda function:
+test/../include/future/future.hh:296:17: error: there are no arguments to ‘engine_exit’ that depend on a template parameter, so a declaration of ‘engine_exit’ must be available [-fpermissive]
+  296 |                 engine_exit(std::current_exception());
+      |                 ^~~~~~~~~~~
+test/../include/future/future.hh: In member function ‘future<T> future<T>::handle_exception_type(Func&&)’:
+test/../include/future/future.hh:321:23: error: ‘function_traits’ does not name a type
+  321 |         using trait = function_traits<Func>;
+      |                       ^~~~~~~~~~~~~~~
+test/../include/future/future.hh:322:23: error: ‘trait’ has not been declared
+  322 |         static_assert(trait::arity == 1, "func can take only one parameter");
+      |                       ^~~~~
+test/../include/future/future.hh:323:34: error: ‘trait’ has not been declared
+  323 |         using ex_type = typename trait::template arg<0>::type;
+      |                                  ^~~~~
+test/../include/future/future.hh:323:53: error: expected template-name before ‘<’ token
+  323 |         using ex_type = typename trait::template arg<0>::type;
+      |                                                     ^
+test/../include/future/future.hh:323:53: error: expected identifier before ‘<’ token
+test/../include/future/future.hh:324:35: error: ‘trait’ has not been declared
+  324 |         using func_ret = typename trait::return_type;
+      |                                   ^~~~~
+test/../include/future/future.hh: In lambda function:
+test/../include/future/future.hh:329:21: error: ‘ex_type’ does not name a type
+  329 |             } catch(ex_type& ex) {
+      |                     ^~~~~~~
+test/../include/future/future.hh:330:33: error: ‘func_ret’ was not declared in this scope
+  330 |                 return futurize<func_ret>::apply(func, ex);
+      |                                 ^~~~~~~~
+test/../include/future/future.hh:330:41: error: template argument 1 is invalid
+  330 |                 return futurize<func_ret>::apply(func, ex);
+      |                                         ^
+test/../include/future/future.hh:330:56: error: ‘ex’ was not declared in this scope
+  330 |                 return futurize<func_ret>::apply(func, ex);
+      |                                                        ^~
+In file included from test/../include/future/promise.hh:17,
+                 from test/future_promise_test.cc:3:
+test/../include/future/../task/schedule_.hh: At global scope:
+test/../include/future/../task/schedule_.hh:10:35: error: redefinition of ‘std::deque<std::unique_ptr<task> > _pending_tasks’
+   10 | std::deque<std::unique_ptr<task>> _pending_tasks;
+      |                                   ^~~~~~~~~~~~~~
+In file included from test/../include/future/promise.hh:17,
+                 from test/../include/future/futurize.hh:2,
+                 from test/../include/future/future.hh:3,
+                 from test/future_promise_test.cc:2:
+test/../include/future/../task/schedule_.hh:10:35: note: ‘std::deque<std::unique_ptr<task> > _pending_tasks’ previously declared here
+   10 | std::deque<std::unique_ptr<task>> _pending_tasks;
+      |                                   ^~~~~~~~~~~~~~
+In file included from test/../include/future/promise.hh:17,
+                 from test/future_promise_test.cc:3:
+test/../include/future/../task/schedule_.hh:12:6: error: redefinition of ‘void add_task(std::unique_ptr<task>&&)’
+   12 | void add_task(std::unique_ptr<task>&& t) { _pending_tasks.push_back(std::move(t)); }
+      |      ^~~~~~~~
+In file included from test/../include/future/promise.hh:17,
+                 from test/../include/future/futurize.hh:2,
+                 from test/../include/future/future.hh:3,
+                 from test/future_promise_test.cc:2:
+test/../include/future/../task/schedule_.hh:12:6: note: ‘void add_task(std::unique_ptr<task>&&)’ previously defined here
+   12 | void add_task(std::unique_ptr<task>&& t) { _pending_tasks.push_back(std::move(t)); }
+      |      ^~~~~~~~
+In file included from test/../include/future/promise.hh:17,
+                 from test/future_promise_test.cc:3:
+test/../include/future/../task/schedule_.hh:13:6: error: redefinition of ‘void add_urgent_task(std::unique_ptr<task>&&)’
+   13 | void add_urgent_task(std::unique_ptr<task>&& t) { _pending_tasks.push_front(std::move(t)); }
+      |      ^~~~~~~~~~~~~~~
+In file included from test/../include/future/promise.hh:17,
+                 from test/../include/future/futurize.hh:2,
+                 from test/../include/future/future.hh:3,
+                 from test/future_promise_test.cc:2:
+test/../include/future/../task/schedule_.hh:13:6: note: ‘void add_urgent_task(std::unique_ptr<task>&&)’ previously defined here
+   13 | void add_urgent_task(std::unique_ptr<task>&& t) { _pending_tasks.push_front(std::move(t)); }
+      |      ^~~~~~~~~~~~~~~
+In file included from test/../include/future/promise.hh:17,
+                 from test/future_promise_test.cc:3:
+test/../include/future/../task/schedule_.hh:15:6: error: redefinition of ‘void schedule(std::unique_ptr<task>)’
+   15 | void schedule(std::unique_ptr<task> t) {
+      |      ^~~~~~~~
+In file included from test/../include/future/promise.hh:17,
+                 from test/../include/future/futurize.hh:2,
+                 from test/../include/future/future.hh:3,
+                 from test/future_promise_test.cc:2:
+test/../include/future/../task/schedule_.hh:15:6: note: ‘void schedule(std::unique_ptr<task>)’ previously defined here
+   15 | void schedule(std::unique_ptr<task> t) {
+      |      ^~~~~~~~
+In file included from test/../include/future/promise.hh:17,
+                 from test/future_promise_test.cc:3:
+test/../include/future/../task/schedule_.hh:19:6: error: redefinition of ‘void schedule_urgent(std::unique_ptr<task>)’
+   19 | void schedule_urgent(std::unique_ptr<task> t) {
+      |      ^~~~~~~~~~~~~~~
+In file included from test/../include/future/promise.hh:17,
+                 from test/../include/future/futurize.hh:2,
+                 from test/../include/future/future.hh:3,
+                 from test/future_promise_test.cc:2:
+test/../include/future/../task/schedule_.hh:19:6: note: ‘void schedule_urgent(std::unique_ptr<task>)’ previously defined here
+   19 | void schedule_urgent(std::unique_ptr<task> t) {
+      |      ^~~~~~~~~~~~~~~
+In file included from test/future_promise_test.cc:3:
+test/../include/future/promise.hh:27:7: error: redefinition of ‘class promise<T>’
+   27 | class promise {
+      |       ^~~~~~~
+In file included from test/../include/future/futurize.hh:2,
+                 from test/../include/future/future.hh:3,
+                 from test/future_promise_test.cc:2:
+test/../include/future/promise.hh:27:7: note: previous definition of ‘class promise<T>’
+   27 | class promise {
+      |       ^~~~~~~
+In file included from test/future_promise_test.cc:3:
+test/../include/future/promise.hh:164:7: error: redefinition of ‘class promise<void>’
+  164 | class promise<void> : public promise<>{};
+      |       ^~~~~~~~~~~~~
+In file included from test/../include/future/futurize.hh:2,
+                 from test/../include/future/future.hh:3,
+                 from test/future_promise_test.cc:2:
+test/../include/future/promise.hh:164:7: note: previous definition of ‘class promise<void>’
+  164 | class promise<void> : public promise<>{};
+      |       ^~~~~~~~~~~~~
+In file included from test/future_promise_test.cc:3:
+test/../include/future/promise.hh:166:6: error: redefinition of ‘void report_failed_future(std::__exception_ptr::exception_ptr)’
+  166 | void report_failed_future(std::exception_ptr eptr) {
+      |      ^~~~~~~~~~~~~~~~~~~~
+In file included from test/../include/future/futurize.hh:2,
+                 from test/../include/future/future.hh:3,
+                 from test/future_promise_test.cc:2:
+test/../include/future/promise.hh:166:6: note: ‘void report_failed_future(std::__exception_ptr::exception_ptr)’ previously defined here
+  166 | void report_failed_future(std::exception_ptr eptr) {
+      |      ^~~~~~~~~~~~~~~~~~~~
+In file included from test/future_promise_test.cc:3:
+test/../include/future/promise.hh:176:13: error: redefinition of ‘void promise<T>::make_ready()’
+  176 | inline void promise<T...>::make_ready() noexcept {
+      |             ^~~~~~~~~~~~~
+In file included from test/../include/future/futurize.hh:2,
+                 from test/../include/future/future.hh:3,
+                 from test/future_promise_test.cc:2:
+test/../include/future/promise.hh:176:13: note: ‘void promise<T>::make_ready()’ previously declared here
+  176 | inline void promise<T...>::make_ready() noexcept {
+      |             ^~~~~~~~~~~~~
+In file included from test/future_promise_test.cc:3:
+test/../include/future/promise.hh:188:13: error: redefinition of ‘void promise<T>::migrated()’
+  188 | inline void promise<T...>::migrated() noexcept {
+      |             ^~~~~~~~~~~~~
+In file included from test/../include/future/futurize.hh:2,
+                 from test/../include/future/future.hh:3,
+                 from test/future_promise_test.cc:2:
+test/../include/future/promise.hh:142:10: note: ‘void promise<T>::migrated()’ previously declared here
+  142 |     void migrated() noexcept{
+      |          ^~~~~~~~
+In file included from /usr/include/c++/10/ranges:46,
+                 from /usr/include/c++/10/bits/ranges_algobase.h:38,
+                 from /usr/include/c++/10/bits/ranges_uninitialized.h:36,
+                 from /usr/include/c++/10/memory:69,
+                 from /home/lifd/googletest/googletest/include/gtest/gtest.h:55,
+                 from test/future_promise_test.cc:1:
+/usr/include/c++/10/tuple: In instantiation of ‘struct std::_Head_base<0, void, false>’:
+/usr/include/c++/10/tuple:341:12:   required from ‘struct std::_Tuple_impl<0, void>’
+/usr/include/c++/10/tuple:520:11:   required from ‘class std::tuple<void>’
+test/../include/future/future_state.hh:18:26:   required from ‘union future_state<void>::any’
+test/../include/future/future_state.hh:20:7:   required from ‘struct future_state<void>’
+test/../include/future/future.hh:39:18:   required from ‘class future<void>’
+test/future_promise_test.cc:61:18:   required from here
+/usr/include/c++/10/tuple:129:17: error: forming reference to void
+  129 |       constexpr _Head_base(const _Head& __h)
+      |                 ^~~~~~~~~~
+/usr/include/c++/10/tuple:166:7: error: forming reference to void
+  166 |       _M_head(_Head_base& __b) noexcept { return __b._M_head_impl; }
+      |       ^~~~~~~
+/usr/include/c++/10/tuple:169:7: error: forming reference to void
+  169 |       _M_head(const _Head_base& __b) noexcept { return __b._M_head_impl; }
+      |       ^~~~~~~
+/usr/include/c++/10/tuple:171:13: error: ‘std::_Head_base<_Idx, _Head, false>::_M_head_impl’ has incomplete type
+  171 |       _Head _M_head_impl;
+      |             ^~~~~~~~~~~~
+/usr/include/c++/10/tuple:171:13: error: invalid use of ‘void’
+/usr/include/c++/10/tuple: In instantiation of ‘struct std::_Tuple_impl<0, void>’:
+/usr/include/c++/10/tuple:520:11:   required from ‘class std::tuple<void>’
+test/../include/future/future_state.hh:18:26:   required from ‘union future_state<void>::any’
+test/../include/future/future_state.hh:20:7:   required from ‘struct future_state<void>’
+test/../include/future/future.hh:39:18:   required from ‘class future<void>’
+test/future_promise_test.cc:61:18:   required from here
+/usr/include/c++/10/tuple:349:7: error: forming reference to void
+  349 |       _M_head(_Tuple_impl& __t) noexcept { return _Base::_M_head(__t); }
+      |       ^~~~~~~
+/usr/include/c++/10/tuple:352:7: error: forming reference to void
+  352 |       _M_head(const _Tuple_impl& __t) noexcept { return _Base::_M_head(__t); }
+      |       ^~~~~~~
+/usr/include/c++/10/tuple:358:17: error: forming reference to void
+  358 |       constexpr _Tuple_impl(const _Head& __head)
+      |                 ^~~~~~~~~~~
+/usr/include/c++/10/tuple:392:2: error: forming reference to void
+  392 |  _Tuple_impl(allocator_arg_t __tag, const _Alloc& __a,
+      |  ^~~~~~~~~~~
+/usr/include/c++/10/tuple: In instantiation of ‘class std::tuple<void>’:
+test/../include/future/future_state.hh:18:26:   required from ‘union future_state<void>::any’
+test/../include/future/future_state.hh:20:7:   required from ‘struct future_state<void>’
+test/../include/future/future.hh:39:18:   required from ‘class future<void>’
+test/future_promise_test.cc:61:18:   required from here
+/usr/include/c++/10/tuple:542:65: error: forming reference to void
+  542 |    _TCC<_Cond>::template __is_implicitly_constructible<_Args...>(),
+      |    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~
+/usr/include/c++/10/tuple:548:65: error: forming reference to void
+  548 |    _TCC<_Cond>::template __is_explicitly_constructible<_Args...>(),
+      |    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~
+/usr/include/c++/10/tuple:542:65: error: forming reference to void
+  542 |    _TCC<_Cond>::template __is_implicitly_constructible<_Args...>(),
+      |    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~
+/usr/include/c++/10/tuple:548:65: error: forming reference to void
+  548 |    _TCC<_Cond>::template __is_explicitly_constructible<_Args...>(),
+      |    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~
+/usr/include/c++/10/tuple:809:71: error: forming reference to void
+  809 |       operator=(typename conditional<__assignable<const _Elements&...>(),
+      |                                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~
+/usr/include/c++/10/tuple:809:71: error: no matching function for call to ‘std::tuple<void>::<expression error>()’
+/usr/include/c++/10/tuple:554:2: note: candidate: ‘template<class ... _UElements> static constexpr std::__enable_if_t<(sizeof... (_UElements) == sizeof... (_Elements)), bool> std::tuple<_Elements>::__assignable() [with _UElements = {_UElements ...}; _Elements = {void}]’
+  554 |  __assignable()
+      |  ^~~~~~~~~~~~
+/usr/include/c++/10/tuple:554:2: note:   template argument deduction/substitution failed:
+/usr/include/c++/10/tuple: In instantiation of ‘static constexpr std::__enable_if_t<(sizeof... (_UElements) == sizeof... (_Elements)), bool> std::tuple<_Elements>::__assignable() [with _UElements = {void}; _Elements = {void}; std::__enable_if_t<(sizeof... (_UElements) == sizeof... (_Elements)), bool> = bool]’:
+/usr/include/c++/10/tuple:820:64:   required from ‘class std::tuple<void>’
+test/../include/future/future_state.hh:18:26:   required from ‘union future_state<void>::any’
+test/../include/future/future_state.hh:20:7:   required from ‘struct future_state<void>’
+test/../include/future/future.hh:39:18:   required from ‘class future<void>’
+test/future_promise_test.cc:61:18:   required from here
+/usr/include/c++/10/tuple:555:61: error: forming reference to void
+  555 |  { return __and_<is_assignable<_Elements&, _UElements>...>::value; }
+      |                                                             ^~~~~
+/usr/include/c++/10/tuple: In instantiation of ‘class std::tuple<void>’:
+test/../include/future/future_state.hh:18:26:   required from ‘union future_state<void>::any’
+test/../include/future/future_state.hh:20:7:   required from ‘struct future_state<void>’
+test/../include/future/future.hh:39:18:   required from ‘class future<void>’
+test/future_promise_test.cc:61:18:   required from here
+/usr/include/c++/10/tuple:820:64:   in ‘constexpr’ expansion of ‘std::tuple<void>::__assignable<void>()’
+/usr/include/c++/10/tuple:820:7: error: ‘constexpr’ call flows off the end of the function
+  820 |       operator=(typename conditional<__assignable<_Elements...>(),
+      |       ^~~~~~~~
+/usr/include/c++/10/tuple:820:64: note: in template argument for type ‘bool’
+  820 |       operator=(typename conditional<__assignable<_Elements...>(),
+      |                                      ~~~~~~~~~~~~~~~~~~~~~~~~~~^~
+test/future_promise_test.cc: In member function ‘virtual void FuturePromiseTest_VoidTest_Test::TestBody()’:
+test/future_promise_test.cc:61:34: error: conversion from ‘future<>’ to non-scalar type ‘future<void>’ requested
+   61 |     future<void> f = p.get_future();
+      |                      ~~~~~~~~~~~~^~
+test/future_promise_test.cc: In member function ‘virtual void FuturePromiseTest_ThenChainingTest_Test::TestBody()’:
+test/future_promise_test.cc:115:17: error: ‘class future<int>’ has no member named ‘then’
+  115 |     auto f2 = f.then([](std::tuple<int> val) {
+      |                 ^~~~
+In file included from test/future_promise_test.cc:2:
+test/../include/future/future.hh: In instantiation of ‘future<T>::future_state* future<T>::state() [with T = {void}; future<T>::future_state = future_state<void>]’:
+test/../include/future/future.hh:94:34:   required from ‘future<T>::~future() [with T = {void}]’
+test/future_promise_test.cc:61:35:   required from here
+test/../include/future/future.hh:100:25: error: conditional expression between distinct pointer types ‘future_state<>*’ and ‘future<void>::future_state*’ {aka ‘future_state<void>*’} lacks a cast
+  100 |         return _promise ? _promise->_state : &_local_state;
+      |                ~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+test/../include/future/future.hh: In instantiation of ‘Result future<T>::then_wrapped(Func&&) [with Func = future<T>::handle_exception<FuturePromiseTest_HandleExceptionTest_Test::TestBody()::<lambda(std::__exception_ptr::exception_ptr)> >::<lambda(auto:46&&)>; Result = future<int>; T = {int}]’:
+test/../include/future/future.hh:309:28:   required from ‘future<T> future<T>::handle_exception(Func&&) [with Func = FuturePromiseTest_HandleExceptionTest_Test::TestBody()::<lambda(std::__exception_ptr::exception_ptr)>; T = {int}]’
+test/future_promise_test.cc:136:6:   required from here
+test/../include/future/future.hh:222:41: error: ‘need_preempt’ was not declared in this scope
+  222 |         if (available() && !need_preempt()) {
+      |                             ~~~~~~~~~~~~^~
+test/../include/future/future.hh:229:86: error: ‘using type = class future<int>’ {aka ‘class future<int>’} has no member named ‘forward_to’
+  229 |                 futurator::apply(std::forward<Func>(func), future(std::move(state))).forward_to(std::move(pr));
+      |                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~
+make: *** [test/future_promise_test.o] Error 1

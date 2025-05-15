@@ -1,0 +1,2 @@
+timestamp,num_clients,total_packets_sent,total_errors,success_rate,throughput_mbps,duration_seconds
+2025-05-15T20:49:22.698637,10,3,0,0.00%,0.00,-1747313362.70
