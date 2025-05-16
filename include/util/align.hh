@@ -37,6 +37,14 @@ T* align_up(T* v, size_t align) {
     return reinterpret_cast<T*>(align_up(reinterpret_cast<uintptr_t>(v), align));
 }
 
+
+template <typename T>
+inline constexpr
+T align_down(T v, int align) {
+    return v & ~(align - 1);
+}
+// z
+
 template <typename T>
 inline constexpr
 T align_down(T v, T align) {

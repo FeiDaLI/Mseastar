@@ -52,8 +52,6 @@ void validate(boost::any& v,
     }
 }
 
-
-
 // Utility function to read from proc filesystem
 std::string read_file_content(const std::string& path) {
     std::ifstream file(path);
@@ -315,5 +313,5 @@ resources allocate(configuration c) {
 unsigned nr_processing_units() {
     return ::sysconf(_SC_NPROCESSORS_ONLN);
 }
-
 } // namespace resource
+
