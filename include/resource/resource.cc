@@ -313,5 +313,5 @@ resources allocate(configuration c) {
 unsigned nr_processing_units() {
     return ::sysconf(_SC_NPROCESSORS_ONLN);
 }
-
 } // namespace resource
+

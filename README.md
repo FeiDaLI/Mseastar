@@ -2,6 +2,16 @@
 
 本项目用于学习 Seastar框架。
 
+
+
+
+## 简化
+去掉sstring;
+
+去掉hwloc，使用/proc代替.
+
+
+
 ## 环境配置
 
 ### 系统依赖安装
@@ -9,7 +19,6 @@
 # 安装必要系统依赖
 sudo apt update
 sudo apt install -y libboost-all-dev libsctp-dev lksctp-tools libaio-dev libunwind-dev
-# hwloc 安装请参考: https://www.open-mpi.org/software/hwloc/v1.11/
 
 
 ### 编译项目
