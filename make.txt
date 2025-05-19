@@ -1,1317 +1,562 @@
-network_stack_registrator:posixmake_default1
-Entering app_template::run_deprecated
-Parsing command line options
-parse end
-Notifying configuration changes
-Configuring SMP
-Configuring SMP 2
-设置thread affinity
-thread affinity end
-分配CPU_SET
-ca::Available memory: 67271786496
-ca::Default reserve memory: 4709025280
-ca::Reserve memory: 4709025280
-ca::Minimum memory: 500000000
-ca::Adjusted available memory after reserve: 62562761216
-Requested memory: 62562761216
-Available memory: 67271786496
-Requested memory: 62562761216
-Available processing units: 12
-Requested processing units: 12
-Memory per processing unit: 5213519872
-Memory depth: 0
-CPU ID: 0, Remaining memory: 0
-CPU ID: 6, Remaining memory: 0
-CPU ID: 1, Remaining memory: 0
-CPU ID: 7, Remaining memory: 0
-CPU ID: 2, Remaining memory: 0
-CPU ID: 8, Remaining memory: 0
-CPU ID: 3, Remaining memory: 0
-CPU ID: 9, Remaining memory: 0
-CPU ID: 4, Remaining memory: 0
-CPU ID: 10, Remaining memory: 0
-CPU ID: 5, Remaining memory: 0
-CPU ID: 11, Remaining memory: 0
-Final remaining memory: 0
-Final remaining memory: 0
-Final remaining memory: 0
-Final remaining memory: 0
-Final remaining memory: 0
-Final remaining memory: 0
-Final remaining memory: 0
-Final remaining memory: 0
-Final remaining memory: 0
-Final remaining memory: 0
-Final remaining memory: 0
-Final remaining memory: 0
-coordinator0 128
-coordinator1 128
-coordinator2 128
-coordinator3 128
-coordinator4 128
-coordinator5 128
-coordinator6 128
-coordinator7 128
-coordinator8 128
-coordinator9 128
-coordinator10 128
-coordinator11 128
-shard_to_coordinator0
-shard_to_coordinator1
-shard_to_coordinator2
-shard_to_coordinator3
-shard_to_coordinator4
-shard_to_coordinator5
-shard_to_coordinator6
-shard_to_coordinator7
-shard_to_coordinator8
-shard_to_coordinator9
-shard_to_coordinator10
-shard_to_coordinator11
-res.cpus.size():12
-cpu.cpu_id:0
-mem.size:5213519872mem.node_id0
-cpu.cpu_id:6
-mem.size:5213519872mem.node_id0
-cpu.cpu_id:1
-mem.size:5213519872mem.node_id0
-cpu.cpu_id:7
-mem.size:5213519872mem.node_id0
-cpu.cpu_id:2
-mem.size:5213519872mem.node_id0
-cpu.cpu_id:8
-mem.size:5213519872mem.node_id0
-cpu.cpu_id:3
-mem.size:5213519872mem.node_id0
-cpu.cpu_id:9
-mem.size:5213519872mem.node_id0
-cpu.cpu_id:4
-mem.size:5213519872mem.node_id0
-cpu.cpu_id:10
-mem.size:5213519872mem.node_id0
-cpu.cpu_id:5
-mem.size:5213519872mem.node_id0
-cpu.cpu_id:11
-mem.size:5213519872mem.node_id0
-thread pind to 0
-mem config begin 
-=== 开始配置内存 ===
-计算总内存:
-  内存块[0] 大小: 5213519872 字节 NUMA节点: 0
-总内存量: 5213519872 字节
-使用默认匿名内存分配
-调整内存池大小至: 5213519872 字节
-第一次执行初始化
-调用初始化cpu_pages
-调用resize
-调用resize
-调用resize
-调用resize
-调整内存池end
-已分配内存块 [0 -> 5213519872) 大小: 5213519872 字节
-=== 内存配置完成 ===
-mem config end 
-开始执行smp::allocate_reactor
-handle signal
-调用signal_handler
-engine().signals1024
-smp::allocate_reactor结束
-create thread 5
-create thread 4
-create thread 6
-create thread 3
-create thread 7
-create thread 8
-create thread 2
-create thread 9
-=== 开始配置内存 ===
-计算总内存:
-  内存块[0] 大小: 5213519872 字节 NUMA节点: 0
-总内存量: 5213519872 字节
-使用默认匿名内存分配
-=== 开始配置内存 ====== 开始配置内存 ===调整内存池大小至: 5213519872 字节
-=== 开始配置内存 ===
-计算总内存:
-  内存块[0] 大小: 5213519872 字节 NUMA节点: 0
-总内存量: 5213519872 字节
-使用默认匿名内存分配
-调整内存池大小至: 5213519872 字节
-第一次执行初始化
-调用初始化cpu_pages
-create thread 11
-create thread 1
-create thread 10
-
-计算总内存:
-  内存块[0] 大小: 5213519872 字节 NUMA节点: 0
-总内存量: 5213519872 字节
-使用默认匿名内存分配
-调整内存池大小至: 5213519872 字节
-第一次执行初始化
-调用初始化cpu_pages
-=== 开始配置内存 ===
-计算总内存:
-  内存块[0] 大小: 5213519872 字节 NUMA节点: 0
-总内存量: 5213519872 字节
-使用默认匿名内存分配
-调整内存池大小至: 5213519872 字节
-=== 开始配置内存 ===
-第一次执行初始化计算总内存:
-
-  内存块[0] 大小: 5213519872 字节=== 开始配置内存 ===计算总内存:
- NUMA节点: 0=== 开始配置内存 ===  内存块[
-0] 大小: 5213519872 字节总内存量: 5213519872 字节
-
- NUMA节点: 0
-使用默认匿名内存分配
-
-调整内存池大小至: 5213519872 字节
-
-总内存量: 5213519872 字节计算总内存:
-  内存块[0] 大小: 5213519872 字节 NUMA节点: 0
-总内存量: 5213519872 字节
-使用默认匿名内存分配
-调整内存池大小至: 5213519872 字节
-第一次执行初始化
-调用初始化cpu_pages
-调用初始化cpu_pages
-
-使用默认匿名内存分配
-调整内存池大小至: 5213519872 字节
-第一次执行初始化
-调用初始化cpu_pages
-第一次执行初始化
-调用初始化cpu_pages
-第一次执行初始化
-调用初始化cpu_pages
-计算总内存:
-  内存块[0] 大小: 5213519872 字节 NUMA节点: 0
-总内存量: 5213519872 字节
-使用默认匿名内存分配
-调整内存池大小至: 5213519872 字节
-第一次执行初始化
-调用初始化cpu_pages
-调用resize
-调用resize
-=== 开始配置内存 ===
-计算总内存:
-  内存块[0] 大小: 5213519872 字节 NUMA节点: 0
-总内存量: 5213519872 字节
-使用默认匿名内存分配
-调整内存池大小至: 5213519872 字节
-第一次执行初始化
-调用初始化cpu_pages
-=== 开始配置内存 ===
-计算总内存:
-  内存块[0] 大小: 5213519872 字节 NUMA节点: 0
-总内存量: 5213519872 字节
-使用默认匿名内存分配
-调整内存池大小至: 5213519872 字节
-第一次执行初始化
-调用初始化cpu_pages
-调用resize
-调用resize
-调用resize
-调用resize
-调用resize
-调用resize
-调用resize
-调用resize
-调用resize
-调用resize
-=== 开始配置内存 ===
-计算总内存:
-  内存块[0] 大小: 5213519872 字节 NUMA节点: 0
-总内存量: 5213519872 字节
-使用默认匿名内存分配
-调整内存池大小至: 5213519872 字节
-第一次执行初始化
-调用初始化cpu_pages
-调用resize
-调用resize
-调用resize
-调用resize
-调用resize
-调用resize
-调用resize
-调用resize
-调用resize
-调用resize
-调用resize
-调用resize
-调用resize
-调用resize
-调用resize
-调用resize
-调用resize
-调用resize
-调用resize
-调用resize
-调用resize
-调用resize
-调用resize
-调用resize
-调用resize
-调用resize
-调用resize
-调用resize
-调用resize
-调用resize
-调用resize
-调用resize
-调整内存池end
-已分配内存块 [0 -> 5213519872) 大小: 5213519872 字节
-=== 内存配置完成 ===
-开始执行smp::allocate_reactor
-调整内存池end
-已分配内存块 [0 -> 5213519872) 大小: 5213519872 字节
-=== 内存配置完成 ===
-开始执行smp::allocate_reactor
-handle signal
-调用signal_handler
-engine().signals1024
-smp::allocate_reactor结束
-handle signal
-调用signal_handler
-engine().signals1024
-smp::allocate_reactor结束
-调整内存池end
-已分配内存块 [0 -> 5213519872) 大小: 5213519872 字节
-=== 内存配置完成 ===
-开始执行smp::allocate_reactor
-调整内存池end
-已分配内存块 [0 -> 5213519872) 大小: 5213519872 字节
-=== 内存配置完成 ===
-开始执行smp::allocate_reactor
-调整内存池end
-已分配内存块 [0 -> 5213519872) 大小: 5213519872 字节
-=== 内存配置完成 ===
-开始执行smp::allocate_reactor
-调整内存池end
-已分配内存块 [0 -> 5213519872) 大小: 5213519872 字节
-=== 内存配置完成 ===
-开始执行smp::allocate_reactor
-调整内存池end
-已分配内存块 [0 -> 5213519872) 大小: 5213519872 字节
-=== 内存配置完成 ===
-开始执行smp::allocate_reactor
-handle signal
-调用signal_handler
-engine().signals1024
-smp::allocate_reactor结束
-handle signal
-调用signal_handler
-engine().signals1024
-handle signal
-调用signal_handler
-engine().signals1024
-调整内存池end
-已分配内存块 [0 -> 5213519872) 大小: 5213519872 字节
-=== 内存配置完成 ===
-开始执行smp::allocate_reactor
-smp::allocate_reactor结束
-handle signal
-调用signal_handler
-engine().signals1024
-smp::allocate_reactor结束
-handle signal
-调用signal_handler
-engine().signals1024
-smp::allocate_reactor结束
-smp::allocate_reactor结束
-handle signal
-调用signal_handler
-engine().signals1024
-smp::allocate_reactor结束
-调整内存池end
-已分配内存块 [0 -> 5213519872) 大小: 5213519872 字节
-=== 内存配置完成 ===
-开始执行smp::allocate_reactor
-调整内存池end
-已分配内存块 [0 -> 5213519872) 大小: 5213519872 字节
-=== 内存配置完成 ===
-开始执行smp::allocate_reactor
-调整内存池end
-已分配内存块 [0 -> 5213519872) 大小: 5213519872 字节
-=== 内存配置完成 ===
-开始执行smp::allocate_reactor
-handle signal
-调用signal_handler
-engine().signals1024
-handle signal
-调用signal_handler
-engine().signals1024
-smp::allocate_reactor结束
-smp::allocate_reactor结束
-handle signal
-调用signal_handler
-engine().signals1024
-smp::allocate_reactor结束
-reactors registered done
-smp qs begin
-smp qs end
-start all queues
-start all queues done
-assign io queues done
-reactor::configurereactor::configure
-
-inited done
-reactor::configure
-reactor::configurereactor::configure
-reactor::configurereactor::configureschedule state available.
-
-continuation name:unnamed
-reactor::configurereactor::configure
-
-schedule state available.reactor::configure
-schedule state available.
-continuation name:unnamed
-
-reactor::configure完成
-reactor::configure
-
-reactor::configureschedule state available.continuation name:unnamed
-schedule state available.reactor::configure完成
-
-
-reactor::configure  _handle_sigint:reactor::configure
-1schedule state available.
-
-reactor::configure  _task_quota:
-continuation name:unnamed
-
-reactor::configure完成
-reactor::configure
-reactor::configure  _handle_sigint:reactor::configure  _handle_sigint:1schedule state available.
-reactor::configurecontinuation name:unnamed
-reactor::configure完成reactor::configure完成
-reactor::configure
-
-reactor::configure  _handle_sigint:1
-reactor::configure  _task_quota:
-reactor::configure  blocked_time:
-reactor::configure  _tasks_processed_report_threshold:
-reactor::configure  _max_task_backlog:
-reactor::configure  _max_poll_time:
-reactor::configure  _strict_dma
-
-reactor::configure  _task_quota:schedule state available.
-
-没有设置aio_eventfd
-handle signal
-调用signal_handler
-continuation name:unnamed
-schedule state available.reactor::configure完成
-reactor::configure
-
-reactor::configure  _handle_sigint:1
-reactor::configure  blocked_time:reactor::configure  blocked_time:
-engine().signalsreactor::configure  _tasks_processed_report_threshold:
-continuation name:reactor::configure  _max_task_backlog:
-reactor::configure  _max_poll_time:
-reactor::configure  _strict_dma
-reactor::configure  _task_quota:
-
-reactor::configure  blocked_time:
-reactor::configure  _tasks_processed_report_threshold:
-unnamedreactor::configure  _max_task_backlog:
-reactor::configure  _max_poll_time:
-reactor::configure  _strict_dma
-reactor::configure  _tasks_processed_report_threshold:
-schedule state available.
-
-continuation name:unnamed
-
-reactor::configure完成
-没有设置aio_eventfd没有设置aio_eventfdreactor::configure
-17408reactor::configure  _max_task_backlog:1
-reactor::configure  _max_poll_time:
-reactor::configure  _strict_dma
-reactor::configure
-
-reactor::configure  _handle_sigint:1handle signal
-调用signal_handler
-
-reactor::configure完成
-reactor::configure
-continuation name:reactor::configure  _handle_sigint:1
-
-reactor::configure  _task_quota:
-没有设置aio_eventfdreactor::configure  blocked_time:
-engine().signalsreactor::configure  _tasks_processed_report_threshold:
-
-reactor::configure  _max_task_backlog:
-reactor::configure  _max_poll_time:
-
-reactor::configure  _strict_dma
-reactor::configure  _handle_sigint:1
-reactor::configure  _task_quota:
-schedule state available.reactor::configure  _task_quota:
-
-reactor::configure  blocked_time:
-reactor::configure  _tasks_processed_report_threshold:
-reactor::configure  _max_task_backlog:
-reactor::configure  _max_poll_time:
-17408reactor::configure  _strict_dma
-reactor::configure  blocked_time:
-reactor::configure  _tasks_processed_report_threshold:
-reactor::configure  _max_task_backlog:没有设置aio_eventfd
-
-handle signal
-调用signal_handler
-reactor::configure  _task_quota:engine().signals
-schedule state available.reactor::configure  blocked_time:
-reactor::configure  _tasks_processed_report_threshold:
-reactor::configure  _max_task_backlog:
-reactor::configure  _max_poll_time:
-reactor::configure  _strict_dma
-
-handle signal
-
-调用signal_handler
-engine().signals17408
-没有设置aio_eventfd
-handle signal
-调用signal_handler
-没有设置aio_eventfdengine().signals17408
-17408schedule state unavailable.handle signal
-调用signal_handler
-engine().signals17408
-handle signal
-schedule state unavailable.
-调用signal_handler
-continuation name:unnamed
-schedule state unavailable.
-
-continuation name:reactor::configure  _max_poll_time:
-
-reactor::configure  _strict_dma
-
-
-unnamedcontinuation name:unnamed
-没有设置aio_eventfd
-handle signal
-schedule state unavailable.调用signal_handler
-engine().signals17408
-engine().signals17408
-schedule state unavailable.
-schedule state unavailable.
-schedule state unavailable.continuation name:
-continuation name:unnamed
-
-schedule state unavailable.handle signal
-unnamed调用signal_handler
-continuation name:engine().signals17408unnamed
-unnamed
-continuation name:unnamed
-continuation name:schedule state unavailable.
-
-continuation name:unnamed
-continuation name:unnamed
-schedule state unavailable.handle signal
-schedule state unavailable.
-continuation name:unnamed
-continuation name:unnamed
-reactor::configure完成
-reactor::configure
-handle signalreactor::configure  _handle_sigint:1
-
-reactor::configure  _task_quota:
-调用signal_handlerreactor::configure  blocked_time:
-reactor::configure  _tasks_processed_report_threshold:
-
-reactor::configure  _max_task_backlog:
-network_statck_readycontinuation name:unnamed
-
-reactor::configure完成schedule state unavailable.
-continuation name:
-unnamed
-reactor::configure完成
-schedule state unavailable.
-schedule state unavailable.unnamedcontinuation name:unnamed
-
-schedule state unavailable.
-schedule state unavailable.continuation name:unnamed
-reactor::configure
-reactor::configure  _handle_sigint:1
-reactor::configure  _task_quota:
-
-reactor::configure  blocked_time:
-reactor::configure  _tasks_processed_report_threshold:
-reactor::configure  _max_task_backlog:
-reactor::configure  _max_poll_time:
-
-reactor::configure  _strict_dma
-handle signal
-continuation name:调用signal_handler
-engine().signals17408
-reactor::configure完成
-没有设置aio_eventfd
-handle signal
-network_statck_ready
-
-
-continuation name:unnamedreactor network_stack
-reactor network_stack
-handle signal
-调用signal_handler
-
-engine().signals17408
-reactor::configure
-reactor::configure  _handle_sigint:network_statck_ready
-reactor::configure
-reactor::configure  _max_poll_time:reactor network_stackreactor::configure  _handle_sigint:
-
-engine().signals17408
-
-
-continuation name:unnamed
-schedule state available.
-handle signal
-schedule state unavailable.
-1continuation name:unnamed
-调用signal_handler
-schedule state available.
-1
-unnamedreactor::configure  _task_quota:
-reactor::configure  _strict_dma
-
-engine().signals17408
-schedule state unavailable.
-
-continuation name:unnamed
-调用signal_handler
-engine().signals17408
-handle signal
-network_statck_ready
-schedule state unavailable.
-schedule state available.reactor network_stack
-network_statck_ready
-没有设置aio_eventfd
-handle signal
-
-调用signal_handler
-engine().signals17408
-reactor::configure  blocked_time:
-reactor::configure  _tasks_processed_report_threshold:
-reactor::configure  _max_task_backlog:
-reactor::configure  _max_poll_time:schedule state available.
-
-continuation name:unnamedschedule state unavailable.
-
-
-continuation name:reactor network_stackreactor::configure  _strict_dma
-
-engine configure done调用signal_handler
-reactor::configure  _task_quota:
-unnamedreactor::configure  blocked_time:
-reactor::configure  _tasks_processed_report_threshold:
-reactor::configure  _max_task_backlog:
-reactor::configure  _max_poll_time:
-schedule state unavailable.reactor::configure  _strict_dma
-engine().signals17408
-
-schedule state available.
-schedule state unavailable.
-schedule state unavailable.
-continuation name:unnamed
-
-schedule state available.
-没有设置aio_eventfdschedule state unavailable.
-continuation name:unnamed
-schedule state available.
-schedule state unavailable.
-continuation name:unnamed
-schedule state available.
-handle signal
-schedule state unavailable.
-handle signal
-schedule state unavailable.调用signal_handler
-engine().signals17408
-schedule state available.
-network_statck_ready
-schedule state unavailable.
-continuation name:unnamed
-reactor network_stack
-
-continuation name:continuation name:unnamed
-调用signal_handlerschedule state available.
-continuation name:schedule state unavailable.unnamed
-schedule state available.
-
-
-schedule state unavailable.
-continuation name:unnamed
-调用signal_handlercontinuation name:unnamed
-unnamed
-schedule state available.
-schedule state unavailable.
-
-schedule state unavailable.schedule state available.
-
-schedule state unavailable.continuation name:smp configure end
-continuation name:
-unnamed
-
-
-
-handle signal
-调用signal_handler
-network_statck_readyStarting engine
-engine().signalsapp的engine id
-17408continuation name:unnamed
-reactor network_stack
-schedule state available.0
-engine().signals17408
-schedule state available.
-schedule state available.
-
-handle signal
-schedule state unavailable.调用signal_handler
-network_statck_ready
-schedule state available.
-reactor network_stack
-schedule state unavailable.
-continuation name:continuation name:unnamed
-
-schedule state available.
-schedule state unavailable.
-
-continuation name:unnamed
-schedule state unavailable.unnamed
-engine().signalscontinuation name:unnamed
-schedule state available.
-network_statck_ready
-unnamed
-reactor network_stack
-schedule state available.
-17408schedule state unavailable.
-
-continuation name:schedule state unavailable.
-
-schedule state available.
-continuation name:schedule state available.
-unnamed
-schedule state unavailable.
-continuation name:unnamed
-unnamed
-schedule state available.
-schedule state unavailable.
-continuation name:unnamedschedule state available.
-continuation name:schedule state available.unnamed
-engine().signalsschedule state unavailable.17408schedule state unavailable.
-schedule state available.
-schedule state unavailable.
-schedule state unavailable.
-
-continuation name:unnamed
-
-network_statck_ready
-
-continuation name:reactor network_stack
-when_started
-schedule state unavailable.
-schedule state available.schedule state available.continuation name:when started config
-unnamed
-schedule state available.
-schedule state available.
-
-schedule state unavailable.
-continuation name:unnamed
-continuation name:schedule state unavailable.unnamedschedule state unavailable.
-
-schedule state available.
-continuation name:unnamed
-
-schedule state unavailable.
-schedule state unavailable.continuation name:unnamed
-schedule state available.
-schedule state available.
-schedule state unavailable.
-schedule state unavailable.
-
-continuation name:unnamed
-schedule state unavailable.schedule state available.
-schedule state available.
-schedule state unavailable.
-schedule state unavailable.
-continuation name:unnamed
-schedule state unavailable.continuation name:
-schedule state available.
-schedule state available.
-continuation name:schedule state unavailable.
-
-continuation name:continuation name:unnamed
-schedule state unavailable.
-main中的funccontinuation name:unnamed
-continuation name:unnamed
-schedule state available.
-unnamed
-
-schedule state available.continuation name:unnamed
-schedule state unavailable.
-unnamedcontinuation name:unnamed
-schedule state unavailable.
-continuation name:schedule state available.unnamed
-
-
-schedule state unavailable.
-continuation name:
-unnamedcontinuation name:continuation name:
-
-schedule state available.schedule state unavailable.
-unnamedcontinuation name:unnamed
-schedule state available.
-schedule state unavailable.
-schedule state unavailable.
-continuation name:unnamed
-schedule state unavailable.
-schedule state available.Running engine
-
-schedule state available.
-
-没有设置aio_eventfd
-handle signal
-调用signal_handler
-
-engine().signals1028
-continuation name:handle signal
-调用signal_handler
-engine().signals33796
-handle signalhandle signal
-调用signal_handlerschedule state available.
-schedule state unavailable.
-schedule state unavailable.continuation name:unnamed
-
-schedule state available.schedule state available.
-
-schedule state available.schedule state unavailable.
-continuation name:unnamed
-
-
-continuation name:
-调用signal_handler
-engine().signals17408
-
-unnamed
-schedule state available.
-schedule state available.
-schedule state unavailable.
-schedule state unavailable.continuation name:unnamed
-schedule state unavailable.
-schedule state available.continuation name:unnamed
-unnamed
-schedule state unavailable.schedule state available.
-
-network_statck_readycontinuation name:unnamed
-
-schedule state available.
-schedule state unavailable.
-schedule state unavailable.continuation name:unnamed
-schedule state available.
-
-engine().signals50180
-
-reactor network_stack
-
-schedule state unavailable.
-schedule state unavailable.continuation name:unnamed
-schedule state unavailable.
-schedule state available.continuation name:unnamed
-schedule state unavailable.
-continuation name:unnamed
-schedule state unavailable.schedule state available.
-
-continuation name:unnamed
-schedule state unavailable.
-schedule state available.continuation name:unnamed
-schedule state available.
-unnamed
-schedule state unavailable.
-
-continuation name:unnamed
-schedule state available.
-schedule state available.
-schedule state unavailable.
-schedule state unavailable.continuation name:unnamed
-
-
-continuation name:unnamed
-continuation name:unnamed
-schedule state unavailable.
-continuation name:unnamed
-continuation name:unnamed
-schedule state unavailable.
-schedule state available.
-handle signalschedule state unavailable.
-continuation name:unnamed
-
-schedule state available.continuation name:unnamed
-schedule state available.schedule state available.
-schedule state available.
-schedule state available.
-
-
-continuation name:unnamed
-schedule state unavailable.
-schedule state unavailable.
-continuation name:unnamedschedule state unavailable.
-schedule state unavailable.
-continuation name:unnamed
-调用signal_handler
-schedule state available.engine().signals
-schedule state available.
-schedule state unavailable.schedule state unavailable.
-
-continuation name:unnamed
-schedule state unavailable.schedule state available.
-50180schedule state unavailable.
-continuation name:unnamed
-
-
-continuation name:unnamed
-schedule state available.continuation name:unnamed
-schedule state available.
-
-schedule state available.schedule state unavailable.
-schedule state available.continuation name:
-schedule state available.
-
-schedule state available.
-schedule state unavailable.
-continuation name:unnamedunnamed
-schedule state unavailable.
-schedule state unavailable.continuation name:unnamed
-schedule state available.
-schedule state available.
-continuation name:schedule state unavailable.
-continuation name:
-unnamed
-
-schedule state unavailable.continuation name:unnamed
-schedule state available.schedule state available.schedule state unavailable.
-
-schedule state available.unnamedschedule state unavailable.
-
-continuation name:
-unnamed
-schedule state available.
-
-schedule state unavailable.
-continuation name:unnamed
-
-continuation name:unnamed
-schedule state unavailable.
-schedule state available.continuation name:
-
-schedule state unavailable.
-schedule state available.continuation name:
-schedule state unavailable.
-unnamedcontinuation name:unnamed
-schedule state available.
-schedule state available.
-unnamedschedule state unavailable.
-continuation name:schedule state unavailable.continuation name:unnamed
-
-schedule state available.
-network_statck_readyschedule state unavailable.schedule state unavailable.
-
-schedule state available.
-schedule state unavailable.
-continuation name:schedule state unavailable.unnamed
-unnamed
-
-reactor network_stackcontinuation name:unnamed
-
-continuation name:unnamed
-
-
-continuation name:unnamed
-
-schedule state unavailable.
-continuation name:unnamed
-
-schedule state available.
-schedule state available.
-schedule state available.schedule state available.schedule state unavailable.
-schedule state available.
-schedule state unavailable.
-
-continuation name:
-schedule state unavailable.schedule state available.
-schedule state unavailable.
-continuation name:unnamedunnamed
-
-
-schedule state unavailable.continuation name:unnamed
-continuation name:unnamedcontinuation name:continuation name:unnamedschedule state available.unnamed
-
-schedule state available.
-
-schedule state available.
-
-schedule state available.schedule state unavailable.
-
-continuation name:schedule state unavailable.continuation name:unnamed
-schedule state available.
-schedule state unavailable.schedule state available.
-unnamedschedule state unavailable.
-continuation name:
-unnamed
-continuation name:unnamed
-
-schedule state available.
-
-schedule state unavailable.
-continuation name:unnamed
-schedule state unavailable.schedule state unavailable.
-continuation name:schedule state available.unnamed
-
-continuation name:unnamed
-
-schedule state unavailable.
-schedule state unavailable.schedule state available.
-
-schedule state available.schedule state unavailable.
-
-continuation name:unnamed
-continuation name:schedule state available.
-schedule state available.
-schedule state unavailable.
-continuation name:unnamed
-
-continuation name:schedule state unavailable.
-continuation name:continuation name:unnamedunnamed
-unnamed
-
-schedule state available.
-unnamed
-schedule state unavailable.continuation name:unnamed
-
-schedule state available.continuation name:unnamed
-schedule state available.
-schedule state available.
-schedule state unavailable.
-schedule state unavailable.continuation name:unnamed
-
-schedule state available.
-
-continuation name:unnamed
-continuation name:unnamed
-schedule state unavailable.
-continuation name:unnamed
-schedule state available.schedule state available.
-
-schedule state unavailable.
-continuation name:unnamed
-schedule state available.schedule state available.
-
-schedule state unavailable.
-continuation name:unnamed
-schedule state available.
-schedule state unavailable.
-schedule state unavailable.
-continuation name:unnamed
-schedule state available.schedule state available.
-schedule state available.
-
-schedule state unavailable.
-continuation name:unnamed
-schedule state unavailable.
-continuation name:unnamed
-schedule state available.schedule state available.
-continuation name:schedule state unavailable.
-continuation name:
-unnamedschedule state unavailable.
-schedule state unavailable.schedule state available.
-
-continuation name:
-schedule state unavailable.continuation name:unnamed
-unnamedunnamed
-continuation name:
-schedule state available.
-unnamed
-
-schedule state available.
-schedule state available.continuation name:unnamed
-schedule state unavailable.
-schedule state available.continuation name:unnamed
-continuation name:
-unnamed
-
-schedule state available.
-schedule state available.schedule state unavailable.schedule state unavailable.
-continuation name:
-unnamed
-schedule state unavailable.continuation name:unnamed
-
-schedule state available.
-schedule state unavailable.
-schedule state available.continuation name:unnamed
-continuation name:unnamed
-
-schedule state available.
-
-continuation name:unnamed
-schedule state available.
-schedule state unavailable.
-continuation name:unnamedschedule state available.
-
-continuation name:unnamed
-continuation name:unnamed
-schedule state available.
-schedule state unavailable.schedule state unavailable.
-schedule state available.
-schedule state available.schedule state unavailable.
-
-continuation name:continuation name:unnamed
-unnamed
-
-continuation name:unnamed
-continuation name:unnamed
-schedule state available.
-schedule state available.
-schedule state unavailable.
-schedule state unavailable.
-schedule state available.continuation name:unnamed
-schedule state available.
-schedule state available.
-
-continuation name:unnamed
-continuation name:schedule state unavailable.unnamed
-
-schedule state unavailable.continuation name:unnamed
-
-continuation name:unnamedschedule state available.
-schedule state available.
-
-continuation name:unnamed
-schedule state unavailable.
-continuation name:unnamed
-schedule state available.
-continuation name:unnamed
-schedule state available.
-continuation name:Engine started. Configuring metrics and scollectd
-unnamedConfiguration information loaded
-
-schedule state available.
-schedule state unavailable.
-schedule state unavailable.
-schedule state unavailable.
-schedule state unavailable.
-schedule state unavailable.
-schedule state unavailable.
-schedule state unavailable.
-schedule state unavailable.
-schedule state unavailable.
-schedule state unavailable.
-schedule state unavailable.
-schedule state unavailable.
-schedule state unavailable.
-schedule state unavailable.
-continuation name:unnamed
-schedule state unavailable.
-continuation name:unnamed
-Future completed successfully
-schedule state available.schedule state available.
-schedule state available.
-schedule state available.schedule state available.schedule state available.schedule state available.schedule state available.
-schedule state available.
-
-
-schedule state available.schedule state unavailable.
-schedule state unavailable.schedule state unavailable.
-
-continuation name:unnamed
-schedule state unavailable.
-
-continuation name:unnamed
-
-schedule state unavailable.continuation name:unnamed
-
-schedule state unavailable.schedule state unavailable.
-schedule state unavailable.continuation name:
-
-continuation name:unnamed
-schedule state available.
-
-schedule state unavailable.
-schedule state unavailable.continuation name:unnamed
-
-continuation name:unnamed
-continuation name:unnamed
-schedule state unavailable.
-continuation name:unnamed
-unnamed
-continuation name:unnamed
-
-continuation name:unnamed
-run udp server start
-listen_addr: 0  10000
-posix_network_statck
-posix make udp channel  addr:10000
-sa start
-posix udp channel fd socket
-fd setsockpt
-engine reuseport
-bind start
-Bound to: 0.0.0.0:10000
-bind failed: schedule state available.
-schedule state unavailable.
-schedule state unavailable.
-schedule state unavailable.
-schedule state unavailable.
-schedule state unavailable.
-schedule state unavailable.
-schedule state unavailable.
-schedule state unavailable.
-schedule state unavailable.
-schedule state unavailable.
-schedule state unavailable.
-schedule state unavailable.
-Seastar UDP server listening on port 10000 ...
-run udp server startrun udp server start
-listen_addr: 0  run udp server startrun udp server start
-run udp server startlisten_addr: run udp server startrun udp server start
-0listen_addr: 0  10000run udp server start
-
-listen_addr: 0  
-10000
-访问到了posix_network_statck
-posix make udp channel  addr:10000
-run udp server startsa start
-posix udp channel fd socketrun udp server start
-
-fd setsockpt
-10000engine reuseport
-
-bind start
-Bound to: 0.0.0.0
-:listen_addr: 0  
-10000listen_addr: 0  10000
-
-访问到了posix_network_statck
-posix make udp channel  addr:10000
-sa start
-posix udp channel fd socket
-listen_addr: 0  10000
-访问到了posix_network_statck
-posix make udp channel  addr:10000
-run udp server startsa start
-
-posix udp channel fd socket
-  10000
-访问到了posix_network_statck
-posix make udp channel  addr:10000
-sa start
-posix udp channel fd socket
-10000
-
-bind failed: fd setsockptlisten_addr: 0  访问到了posix_network_statck10000
-访问到了posix_network_statck
-posix make udp channel  addr:10000listen_addr: 0  访问到了posix_network_statck10000
-posix make udp channel  addr:10000
-fd setsockptsa start
-
-posix udp channel fd socket
-posix make udp channel  addr:10000
-
-sa start
-posix udp channel fd socket
-
-engine reuseport
-bind start
-Bound to: 
-0.0.0.0:10000
-
-访问到了posix_network_statck
-schedule state available.
-
-fd setsockptengine reuseport
-bind start
-Bound to: fd setsockpt0.0.0.0
-fd setsockptengine reuseport
-listen_addr: bind start
-Bound to: listen_addr: 0.0.0.0:10000
-bind failed: :sa start
-posix udp channel fd socket
-
-
-engine reuseport
-0bind start
-bind failed: 0Bound to: 100000.0.0.0:访问到了posix_network_statck
-posix make udp channel  addr:10000
-  sa start
-posix udp channel fd socket
-  10000
-posix make udp channel  fd setsockpt
-fd setsockptengine reuseport
-bind start
-Bound to: 100000.0.0.0:10000
-bind failed: schedule state available.
-schedule state unavailable.
-continuation name:unnamed
-
-访问到了posix_network_statckbind failed: addr:10000schedule state unavailable.
-
-
-
-10000bind failed: engine reuseport
-bind start
-Bound to: continuation name:0.0.0.0:10000
-schedule state available.
-schedule state unavailable.
-unnamedcontinuation name:unnamed
-
-posix make udp channel  addr:10000
-sa start
-posix udp channel fd socket
-
-访问到了posix_network_statck
-posix make udp channel  addr:10000
-schedule state available.
-
-sa start
-posix udp channel fd socket
-bind failed: engine reuseport
-bind start
-Bound to: fd setsockpt0.0.0.0:10000
-schedule state available.
-schedule state unavailable.
-schedule state unavailable.
-
-continuation name:unnamed
-bind failed: fd setsockpt
-schedule state available.engine reuseport
-bind start
-Bound to: sa start
-posix udp channel fd socket
-schedule state available.
-
-fd setsockpt
-engine reuseportengine reuseport
-schedule state unavailable.
-bind start
-schedule state unavailable.Bound to: 
-
-continuation name:unnamed
-bind start
-Bound to: 0.0.0.00.0.0.0::10000continuation name:unnamed0.0.0.0:continuation name:10000unnamed
-schedule state available.
-
-10000bind failed: schedule state unavailable.
-
-continuation name:unnamed
-
-
-bind failed: bind failed: schedule state available.
-schedule state unavailable.
-continuation name:unnamed
-schedule state available.
-schedule state unavailable.
-continuation name:unnamed
-schedule state available.
-schedule state unavailable.
-continuation name:unnamed
-promise abandoned
-fail future####
+g++ -w -Wall -std=c++20 -g -Iinclude -pthread -MMD -c test/http_test/http_test.cc -o build/test/http_test/http_test.o
+In file included from request_parser.rl:27,
+                 from test/http_test/../../include/HTTP/httpd.hh:25,
+                 from test/http_test/http_test.cc:1:
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh: In member function ‘void file_data_source_impl::issue_read_aheads(unsigned int)’:
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:7347:23: error: ‘class std::deque<file_data_source_impl::issued_read>’ has no member named ‘reserve’
+ 7347 |         _read_buffers.reserve(ra); // prevent push_back() failure
+      |                       ^~~~~~~
+In file included from request_parser.rl:27,
+                 from test/http_test/../../include/HTTP/httpd.hh:25,
+                 from test/http_test/http_test.cc:1:
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh: At global scope:
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:10086:1: error: expected unqualified-id before ‘public’
+10086 | public:
+      | ^~~~~~
+In file included from request_parser.rl:27,
+                 from test/http_test/../../include/HTTP/httpd.hh:25,
+                 from test/http_test/http_test.cc:1:
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh: In static member function ‘static std::vector<std::__cxx11::basic_string<char> > network_stack_registry::list()’:
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:14179:12: error: could not convert ‘ret’ from ‘vector<basic_sstring<char, unsigned int, 15>>’ to ‘vector<std::__cxx11::basic_string<char>>’
+14179 |     return ret;
+      |            ^~~
+      |            |
+      |            vector<basic_sstring<char, unsigned int, 15>>
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh: In lambda function:
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:14431:90: error: no matching function for call to ‘make_shared(std::remove_reference<pollable_fd&>::type)’
+14431 |                 new posix_connected_socket_impl<Transport>(std::make_shared(std::move(fd))));
+      |                                                                                          ^
+In file included from /usr/include/c++/10/memory:84,
+                 from request_parser.rl:24,
+                 from test/http_test/../../include/HTTP/httpd.hh:25,
+                 from test/http_test/http_test.cc:1:
+/usr/include/c++/10/bits/shared_ptr.h:872:5: note: candidate: ‘template<class _Tp, class ... _Args> std::shared_ptr<_Tp> std::make_shared(_Args&& ...)’
+  872 |     make_shared(_Args&&... __args)
+      |     ^~~~~~~~~~~
+/usr/include/c++/10/bits/shared_ptr.h:872:5: note:   template argument deduction/substitution failed:
+In file included from request_parser.rl:27,
+                 from test/http_test/../../include/HTTP/httpd.hh:25,
+                 from test/http_test/http_test.cc:1:
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:14431:90: note:   couldn’t deduce template parameter ‘_Tp’
+14431 |                 new posix_connected_socket_impl<Transport>(std::make_shared(std::move(fd))));
+      |                                                                                          ^
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh: In static member function ‘static void net::posix_ap_server_socket_impl<Transport>::move_connected_socket(socket_address, pollable_fd, socket_address)’:
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:14448:129: error: no matching function for call to ‘make_shared(std::remove_reference<pollable_fd&>::type)’
+14448 |             std::unique_ptr<connected_socket_impl> csi(new posix_connected_socket_impl<Transport>(std::make_shared(std::move(fd))));
+      |                                                                                                                                 ^
+In file included from /usr/include/c++/10/memory:84,
+                 from request_parser.rl:24,
+                 from test/http_test/../../include/HTTP/httpd.hh:25,
+                 from test/http_test/http_test.cc:1:
+/usr/include/c++/10/bits/shared_ptr.h:872:5: note: candidate: ‘template<class _Tp, class ... _Args> std::shared_ptr<_Tp> std::make_shared(_Args&& ...)’
+  872 |     make_shared(_Args&&... __args)
+      |     ^~~~~~~~~~~
+/usr/include/c++/10/bits/shared_ptr.h:872:5: note:   template argument deduction/substitution failed:
+In file included from request_parser.rl:27,
+                 from test/http_test/../../include/HTTP/httpd.hh:25,
+                 from test/http_test/http_test.cc:1:
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:14448:129: note:   couldn’t deduce template parameter ‘_Tp’
+14448 |             std::unique_ptr<connected_socket_impl> csi(new posix_connected_socket_impl<Transport>(std::make_shared(std::move(fd))));
+      |                                                                                                                                 ^
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh: In lambda function:
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:15693:36: error: ‘XFS_XFLAG_EXTSIZE’ was not declared in this scope; did you mean ‘FS_XFLAG_EXTSIZE’?
+15693 |                 attr.fsx_xflags |= XFS_XFLAG_EXTSIZE;
+      |                                    ^~~~~~~~~~~~~~~~~
+      |                                    FS_XFLAG_EXTSIZE
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:15697:25: error: ‘XFS_IOC_FSSETXATTR’ was not declared in this scope; did you mean ‘FS_IOC_FSSETXATTR’?
+15697 |             ::ioctl(fd, XFS_IOC_FSSETXATTR, &attr);
+      |                         ^~~~~~~~~~~~~~~~~~
+      |                         FS_IOC_FSSETXATTR
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh: At global scope:
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:15757:1: error: no declaration matches ‘future<std::optional<directory_entry_type> > reactor::file_type(std::string)’
+15757 | reactor::file_type(std::string name) {
+      | ^~~~~~~
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:15757:1: note: no functions named ‘future<std::optional<directory_entry_type> > reactor::file_type(std::string)’
+In file included from request_parser.rl:27,
+                 from test/http_test/../../include/HTTP/httpd.hh:25,
+                 from test/http_test/http_test.cc:1:
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:6885:8: note: ‘struct reactor’ defined here
+ 6885 | struct reactor {
+      |        ^~~~~~~
+In file included from request_parser.rl:27,
+                 from test/http_test/../../include/HTTP/httpd.hh:25,
+                 from test/http_test/http_test.cc:1:
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh: In lambda function:
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:15810:15: error: ‘EXT2_SUPER_MAGIC’ was not declared in this scope
+15810 |             { EXT2_SUPER_MAGIC, fs_type::ext2 },
+      |               ^~~~~~~~~~~~~~~~
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:15811:15: error: ‘EXT3_SUPER_MAGIC’ was not declared in this scope
+15811 |             { EXT3_SUPER_MAGIC, fs_type::ext3 },
+      |               ^~~~~~~~~~~~~~~~
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:15812:15: error: ‘EXT4_SUPER_MAGIC’ was not declared in this scope
+15812 |             { EXT4_SUPER_MAGIC, fs_type::ext4 },
+      |               ^~~~~~~~~~~~~~~~
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:15813:15: error: ‘BTRFS_SUPER_MAGIC’ was not declared in this scope
+15813 |             { BTRFS_SUPER_MAGIC, fs_type::btrfs },
+      |               ^~~~~~~~~~~~~~~~~
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:15815:15: error: ‘TMPFS_MAGIC’ was not declared in this scope
+15815 |             { TMPFS_MAGIC, fs_type::tmpfs },
+      |               ^~~~~~~~~~~
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:15816:9: error: could not convert ‘{{1481003842, fs_type::xfs}, {<expression error>, fs_type::ext2}, {<expression error>, fs_type::ext3}, {<expression error>, fs_type::ext4}, {<expression error>, fs_type::btrfs}, {16964, fs_type::hfs}, {<expression error>, fs_type::tmpfs}}’ from ‘<brace-enclosed initializer list>’ to ‘std::unordered_map<long int, fs_type>’
+15816 |         };
+      |         ^
+      |         |
+      |         <brace-enclosed initializer list>
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh: At global scope:
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:15890:1: error: no declaration matches ‘file_handle file::dup()’
+15890 | file::dup() {
+      | ^~~~
+In file included from request_parser.rl:27,
+                 from test/http_test/../../include/HTTP/httpd.hh:25,
+                 from test/http_test/http_test.cc:1:
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:6450:23: note: candidate is: ‘File::file_handle file::dup()’
+ 6450 |     File::file_handle dup();
+      |                       ^~~
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:6173:7: note: ‘class file’ defined here
+ 6173 | class file {
+      |       ^~~~
+In file included from request_parser.rl:27,
+                 from test/http_test/../../include/HTTP/httpd.hh:25,
+                 from test/http_test/http_test.cc:1:
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh: In member function ‘virtual future<> posix_file_impl::flush()’:
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:15939:16: error: ‘struct reactor’ has no member named ‘_fsyncs’
+15939 |     ++engine()._fsyncs;
+      |                ^~~~~~~
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh: In member function ‘virtual future<> posix_file_impl::close()’:
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:16024:9: error: ‘seastar_logger’ was not declared in this scope
+16024 |         seastar_logger.warn("double close() detected, contact support");
+      |         ^~~~~~~~~~~~~~
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh: In lambda function:
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:16041:13: error: ‘report_exception’ was not declared in this scope
+16041 |             report_exception("Running ::close() in reactor thread, submission failed with exception", std::current_exception());
+      |             ^~~~~~~~~~~~~~~~
+In file included from test/http_test/../../include/HTTP/httpd.hh:25,
+                 from test/http_test/http_test.cc:1:
+request_parser.rl: In member function ‘char* http_request_parser::parse(char*, char*, char*)’:
+request_parser.rl:119:9: error: ‘sstring_builder’ has not been declared
+request_parser.rl:120:28: error: ‘g’ was not declared in this scope
+request_parser.rl: In lambda function:
+request_parser.rl:120:37: error: ‘g’ is not captured
+request_parser.rl:120:33: note: the lambda has no capture-default
+request_parser.rl:120:28: note: ‘<typeprefixerror>g’ declared here
+In file included from test/http_test/http_test.cc:1:
+test/http_test/../../include/HTTP/httpd.hh: At global scope:
+test/http_test/../../include/HTTP/httpd.hh:137:9: error: ‘queue’ does not name a type; did you mean ‘io_queue’?
+  137 |         queue<std::unique_ptr<reply>> _replies { 10 };
+      |         ^~~~~
+      |         io_queue
+test/http_test/../../include/HTTP/httpd.hh: In lambda function:
+test/http_test/../../include/HTTP/httpd.hh:174:24: error: ‘_replies’ was not declared in this scope
+  174 |                 return _replies.push_eventually( {});
+      |                        ^~~~~~~~
+test/http_test/../../include/HTTP/httpd.hh: In member function ‘future<> httpd::http_server::connection::read()’:
+test/http_test/../../include/HTTP/httpd.hh:175:14: error: no matching function for call to ‘future<>::then_wrapped(httpd::http_server::connection::read()::<lambda(future<>)>)’
+  175 |             }).finally([this] {
+      |              ^
+In file included from request_parser.rl:27,
+                 from test/http_test/../../include/HTTP/httpd.hh:25,
+                 from test/http_test/http_test.cc:1:
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:2544:5: note: candidate: ‘template<class Func, class Result> Result future<T>::then_wrapped(Func&&) [with Func = Func; Result = Result; T = {}]’
+ 2544 |     then_wrapped(Func&& func) noexcept {
+      |     ^~~~~~~~~~~~
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:2544:5: note:   template argument deduction/substitution failed:
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:2541:30: error: no type named ‘type’ in ‘class std::result_of<httpd::http_server::connection::read()::<lambda(future<>)>(future<>)>’
+ 2541 |     template <typename Func, typename Result = futurize_t<std::result_of_t<Func(future)>>>
+      |                              ^~~~~~~~
+In file included from test/http_test/http_test.cc:1:
+test/http_test/../../include/HTTP/httpd.hh: In lambda function:
+test/http_test/../../include/HTTP/httpd.hh:189:24: error: ‘_replies’ was not declared in this scope
+  189 |                 return _replies.not_full().then([req = std::move(req), this] () mutable {
+      |                        ^~~~~~~~
+test/http_test/../../include/HTTP/httpd.hh: In member function ‘future<> httpd::http_server::connection::do_response_loop()’:
+test/http_test/../../include/HTTP/httpd.hh:207:20: error: ‘_replies’ was not declared in this scope
+  207 |             return _replies.pop_eventually().then(
+      |                    ^~~~~~~~
+test/http_test/../../include/HTTP/httpd.hh: In member function ‘future<> httpd::http_server::connection::start_response()’:
+test/http_test/../../include/HTTP/httpd.hh:222:49: error: ‘to_std’ has not been declared
+  222 |             _resp->_headers["Content-Length"] = to_std::string(
+      |                                                 ^~~~~~
+test/http_test/../../include/HTTP/httpd.hh:225:49: error: no matching function for call to ‘output_stream<char>::write(std::__cxx11::basic_string<char>::iterator, std::__cxx11::basic_string<char>::size_type)’
+  225 |                     _resp->_response_line.size()).then([this] {
+      |                                                 ^
+In file included from request_parser.rl:27,
+                 from test/http_test/../../include/HTTP/httpd.hh:25,
+                 from test/http_test/http_test.cc:1:
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:5628:14: note: candidate: ‘future<> output_stream<CharType>::write(const char_type*, size_t) [with CharType = char; output_stream<CharType>::char_type = char; size_t = long unsigned int]’
+ 5628 |     future<> write(const char_type* buf, size_t n);
+      |              ^~~~~
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:5628:37: note:   no known conversion for argument 1 from ‘std::__cxx11::basic_string<char>::iterator’ to ‘const char_type*’ {aka ‘const char*’}
+ 5628 |     future<> write(const char_type* buf, size_t n);
+      |                    ~~~~~~~~~~~~~~~~~^~~
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:5629:14: note: candidate: ‘future<> output_stream<CharType>::write(const char_type*) [with CharType = char; output_stream<CharType>::char_type = char]’
+ 5629 |     future<> write(const char_type* buf);
+      |              ^~~~~
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:5629:14: note:   candidate expects 1 argument, 2 provided
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:5632:14: note: candidate: ‘template<class StringChar, class SizeType, SizeType MaxSize> future<> output_stream<CharType>::write(const basic_sstring<StringChar, SizeType, MaxSize>&) [with StringChar = StringChar; SizeType = SizeType; SizeType MaxSize = MaxSize; CharType = char]’
+ 5632 |     future<> write(const basic_sstring<StringChar, SizeType, MaxSize>& s);
+      |              ^~~~~
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:5632:14: note:   template argument deduction/substitution failed:
+In file included from test/http_test/http_test.cc:1:
+test/http_test/../../include/HTTP/httpd.hh:225:49: note:   ‘std::__cxx11::basic_string<char>::iterator’ is not derived from ‘const basic_sstring<char_type, size_type, Max>’
+  225 |                     _resp->_response_line.size()).then([this] {
+      |                                                 ^
+In file included from request_parser.rl:27,
+                 from test/http_test/../../include/HTTP/httpd.hh:25,
+                 from test/http_test/http_test.cc:1:
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:5633:14: note: candidate: ‘future<> output_stream<CharType>::write(const std::__cxx11::basic_string<_CharT>&) [with CharType = char]’
+ 5633 |     future<> write(const std::basic_string<char_type>& s);
+      |              ^~~~~
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:5633:14: note:   candidate expects 1 argument, 2 provided
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:5635:14: note: candidate: ‘future<> output_stream<CharType>::write(net::packet) [with CharType = char]’
+ 5635 |     future<> write(net::packet p);
+      |              ^~~~~
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:5635:14: note:   candidate expects 1 argument, 2 provided
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:5636:14: note: candidate: ‘future<> output_stream<CharType>::write(scattered_message<CharType>) [with CharType = char]’
+ 5636 |     future<> write(scattered_message<char_type> msg);
+      |              ^~~~~
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:5636:14: note:   candidate expects 1 argument, 2 provided
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:5637:14: note: candidate: ‘future<> output_stream<CharType>::write(temporary_buffer<char_type>) [with CharType = char]’
+ 5637 |     future<> write(temporary_buffer<char_type>);
+      |              ^~~~~
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:5637:14: note:   candidate expects 1 argument, 2 provided
+In file included from test/http_test/http_test.cc:1:
+test/http_test/../../include/HTTP/httpd.hh: In member function ‘future<> httpd::http_server::connection::write_reply_headers(std::unordered_map<std::__cxx11::basic_string<char>, std::__cxx11::basic_string<char> >::iterator)’:
+test/http_test/../../include/HTTP/httpd.hh:242:72: error: no matching function for call to ‘output_stream<char>::write(std::__cxx11::basic_string<char>::const_iterator, std::__cxx11::basic_string<char>::size_type)’
+  242 |             return _write_buf.write(hi->first.begin(), hi->first.size()).then(
+      |                                                                        ^
+In file included from request_parser.rl:27,
+                 from test/http_test/../../include/HTTP/httpd.hh:25,
+                 from test/http_test/http_test.cc:1:
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:13836:1: note: candidate: ‘future<> output_stream<CharType>::write(const char_type*, size_t) [with CharType = char; output_stream<CharType>::char_type = char; size_t = long unsigned int]’
+13836 | output_stream<CharType>::write(const char_type* buf, size_t n) {
+      | ^~~~~~~~~~~~~~~~~~~~~~~
+In file included from request_parser.rl:27,
+                 from test/http_test/../../include/HTTP/httpd.hh:25,
+                 from test/http_test/http_test.cc:1:
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:5628:37: note:   no known conversion for argument 1 from ‘std::__cxx11::basic_string<char>::const_iterator’ to ‘const char_type*’ {aka ‘const char*’}
+ 5628 |     future<> write(const char_type* buf, size_t n);
+      |                    ~~~~~~~~~~~~~~~~~^~~
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:5629:14: note: candidate: ‘future<> output_stream<CharType>::write(const char_type*) [with CharType = char; output_stream<CharType>::char_type = char]’
+ 5629 |     future<> write(const char_type* buf);
+      |              ^~~~~
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:5629:14: note:   candidate expects 1 argument, 2 provided
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:5632:14: note: candidate: ‘template<class StringChar, class SizeType, SizeType MaxSize> future<> output_stream<CharType>::write(const basic_sstring<StringChar, SizeType, MaxSize>&) [with StringChar = StringChar; SizeType = SizeType; SizeType MaxSize = MaxSize; CharType = char]’
+ 5632 |     future<> write(const basic_sstring<StringChar, SizeType, MaxSize>& s);
+      |              ^~~~~
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:5632:14: note:   template argument deduction/substitution failed:
+In file included from test/http_test/http_test.cc:1:
+test/http_test/../../include/HTTP/httpd.hh:242:72: note:   ‘std::__cxx11::basic_string<char>::const_iterator’ is not derived from ‘const basic_sstring<char_type, size_type, Max>’
+  242 |             return _write_buf.write(hi->first.begin(), hi->first.size()).then(
+      |                                                                        ^
+In file included from request_parser.rl:27,
+                 from test/http_test/../../include/HTTP/httpd.hh:25,
+                 from test/http_test/http_test.cc:1:
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:5633:14: note: candidate: ‘future<> output_stream<CharType>::write(const std::__cxx11::basic_string<_CharT>&) [with CharType = char]’
+ 5633 |     future<> write(const std::basic_string<char_type>& s);
+      |              ^~~~~
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:5633:14: note:   candidate expects 1 argument, 2 provided
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:5635:14: note: candidate: ‘future<> output_stream<CharType>::write(net::packet) [with CharType = char]’
+ 5635 |     future<> write(net::packet p);
+      |              ^~~~~
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:5635:14: note:   candidate expects 1 argument, 2 provided
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:5636:14: note: candidate: ‘future<> output_stream<CharType>::write(scattered_message<CharType>) [with CharType = char]’
+ 5636 |     future<> write(scattered_message<char_type> msg);
+      |              ^~~~~
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:5636:14: note:   candidate expects 1 argument, 2 provided
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:5637:14: note: candidate: ‘future<> output_stream<CharType>::write(temporary_buffer<char_type>) [with CharType = char]’
+ 5637 |     future<> write(temporary_buffer<char_type>);
+      |              ^~~~~
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:5637:14: note:   candidate expects 1 argument, 2 provided
+In file included from test/http_test/http_test.cc:1:
+test/http_test/../../include/HTTP/httpd.hh: In lambda function:
+test/http_test/../../include/HTTP/httpd.hh:246:78: error: no matching function for call to ‘output_stream<char>::write(std::__cxx11::basic_string<char>::iterator, std::__cxx11::basic_string<char>::size_type)’
+  246 |                 return _write_buf.write(hi->second.begin(), hi->second.size());
+      |                                                                              ^
+In file included from request_parser.rl:27,
+                 from test/http_test/../../include/HTTP/httpd.hh:25,
+                 from test/http_test/http_test.cc:1:
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:13836:1: note: candidate: ‘future<> output_stream<CharType>::write(const char_type*, size_t) [with CharType = char; output_stream<CharType>::char_type = char; size_t = long unsigned int]’
+13836 | output_stream<CharType>::write(const char_type* buf, size_t n) {
+      | ^~~~~~~~~~~~~~~~~~~~~~~
+In file included from request_parser.rl:27,
+                 from test/http_test/../../include/HTTP/httpd.hh:25,
+                 from test/http_test/http_test.cc:1:
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:5628:37: note:   no known conversion for argument 1 from ‘std::__cxx11::basic_string<char>::iterator’ to ‘const char_type*’ {aka ‘const char*’}
+ 5628 |     future<> write(const char_type* buf, size_t n);
+      |                    ~~~~~~~~~~~~~~~~~^~~
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:5629:14: note: candidate: ‘future<> output_stream<CharType>::write(const char_type*) [with CharType = char; output_stream<CharType>::char_type = char]’
+ 5629 |     future<> write(const char_type* buf);
+      |              ^~~~~
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:5629:14: note:   candidate expects 1 argument, 2 provided
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:5632:14: note: candidate: ‘template<class StringChar, class SizeType, SizeType MaxSize> future<> output_stream<CharType>::write(const basic_sstring<StringChar, SizeType, MaxSize>&) [with StringChar = StringChar; SizeType = SizeType; SizeType MaxSize = MaxSize; CharType = char]’
+ 5632 |     future<> write(const basic_sstring<StringChar, SizeType, MaxSize>& s);
+      |              ^~~~~
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:5632:14: note:   template argument deduction/substitution failed:
+In file included from test/http_test/http_test.cc:1:
+test/http_test/../../include/HTTP/httpd.hh:246:78: note:   ‘std::__cxx11::basic_string<char>::iterator’ is not derived from ‘const basic_sstring<char_type, size_type, Max>’
+  246 |                 return _write_buf.write(hi->second.begin(), hi->second.size());
+      |                                                                              ^
+In file included from request_parser.rl:27,
+                 from test/http_test/../../include/HTTP/httpd.hh:25,
+                 from test/http_test/http_test.cc:1:
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:5633:14: note: candidate: ‘future<> output_stream<CharType>::write(const std::__cxx11::basic_string<_CharT>&) [with CharType = char]’
+ 5633 |     future<> write(const std::basic_string<char_type>& s);
+      |              ^~~~~
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:5633:14: note:   candidate expects 1 argument, 2 provided
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:5635:14: note: candidate: ‘future<> output_stream<CharType>::write(net::packet) [with CharType = char]’
+ 5635 |     future<> write(net::packet p);
+      |              ^~~~~
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:5635:14: note:   candidate expects 1 argument, 2 provided
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:5636:14: note: candidate: ‘future<> output_stream<CharType>::write(scattered_message<CharType>) [with CharType = char]’
+ 5636 |     future<> write(scattered_message<char_type> msg);
+      |              ^~~~~
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:5636:14: note:   candidate expects 1 argument, 2 provided
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:5637:14: note: candidate: ‘future<> output_stream<CharType>::write(temporary_buffer<char_type>) [with CharType = char]’
+ 5637 |     future<> write(temporary_buffer<char_type>);
+      |              ^~~~~
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:5637:14: note:   candidate expects 1 argument, 2 provided
+In file included from test/http_test/http_test.cc:1:
+test/http_test/../../include/HTTP/httpd.hh: In lambda function:
+test/http_test/../../include/HTTP/httpd.hh:365:23: error: ‘class httpd::http_server::connection’ has no member named ‘_replies’
+  365 |                 this->_replies.push(std::move(rep));
+      |                       ^~~~~~~~
+test/http_test/../../include/HTTP/httpd.hh: In member function ‘future<> httpd::http_server::connection::write_body()’:
+test/http_test/../../include/HTTP/httpd.hh:371:43: error: no matching function for call to ‘output_stream<char>::write(std::__cxx11::basic_string<char>::iterator, std::__cxx11::basic_string<char>::size_type)’
+  371 |                     _resp->_content.size());
+      |                                           ^
+In file included from request_parser.rl:27,
+                 from test/http_test/../../include/HTTP/httpd.hh:25,
+                 from test/http_test/http_test.cc:1:
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:13836:1: note: candidate: ‘future<> output_stream<CharType>::write(const char_type*, size_t) [with CharType = char; output_stream<CharType>::char_type = char; size_t = long unsigned int]’
+13836 | output_stream<CharType>::write(const char_type* buf, size_t n) {
+      | ^~~~~~~~~~~~~~~~~~~~~~~
+In file included from request_parser.rl:27,
+                 from test/http_test/../../include/HTTP/httpd.hh:25,
+                 from test/http_test/http_test.cc:1:
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:5628:37: note:   no known conversion for argument 1 from ‘std::__cxx11::basic_string<char>::iterator’ to ‘const char_type*’ {aka ‘const char*’}
+ 5628 |     future<> write(const char_type* buf, size_t n);
+      |                    ~~~~~~~~~~~~~~~~~^~~
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:5629:14: note: candidate: ‘future<> output_stream<CharType>::write(const char_type*) [with CharType = char; output_stream<CharType>::char_type = char]’
+ 5629 |     future<> write(const char_type* buf);
+      |              ^~~~~
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:5629:14: note:   candidate expects 1 argument, 2 provided
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:5632:14: note: candidate: ‘template<class StringChar, class SizeType, SizeType MaxSize> future<> output_stream<CharType>::write(const basic_sstring<StringChar, SizeType, MaxSize>&) [with StringChar = StringChar; SizeType = SizeType; SizeType MaxSize = MaxSize; CharType = char]’
+ 5632 |     future<> write(const basic_sstring<StringChar, SizeType, MaxSize>& s);
+      |              ^~~~~
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:5632:14: note:   template argument deduction/substitution failed:
+In file included from test/http_test/http_test.cc:1:
+test/http_test/../../include/HTTP/httpd.hh:371:43: note:   ‘std::__cxx11::basic_string<char>::iterator’ is not derived from ‘const basic_sstring<char_type, size_type, Max>’
+  371 |                     _resp->_content.size());
+      |                                           ^
+In file included from request_parser.rl:27,
+                 from test/http_test/../../include/HTTP/httpd.hh:25,
+                 from test/http_test/http_test.cc:1:
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:5633:14: note: candidate: ‘future<> output_stream<CharType>::write(const std::__cxx11::basic_string<_CharT>&) [with CharType = char]’
+ 5633 |     future<> write(const std::basic_string<char_type>& s);
+      |              ^~~~~
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:5633:14: note:   candidate expects 1 argument, 2 provided
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:5635:14: note: candidate: ‘future<> output_stream<CharType>::write(net::packet) [with CharType = char]’
+ 5635 |     future<> write(net::packet p);
+      |              ^~~~~
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:5635:14: note:   candidate expects 1 argument, 2 provided
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:5636:14: note: candidate: ‘future<> output_stream<CharType>::write(scattered_message<CharType>) [with CharType = char]’
+ 5636 |     future<> write(scattered_message<char_type> msg);
+      |              ^~~~~
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:5636:14: note:   candidate expects 1 argument, 2 provided
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:5637:14: note: candidate: ‘future<> output_stream<CharType>::write(temporary_buffer<char_type>) [with CharType = char]’
+ 5637 |     future<> write(temporary_buffer<char_type>);
+      |              ^~~~~
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:5637:14: note:   candidate expects 1 argument, 2 provided
+In file included from test/http_test/http_test.cc:1:
+test/http_test/../../include/HTTP/httpd.hh: In constructor ‘httpd::http_server_control::http_server_control()’:
+test/http_test/../../include/HTTP/httpd.hh:419:44: error: no matching function for call to ‘sharded<httpd::http_server>::sharded()’
+  419 |     http_server_control():_server_dist(new distributed<http_server>) {
+      |                                            ^~~~~~~~~~~~~~~~~~~~~~~~
+In file included from request_parser.rl:27,
+                 from test/http_test/../../include/HTTP/httpd.hh:25,
+                 from test/http_test/http_test.cc:1:
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:10092:5: note: candidate: ‘sharded<Service>::sharded(sharded<Service>&&) [with Service = httpd::http_server]’
+10092 |     sharded(sharded&& other) = default;
+      |     ^~~~~~~
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:10092:5: note:   candidate expects 1 argument, 0 provided
+In file included from test/http_test/http_test.cc:1:
+test/http_test/../../include/HTTP/httpd.hh: In member function ‘future<> httpd::http_server_control::start(const string&)’:
+test/http_test/../../include/HTTP/httpd.hh:424:40: error: ‘future<> sharded<Service>::start(Args&& ...) [with Args = {const std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >&}; Service = httpd::http_server]’ is private within this context
+  424 |         return _server_dist->start(name);
+      |                                        ^
+In file included from request_parser.rl:27,
+                 from test/http_test/../../include/HTTP/httpd.hh:25,
+                 from test/http_test/http_test.cc:1:
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:10326:1: note: declared private here
+10326 | sharded<Service>::start(Args&&... args) {
+      | ^~~~~~~~~~~~~~~~
+In file included from test/http_test/http_test.cc:1:
+test/http_test/../../include/HTTP/httpd.hh: In member function ‘future<> httpd::http_server_control::stop()’:
+test/http_test/../../include/HTTP/httpd.hh:428:35: error: ‘future<> sharded<Service>::stop() [with Service = httpd::http_server]’ is private within this context
+  428 |         return _server_dist->stop();
+      |                                   ^
+In file included from request_parser.rl:27,
+                 from test/http_test/../../include/HTTP/httpd.hh:25,
+                 from test/http_test/http_test.cc:1:
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:10372:1: note: declared private here
+10372 | sharded<Service>::stop() {
+      | ^~~~~~~~~~~~~~~~
+In file included from test/http_test/http_test.cc:1:
+test/http_test/../../include/HTTP/httpd.hh: In member function ‘future<> httpd::http_server_control::set_routes(std::function<void(httpd::routes&)>)’:
+test/http_test/../../include/HTTP/httpd.hh:434:10: error: ‘future<> sharded<Service>::invoke_on_all(Func&&) [with Func = httpd::http_server_control::set_routes(std::function<void(httpd::routes&)>)::<lambda(httpd::http_server&)>; Service = httpd::http_server]’ is private within this context
+  434 |         });
+      |          ^
+In file included from request_parser.rl:27,
+                 from test/http_test/../../include/HTTP/httpd.hh:25,
+                 from test/http_test/http_test.cc:1:
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:10420:1: note: declared private here
+10420 | sharded<Service>::invoke_on_all(Func&& func) {
+      | ^~~~~~~~~~~~~~~~
+In file included from test/http_test/http_test.cc:1:
+test/http_test/../../include/HTTP/httpd.hh: In member function ‘future<> httpd::http_server_control::listen(ipv4_addr)’:
+test/http_test/../../include/HTTP/httpd.hh:438:70: error: ‘future<> sharded<Service>::invoke_on_all(future<> (Service::*)(Args ...), Args ...) [with Args = {ipv4_addr}; Service = httpd::http_server]’ is private within this context
+  438 |         return _server_dist->invoke_on_all(&http_server::listen, addr);
+      |                                                                      ^
+In file included from request_parser.rl:27,
+                 from test/http_test/../../include/HTTP/httpd.hh:25,
+                 from test/http_test/http_test.cc:1:
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:10394:1: note: declared private here
+10394 | sharded<Service>::invoke_on_all(future<> (Service::*func)(Args...), Args... args) {
+      | ^~~~~~~~~~~~~~~~
+In file included from test/http_test/http_test.cc:6:
+test/http_test/../../include/HTTP/exception.hh: At global scope:
+test/http_test/../../include/HTTP/exception.hh:124:16: error: ‘json’ in namespace ‘boost’ does not name a type
+  124 |         boost::json::object to_json() const {
+      |                ^~~~
+test/http_test/http_test.cc: In function ‘int main()’:
+test/http_test/http_test.cc:204:18: error: cannot convert ‘future<>’ to ‘int’ in return
+  203 |     return when_all(std::move(f1), std::move(f2), std::move(f3), std::move(f4))
+      |            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  204 |             .then([] (std::tuple<future<>, future<>, future<>, future<>> fs) {
+      |             ~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      |                  |
+      |                  future<>
+  205 |         std::get<0>(fs).get();
+      |         ~~~~~~~~~~~~~~~~~~~~~~
+  206 |         std::get<1>(fs).get();
+      |         ~~~~~~~~~~~~~~~~~~~~~~
+  207 |         std::get<2>(fs).get();
+      |         ~~~~~~~~~~~~~~~~~~~~~~
+  208 |         std::get<3>(fs).get();
+      |         ~~~~~~~~~~~~~~~~~~~~~~
+  209 |     });
+      |     ~~            
+In file included from request_parser.rl:27,
+                 from test/http_test/../../include/HTTP/httpd.hh:25,
+                 from test/http_test/http_test.cc:1:
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh: In instantiation of ‘void expiring_fifo<T, OnExpiry, Clock>::reserve(size_t) [with T = basic_semaphore<semaphore_default_exception_factory>::entry; OnExpiry = basic_semaphore<semaphore_default_exception_factory>::expiry_handler; Clock = std::chrono::_V2::steady_clock; size_t = long unsigned int]’:
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:5017:27:   required from ‘void basic_semaphore<ExceptionFactory, Clock>::ensure_space_for_waiters(size_t) [with ExceptionFactory = semaphore_default_exception_factory; Clock = std::chrono::_V2::steady_clock; size_t = long unsigned int]’
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:10470:53:   required from here
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:4825:22: error: ‘class std::deque<expiring_fifo<basic_semaphore<semaphore_default_exception_factory>::entry, basic_semaphore<semaphore_default_exception_factory>::expiry_handler, std::chrono::_V2::steady_clock>::entry, std::allocator<expiring_fifo<basic_semaphore<semaphore_default_exception_factory>::entry, basic_semaphore<semaphore_default_exception_factory>::expiry_handler, std::chrono::_V2::steady_clock>::entry> >’ has no member named ‘reserve’
+ 4825 |         return _list.reserve(size);
+      |                ~~~~~~^~~~~~~
+In file included from request_parser.rl:27,
+                 from test/http_test/../../include/HTTP/httpd.hh:25,
+                 from test/http_test/http_test.cc:1:
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh: In instantiation of ‘int internal::when_all_state<ResolvedTupleTransform, Futures>::wait() [with long unsigned int Idx = 0; ResolvedTupleTransform = internal::identity_futures_tuple<future<>, future<> >; Futures = {future<>, future<>}]’:
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:9588:46:   required from ‘typename ResolvedTupleTransform::future_type internal::when_all_state<ResolvedTupleTransform, Futures>::wait_all(std::index_sequence<__var_indices ...>) [with long unsigned int ...Idx = {0, 1}; ResolvedTupleTransform = internal::identity_futures_tuple<future<>, future<> >; Futures = {future<>, future<>}; typename ResolvedTupleTransform::future_type = future<std::tuple<future<>, future<> > >; std::index_sequence<__var_indices ...> = std::integer_sequence<long unsigned int, 0, 1>]’
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:9631:23:   required from ‘future<std::tuple<_Tps ...> > when_all(Futs&& ...) [with Futs = {future<>, future<>}]’
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:10497:110:   required from here
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:9579:43: error: ‘class internal::when_all_state<internal::identity_futures_tuple<future<>, future<> >, future<>, future<> >’ has no member named ‘shared_from_this’
+ 9579 |             f = f.then_wrapped([s = this->shared_from_this()] (auto&& f) {
+      |                                     ~~~~~~^~~~~~~~~~~~~~~~
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh: In instantiation of ‘int internal::when_all_state<ResolvedTupleTransform, Futures>::wait() [with long unsigned int Idx = 1; ResolvedTupleTransform = internal::identity_futures_tuple<future<>, future<> >; Futures = {future<>, future<>}]’:
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:9588:46:   required from ‘typename ResolvedTupleTransform::future_type internal::when_all_state<ResolvedTupleTransform, Futures>::wait_all(std::index_sequence<__var_indices ...>) [with long unsigned int ...Idx = {0, 1}; ResolvedTupleTransform = internal::identity_futures_tuple<future<>, future<> >; Futures = {future<>, future<>}; typename ResolvedTupleTransform::future_type = future<std::tuple<future<>, future<> > >; std::index_sequence<__var_indices ...> = std::integer_sequence<long unsigned int, 0, 1>]’
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:9631:23:   required from ‘future<std::tuple<_Tps ...> > when_all(Futs&& ...) [with Futs = {future<>, future<>}]’
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:10497:110:   required from here
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:9579:43: error: ‘class internal::when_all_state<internal::identity_futures_tuple<future<>, future<> >, future<>, future<> >’ has no member named ‘shared_from_this’
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh: In instantiation of ‘int internal::when_all_state<ResolvedTupleTransform, Futures>::wait() [with long unsigned int Idx = 0; ResolvedTupleTransform = internal::identity_futures_tuple<future<>, future<>, future<>, future<> >; Futures = {future<>, future<>, future<>, future<>}]’:
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:9588:46:   required from ‘typename ResolvedTupleTransform::future_type internal::when_all_state<ResolvedTupleTransform, Futures>::wait_all(std::index_sequence<__var_indices ...>) [with long unsigned int ...Idx = {0, 1, 2, 3}; ResolvedTupleTransform = internal::identity_futures_tuple<future<>, future<>, future<>, future<> >; Futures = {future<>, future<>, future<>, future<>}; typename ResolvedTupleTransform::future_type = future<std::tuple<future<>, future<>, future<>, future<> > >; std::index_sequence<__var_indices ...> = std::integer_sequence<long unsigned int, 0, 1, 2, 3>]’
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:9631:23:   required from ‘future<std::tuple<_Tps ...> > when_all(Futs&& ...) [with Futs = {future<>, future<>, future<>, future<>}]’
+test/http_test/http_test.cc:203:79:   required from here
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:9579:43: error: ‘class internal::when_all_state<internal::identity_futures_tuple<future<>, future<>, future<>, future<> >, future<>, future<>, future<>, future<> >’ has no member named ‘shared_from_this’
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh: In instantiation of ‘int internal::when_all_state<ResolvedTupleTransform, Futures>::wait() [with long unsigned int Idx = 1; ResolvedTupleTransform = internal::identity_futures_tuple<future<>, future<>, future<>, future<> >; Futures = {future<>, future<>, future<>, future<>}]’:
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:9588:46:   required from ‘typename ResolvedTupleTransform::future_type internal::when_all_state<ResolvedTupleTransform, Futures>::wait_all(std::index_sequence<__var_indices ...>) [with long unsigned int ...Idx = {0, 1, 2, 3}; ResolvedTupleTransform = internal::identity_futures_tuple<future<>, future<>, future<>, future<> >; Futures = {future<>, future<>, future<>, future<>}; typename ResolvedTupleTransform::future_type = future<std::tuple<future<>, future<>, future<>, future<> > >; std::index_sequence<__var_indices ...> = std::integer_sequence<long unsigned int, 0, 1, 2, 3>]’
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:9631:23:   required from ‘future<std::tuple<_Tps ...> > when_all(Futs&& ...) [with Futs = {future<>, future<>, future<>, future<>}]’
+test/http_test/http_test.cc:203:79:   required from here
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:9579:43: error: ‘class internal::when_all_state<internal::identity_futures_tuple<future<>, future<>, future<>, future<> >, future<>, future<>, future<>, future<> >’ has no member named ‘shared_from_this’
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh: In instantiation of ‘int internal::when_all_state<ResolvedTupleTransform, Futures>::wait() [with long unsigned int Idx = 2; ResolvedTupleTransform = internal::identity_futures_tuple<future<>, future<>, future<>, future<> >; Futures = {future<>, future<>, future<>, future<>}]’:
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:9588:46:   required from ‘typename ResolvedTupleTransform::future_type internal::when_all_state<ResolvedTupleTransform, Futures>::wait_all(std::index_sequence<__var_indices ...>) [with long unsigned int ...Idx = {0, 1, 2, 3}; ResolvedTupleTransform = internal::identity_futures_tuple<future<>, future<>, future<>, future<> >; Futures = {future<>, future<>, future<>, future<>}; typename ResolvedTupleTransform::future_type = future<std::tuple<future<>, future<>, future<>, future<> > >; std::index_sequence<__var_indices ...> = std::integer_sequence<long unsigned int, 0, 1, 2, 3>]’
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:9631:23:   required from ‘future<std::tuple<_Tps ...> > when_all(Futs&& ...) [with Futs = {future<>, future<>, future<>, future<>}]’
+test/http_test/http_test.cc:203:79:   required from here
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:9579:43: error: ‘class internal::when_all_state<internal::identity_futures_tuple<future<>, future<>, future<>, future<> >, future<>, future<>, future<>, future<> >’ has no member named ‘shared_from_this’
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh: In instantiation of ‘int internal::when_all_state<ResolvedTupleTransform, Futures>::wait() [with long unsigned int Idx = 3; ResolvedTupleTransform = internal::identity_futures_tuple<future<>, future<>, future<>, future<> >; Futures = {future<>, future<>, future<>, future<>}]’:
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:9588:46:   required from ‘typename ResolvedTupleTransform::future_type internal::when_all_state<ResolvedTupleTransform, Futures>::wait_all(std::index_sequence<__var_indices ...>) [with long unsigned int ...Idx = {0, 1, 2, 3}; ResolvedTupleTransform = internal::identity_futures_tuple<future<>, future<>, future<>, future<> >; Futures = {future<>, future<>, future<>, future<>}; typename ResolvedTupleTransform::future_type = future<std::tuple<future<>, future<>, future<>, future<> > >; std::index_sequence<__var_indices ...> = std::integer_sequence<long unsigned int, 0, 1, 2, 3>]’
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:9631:23:   required from ‘future<std::tuple<_Tps ...> > when_all(Futs&& ...) [with Futs = {future<>, future<>, future<>, future<>}]’
+test/http_test/http_test.cc:203:79:   required from here
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:9579:43: error: ‘class internal::when_all_state<internal::identity_futures_tuple<future<>, future<>, future<>, future<> >, future<>, future<>, future<>, future<> >’ has no member named ‘shared_from_this’
+In file included from /usr/include/c++/10/ext/alloc_traits.h:34,
+                 from /usr/include/c++/10/bits/stl_uninitialized.h:67,
+                 from /usr/include/c++/10/memory:66,
+                 from request_parser.rl:24,
+                 from test/http_test/../../include/HTTP/httpd.hh:25,
+                 from test/http_test/http_test.cc:1:
+/usr/include/c++/10/bits/alloc_traits.h: In instantiation of ‘static constexpr void std::allocator_traits<std::allocator<_Up> >::construct(std::allocator_traits<std::allocator<_Up> >::allocator_type&, _Up*, _Args&& ...) [with _Up = priority_class; _Args = {unsigned int&}; _Tp = priority_class; std::allocator_traits<std::allocator<_Up> >::allocator_type = std::allocator<priority_class>]’:
+/usr/include/c++/10/bits/shared_ptr_base.h:551:39:   required from ‘std::_Sp_counted_ptr_inplace<_Tp, _Alloc, _Lp>::_Sp_counted_ptr_inplace(_Alloc, _Args&& ...) [with _Args = {unsigned int&}; _Tp = priority_class; _Alloc = std::allocator<priority_class>; __gnu_cxx::_Lock_policy _Lp = __gnu_cxx::_S_atomic]’
+/usr/include/c++/10/bits/shared_ptr_base.h:682:16:   required from ‘std::__shared_count<_Lp>::__shared_count(_Tp*&, std::_Sp_alloc_shared_tag<_Alloc>, _Args&& ...) [with _Tp = priority_class; _Alloc = std::allocator<priority_class>; _Args = {unsigned int&}; __gnu_cxx::_Lock_policy _Lp = __gnu_cxx::_S_atomic]’
+/usr/include/c++/10/bits/shared_ptr_base.h:1371:71:   required from ‘std::__shared_ptr<_Tp, _Lp>::__shared_ptr(std::_Sp_alloc_shared_tag<_Tp>, _Args&& ...) [with _Alloc = std::allocator<priority_class>; _Args = {unsigned int&}; _Tp = priority_class; __gnu_cxx::_Lock_policy _Lp = __gnu_cxx::_S_atomic]’
+/usr/include/c++/10/bits/shared_ptr.h:408:59:   required from ‘std::shared_ptr<_Tp>::shared_ptr(std::_Sp_alloc_shared_tag<_Tp>, _Args&& ...) [with _Alloc = std::allocator<priority_class>; _Args = {unsigned int&}; _Tp = priority_class]’
+/usr/include/c++/10/bits/shared_ptr.h:859:14:   required from ‘std::shared_ptr<_Tp> std::allocate_shared(const _Alloc&, _Args&& ...) [with _Tp = priority_class; _Alloc = std::allocator<priority_class>; _Args = {unsigned int&}]’
+/usr/include/c++/10/bits/shared_ptr.h:875:39:   required from ‘std::shared_ptr<_Tp> std::make_shared(_Args&& ...) [with _Tp = priority_class; _Args = {unsigned int&}]’
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:5216:76:   required from here
+/usr/include/c++/10/bits/alloc_traits.h:514:21: error: no matching function for call to ‘construct_at(priority_class*&, unsigned int&)’
+  514 |    std::construct_at(__p, std::forward<_Args>(__args)...);
+      |    ~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from /usr/include/c++/10/memory:65,
+                 from request_parser.rl:24,
+                 from test/http_test/../../include/HTTP/httpd.hh:25,
+                 from test/http_test/http_test.cc:1:
+/usr/include/c++/10/bits/stl_construct.h:94:5: note: candidate: ‘template<class _Tp, class ... _Args> constexpr decltype (::new(void*(0)) _Tp) std::construct_at(_Tp*, _Args&& ...)’
+   94 |     construct_at(_Tp* __location, _Args&&... __args)
+      |     ^~~~~~~~~~~~
+/usr/include/c++/10/bits/stl_construct.h:94:5: note:   template argument deduction/substitution failed:
+/usr/include/c++/10/bits/stl_construct.h: In substitution of ‘template<class _Tp, class ... _Args> constexpr decltype (::new(void*(0)) _Tp) std::construct_at(_Tp*, _Args&& ...) [with _Tp = priority_class; _Args = {unsigned int&}]’:
+/usr/include/c++/10/bits/alloc_traits.h:514:21:   required from ‘static constexpr void std::allocator_traits<std::allocator<_Up> >::construct(std::allocator_traits<std::allocator<_Up> >::allocator_type&, _Up*, _Args&& ...) [with _Up = priority_class; _Args = {unsigned int&}; _Tp = priority_class; std::allocator_traits<std::allocator<_Up> >::allocator_type = std::allocator<priority_class>]’
+/usr/include/c++/10/bits/shared_ptr_base.h:551:39:   required from ‘std::_Sp_counted_ptr_inplace<_Tp, _Alloc, _Lp>::_Sp_counted_ptr_inplace(_Alloc, _Args&& ...) [with _Args = {unsigned int&}; _Tp = priority_class; _Alloc = std::allocator<priority_class>; __gnu_cxx::_Lock_policy _Lp = __gnu_cxx::_S_atomic]’
+/usr/include/c++/10/bits/shared_ptr_base.h:682:16:   required from ‘std::__shared_count<_Lp>::__shared_count(_Tp*&, std::_Sp_alloc_shared_tag<_Alloc>, _Args&& ...) [with _Tp = priority_class; _Alloc = std::allocator<priority_class>; _Args = {unsigned int&}; __gnu_cxx::_Lock_policy _Lp = __gnu_cxx::_S_atomic]’
+/usr/include/c++/10/bits/shared_ptr_base.h:1371:71:   required from ‘std::__shared_ptr<_Tp, _Lp>::__shared_ptr(std::_Sp_alloc_shared_tag<_Tp>, _Args&& ...) [with _Alloc = std::allocator<priority_class>; _Args = {unsigned int&}; _Tp = priority_class; __gnu_cxx::_Lock_policy _Lp = __gnu_cxx::_S_atomic]’
+/usr/include/c++/10/bits/shared_ptr.h:408:59:   required from ‘std::shared_ptr<_Tp>::shared_ptr(std::_Sp_alloc_shared_tag<_Tp>, _Args&& ...) [with _Alloc = std::allocator<priority_class>; _Args = {unsigned int&}; _Tp = priority_class]’
+/usr/include/c++/10/bits/shared_ptr.h:859:14:   required from ‘std::shared_ptr<_Tp> std::allocate_shared(const _Alloc&, _Args&& ...) [with _Tp = priority_class; _Alloc = std::allocator<priority_class>; _Args = {unsigned int&}]’
+/usr/include/c++/10/bits/shared_ptr.h:875:39:   required from ‘std::shared_ptr<_Tp> std::make_shared(_Args&& ...) [with _Tp = priority_class; _Args = {unsigned int&}]’
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:5216:76:   required from here
+/usr/include/c++/10/bits/stl_construct.h:96:17: error: ‘priority_class::priority_class(uint32_t)’ is private within this context
+   96 |     -> decltype(::new((void*)0) _Tp(std::declval<_Args>()...))
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from request_parser.rl:27,
+                 from test/http_test/../../include/HTTP/httpd.hh:25,
+                 from test/http_test/http_test.cc:1:
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:5135:14: note: declared private here
+ 5135 |     explicit priority_class(uint32_t shares) : _shares(shares) {}
+      |              ^~~~~~~~~~~~~~
+In file included from /usr/include/c++/10/memory:65,
+                 from request_parser.rl:24,
+                 from test/http_test/../../include/HTTP/httpd.hh:25,
+                 from test/http_test/http_test.cc:1:
+/usr/include/c++/10/bits/stl_construct.h:95:23: error: ‘priority_class::priority_class(uint32_t)’ is private within this context
+   95 |     noexcept(noexcept(::new((void*)0) _Tp(std::declval<_Args>()...)))
+      |                       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from request_parser.rl:27,
+                 from test/http_test/../../include/HTTP/httpd.hh:25,
+                 from test/http_test/http_test.cc:1:
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:5135:14: note: declared private here
+ 5135 |     explicit priority_class(uint32_t shares) : _shares(shares) {}
+      |              ^~~~~~~~~~~~~~
+In file included from request_parser.rl:27,
+                 from test/http_test/../../include/HTTP/httpd.hh:25,
+                 from test/http_test/http_test.cc:1:
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh: At global scope:
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:7097:22: error: ‘future<io_event> reactor::submit_io_write(const io_priority_class&, size_t, Func) [with Func = posix_file_impl::write_dma(uint64_t, const void*, size_t, const io_priority_class&)::<lambda(iocb&)>; size_t = long unsigned int]’, declared using local type ‘posix_file_impl::write_dma(uint64_t, const void*, size_t, const io_priority_class&)::<lambda(iocb&)>’, is used but never defined [-fpermissive]
+ 7097 |     future<io_event> submit_io_write(const io_priority_class& priority_class, size_t len, Func prepare_io);
+      |                      ^~~~~~~~~~~~~~~
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:7097:22: error: ‘future<io_event> reactor::submit_io_write(const io_priority_class&, size_t, Func) [with Func = posix_file_impl::write_dma(uint64_t, std::vector<iovec>, const io_priority_class&)::<lambda(iocb&)>; size_t = long unsigned int]’, declared using local type ‘posix_file_impl::write_dma(uint64_t, std::vector<iovec>, const io_priority_class&)::<lambda(iocb&)>’, is used but never defined [-fpermissive]
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:7095:22: error: ‘future<io_event> reactor::submit_io_read(const io_priority_class&, size_t, Func) [with Func = posix_file_impl::read_dma(uint64_t, void*, size_t, const io_priority_class&)::<lambda(iocb&)>; size_t = long unsigned int]’, declared using local type ‘posix_file_impl::read_dma(uint64_t, void*, size_t, const io_priority_class&)::<lambda(iocb&)>’, is used but never defined [-fpermissive]
+ 7095 |     future<io_event> submit_io_read(const io_priority_class& priority_class, size_t len, Func prepare_io);
+      |                      ^~~~~~~~~~~~~~
+test/http_test/../../include/HTTP/../../include/future/future_all12.hh:7095:22: error: ‘future<io_event> reactor::submit_io_read(const io_priority_class&, size_t, Func) [with Func = posix_file_impl::read_dma(uint64_t, std::vector<iovec>, const io_priority_class&)::<lambda(iocb&)>; size_t = long unsigned int]’, declared using local type ‘posix_file_impl::read_dma(uint64_t, std::vector<iovec>, const io_priority_class&)::<lambda(iocb&)>’, is used but never defined [-fpermissive]
+makefile:128: recipe for target 'build/test/http_test/http_test.o' failed
+make: *** [build/test/http_test/http_test.o] Error 1

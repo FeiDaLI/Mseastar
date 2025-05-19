@@ -1,0 +1,33 @@
+build/test/http_test/http_test.o: test/http_test/http_test.cc \
+ test/http_test/../../include/HTTP/httpd.hh \
+ test/http_test/../../include/HTTP/request_parser.hh \
+ test/http_test/../../include/HTTP/request.hh \
+ test/http_test/../../include/HTTP/common.hh \
+ test/http_test/../../include/HTTP/../../include/future/future_all12.hh \
+ test/http_test/../../include/HTTP/../../include/future/../task/task.hh \
+ test/http_test/../../include/HTTP/../../include/future/../util/shared_ptr.hh \
+ test/http_test/../../include/HTTP/../../include/future/../util/bitops.hh \
+ test/http_test/../../include/HTTP/../../include/future/do_with.hh \
+ test/http_test/../../include/HTTP/../../include/future/../resource/resource.hh \
+ test/http_test/../../include/HTTP/../../include/future/../util/align.hh \
+ test/http_test/../../include/HTTP/../../include/future/../util/bool_class.hh \
+ test/http_test/../../include/HTTP/../../include/future/../util/spinlock.hh \
+ test/http_test/../../include/HTTP/../../include/future/../util/unaligned.hh \
+ test/http_test/../../include/HTTP/../../include/future/../fd/posix.hh \
+ test/http_test/../../include/HTTP/../../include/future/../util/backtrace.hh \
+ test/http_test/../../include/HTTP/../app/app-template.hh \
+ test/http_test/../../include/HTTP/reply.hh \
+ test/http_test/../../include/HTTP/mime_types.hh \
+ test/http_test/../../include/HTTP/routes.hh \
+ test/http_test/../../include/HTTP/matchrules.hh \
+ test/http_test/../../include/HTTP/handlers.hh \
+ test/http_test/../../include/HTTP/matcher.hh \
+ test/http_test/../../include/HTTP/handlers.hh \
+ test/http_test/../../include/HTTP/matcher.hh \
+ test/http_test/../../include/HTTP/matchrules.hh \
+ test/http_test/../../include/HTTP/routes.hh \
+ test/http_test/../../include/HTTP/exception.hh \
+ include/json/json_elements.hh include/json/formatter.hh \
+ test/http_test/../../include/HTTP/transformers.hh \
+ test/http_test/../../include/HTTP/file_handler.hh \
+ test/http_test/../../include/app/app-template.hh
