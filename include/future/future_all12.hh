@@ -3726,7 +3726,6 @@ public:
 struct ipv4_addr {
     uint32_t ip;
     uint16_t port;
-
     ipv4_addr() : ip(0), port(0) {}
     ipv4_addr(uint32_t ip, uint16_t port) : ip(ip), port(port) {}
     ipv4_addr(uint16_t port) : ip(0), port(port) {}
@@ -13907,12 +13906,11 @@ input_stream<CharType>::read_exactly(size_t n) {
     }
 }
 
-template <typename CharType>
+template <typename CharType> 
 template <typename Consumer>
-future<>
-input_stream<CharType>::consume(Consumer& consumer) {
+future<> input_stream<CharType>::consume(Consumer& consumer) {
     return repeat([&consumer, this] {
-        if (_buf.empty() && !_eof) {
+        if(_buf.empty() && !_eof) {
             return _fd.get().then([this] (tmp_buf buf) {
                 _buf = std::move(buf);
                 _eof = _buf.empty();
@@ -14082,6 +14080,11 @@ output_stream<CharType>::write(const char_type* buf, size_t n) {
     }
 }
 
+
+void add_to_flush_poller(output_stream<char>* os) {
+    engine()._flush_batching.emplace_back(os);
+}
+
 template <typename CharType>
 future<>
 output_stream<CharType>::flush() {
@@ -14112,7 +14115,7 @@ output_stream<CharType>::flush() {
     return make_ready_future<>();
 }
 
-void add_to_flush_poller(output_stream<char>* x);
+
 
 template <typename CharType>
 future<>
@@ -16380,3 +16383,218 @@ const io_priority_class& default_priority_class() {
     }();
     return shard_default_class;
 }
+
+
+future<file> open_file_dma(std::string name, open_flags flags) {
+    return engine().open_file_dma(std::move(name), flags, file_open_options());
+}
+
+future<> remove_file(std::string pathname) {
+    return engine().remove_file(std::move(pathname));
+}
+
+
+future<> check_direct_io_support(std::string path) {
+    struct w {
+        std::string path;
+        open_flags flags;
+        std::function<future<>()> cleanup;
+        static w parse(std::string path, std::optional<directory_entry_type> type) {
+            if (!type) {
+                throw std::invalid_argument("Could not open file. Make sure it exists");
+            }
+            if (type == directory_entry_type::directory) {
+                auto fpath = path + "/.o_direct_test";
+                return w{fpath, open_flags::wo | open_flags::create | open_flags::truncate, [fpath] { return remove_file(fpath); }};
+            } else if ((type == directory_entry_type::regular) || (type == directory_entry_type::link)) {
+                return w{path, open_flags::ro, [] { return make_ready_future<>(); }};
+            } else {
+                throw std::invalid_argument("neither a directory nor file. Can't be opened with O_DIRECT");
+            }
+        };
+    };
+    return engine().file_type(path).then([path] (auto type) {
+        auto w = w::parse(path, type);
+        return open_file_dma(w.path, w.flags).then_wrapped([path = w.path, cleanup = std::move(w.cleanup)] (future<file> f) {
+            try {
+                f.get0();
+                return cleanup();
+            } catch (std::system_error& e) {
+                if (e.code() == std::error_code(EINVAL, std::system_category())) {
+                    throw("Could not open file. Does your filesystem support O_DIRECT?");
+                }
+                throw;
+            }
+        });
+    });
+}
+
+
+
+future<file> open_file_dma(std::string name, open_flags flags, file_open_options options) {
+    return engine().open_file_dma(std::move(name), flags, options);
+}
+
+future<file> open_directory(std::string name) {
+    return engine().open_directory(std::move(name));
+}
+
+future<> make_directory(std::string name) {
+    return engine().make_directory(std::move(name));
+}
+
+future<> touch_directory(std::string name) {
+    return engine().touch_directory(std::move(name));
+}
+
+future<> sync_directory(std::string name) {
+    return open_directory(std::move(name)).then([] (file f) {
+        return do_with(std::move(f), [] (file& f) {
+            return f.flush().then([&f] () mutable {
+                return f.close();
+            });
+        });
+    });
+}
+
+future<> do_recursive_touch_directory(std::string base, std::string name) {
+    static const std::string::value_type separator = '/';
+
+    if (name.empty()) {
+        return make_ready_future<>();
+    }
+
+    size_t pos = std::min(name.find(separator), name.size() - 1);
+    base += name.substr(0 , pos + 1);
+    name = name.substr(pos + 1);
+    return touch_directory(base).then([base, name] {
+        return do_recursive_touch_directory(base, name);
+    }).then([base] {
+        // We will now flush the directory that holds the entry we potentially
+        // created. Technically speaking, we only need to touch when we did
+        // create. But flushing the unchanged ones should be cheap enough - and
+        // it simplifies the code considerably.
+        if (base.empty()) {
+            return make_ready_future<>();
+        }
+
+        return sync_directory(base);
+    });
+}
+
+
+future<> recursive_touch_directory(std::string name) {
+    // If the name is empty,  it will be of the type a/b/c, which should be interpreted as
+    // a relative path. This means we have to flush our current directory
+    sstring base = "";
+    if (name[0] != '/' || name[0] == '.') {
+        base = "./";
+    }
+    return do_recursive_touch_directory(base, name);
+}
+
+
+future<> rename_file(std::string old_pathname, std::string new_pathname) {
+    return engine().rename_file(std::move(old_pathname), std::move(new_pathname));
+}
+
+future<fs_type> file_system_at(std::string name) {
+    return engine().file_system_at(name);
+}
+
+future<uint64_t> file_size(std::string name) {
+    return engine().file_size(name);
+}
+
+future<bool> file_exists(std::string name) {
+    return engine().file_exists(name);
+}
+
+future<> link_file(std::string oldpath, std::string newpath) {
+    return engine().link_file(std::move(oldpath), std::move(newpath));
+}
+
+server_socket listen(socket_address sa) {
+    return engine().listen(sa);
+}
+
+server_socket listen(socket_address sa, listen_options opts) {
+    return engine().listen(sa, opts);
+}
+
+future<connected_socket> connect(socket_address sa) {
+    return engine().connect(sa);
+}
+
+future<connected_socket> connect(socket_address sa, socket_address local, transport proto = transport::TCP) {
+    return engine().connect(sa, local, proto);
+}
+
+input_stream<char> make_file_input_stream(
+        file f, uint64_t offset, uint64_t len, file_input_stream_options options) {
+    return input_stream<char>(file_data_source(std::move(f), offset, len, std::move(options)));
+}
+
+input_stream<char> make_file_input_stream(
+        file f, uint64_t offset, file_input_stream_options options) {
+    return make_file_input_stream(std::move(f), offset, std::numeric_limits<uint64_t>::max(), std::move(options));
+}
+
+input_stream<char> make_file_input_stream(
+        file f, file_input_stream_options options) {
+    return make_file_input_stream(std::move(f), 0, std::move(options));
+}
+
+#include <boost/asio/ip/address_v4.hpp>
+#include <boost/algorithm/string.hpp>
+// 辅助函数：手动分割字符串
+std::vector<std::string> split(const std::string& str, char delimiter) {
+    std::vector<std::string> tokens;
+    std::stringstream ss(str);
+    std::string token;
+    while (std::getline(ss, token, delimiter)) {
+        tokens.push_back(token);
+    }
+    return tokens;
+}
+
+// 辅助函数：将 IP 地址字符串转换为 uint32_t
+uint32_t string_to_ip(const std::string& addr) {
+    struct in_addr in;
+    if (inet_pton(AF_INET, addr.c_str(), &in) != 1) {
+        throw std::invalid_argument("Invalid IP address: " + addr);
+    }
+    return net::ntoh(in.s_addr); // 转换为主机字节序
+}
+
+ipv4_addr::ipv4_addr(const std::string &addr) {
+    try {
+        std::vector<std::string> items = split(addr, ':');
+        if (items.size() == 1) {
+            ip = string_to_ip(items[0]);
+            port = 0;
+        } else if (items.size() == 2) {
+            ip = string_to_ip(items[0]);
+            port = std::stoul(items[1]);
+        } else {
+            throw std::invalid_argument("invalid format: " + addr);
+        }
+    } catch (const std::exception& e) {
+        throw std::invalid_argument("Invalid IP address: " + addr + ", error: " + e.what());
+    }
+}
+
+ipv4_addr::ipv4_addr(const std::string &addr, uint16_t port_) {
+    try {
+        ip = string_to_ip(addr);
+        port = port_;
+    } catch (const std::exception& e) {
+        throw std::invalid_argument("Invalid IP address: " + addr + ", error: " + e.what());
+    }
+}
+
+// ipv4_addr::ipv4_addr(const net::inet_address& a, uint16_t port)
+//     : ipv4_addr([&a] {
+//         ::in_addr in = a;
+//         return net::ntoh(in.s_addr);
+//     }(), port){}

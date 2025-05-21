@@ -4,7 +4,6 @@
 #include <unordered_map>
 #include <tuple>
 #include "common.hh"
-#include "core/sstring.hh"
 #include "routes.hh"
 #include "function_handlers.hh"
 namespace httpd {
@@ -25,11 +24,11 @@ struct json_operation {
      * @param method the http method type
      * @param nickname the http nickname
      */
-    json_operation(operation_type method, const sstring& nickname)
+    json_operation(operation_type method, const std::string& nickname)
             : method(method), nickname(nickname) {
     }
     operation_type method;
-    sstring nickname;
+    std::string nickname;
 };
 
 /**
@@ -55,10 +54,10 @@ struct path_description {
      * @param method the http method
      * @param nickname the nickname
      */
-    path_description(const sstring& path, operation_type method,
-            const sstring& nickname,
-            const std::vector<std::pair<sstring, bool>>& path_parameters,
-            const std::vector<sstring>& mandatory_params);
+    path_description(const std::string& path, operation_type method,
+            const std::string& nickname,
+            const std::vector<std::pair<std::string, bool>>& path_parameters,
+            const std::vector<std::string>& mandatory_params);
 
     /**
      * Add a parameter to the path definition
@@ -76,7 +75,7 @@ struct path_description {
      * path should be equal to /ets/hosts and not only /etc
      * @return the current path description
      */
-    path_description* pushparam(const sstring& param,
+    path_description* pushparam(const std::string& param,
     bool all_path = false) {
         params.push_back( { param, all_path });
         return this;
@@ -87,14 +86,14 @@ struct path_description {
      * @param param the parameter to head
      * @return a pointer to the current path description
      */
-    path_description* pushmandatory_param(const sstring& param) {
+    path_description* pushmandatory_param(const std::string& param) {
         mandatory_queryparams.push_back(param);
         return this;
     }
-    std::vector<std::pair<sstring, bool>> params;
-    sstring path;
+    std::vector<std::pair<std::string, bool>> params;
+    std::string path;
     json_operation operations;
-    std::vector<sstring> mandatory_queryparams;
+    std::vector<std::string> mandatory_queryparams;
     void set(routes& _routes, handler_base* handler) const;
     void set(routes& _routes, const json_request_function& f) const;
     void set(routes& _routes, const future_json_function& f) const;
@@ -102,12 +101,8 @@ struct path_description {
 
 }
 
-
-
-
 namespace httpd {
     using namespace std;
-
     void path_description::set(routes& _routes, handler_base* handler) const {
         for (auto& i : mandatory_queryparams) {
             handler->mandatory(i);
@@ -132,18 +127,12 @@ void path_description::set(routes& _routes,
 void path_description::set(routes& _routes, const future_json_function& f) const {
     set(_routes, new function_handler(f));
 }
-path_description::path_description(const sstring& path, operation_type method,
-        const sstring& nickname,
-        const std::vector<std::pair<sstring, bool>>& path_parameters,
-        const std::vector<sstring>& mandatory_params)
-        : path(path), operations(method, nickname) {
-
-    for (auto man : mandatory_params) {
-        pushmandatory_param(man);
-    }
-    for (auto param : path_parameters) {
-        params.push_back(param);
-    }
+path_description::path_description(const std::string& path, operation_type method,
+        const std::string& nickname,
+        const std::vector<std::pair<std::string, bool>>& path_parameters,
+        const std::vector<std::string>& mandatory_params):path(path), operations(method, nickname) {
+            for(auto man : mandatory_params) {pushmandatory_param(man);}
+            for(auto param : path_parameters) {params.push_back(param);}
   }
 }
 

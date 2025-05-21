@@ -9,6 +9,7 @@
 #include <iostream>
 #include <algorithm>
 #include <unordered_map>
+#include <string_view>
 #include <queue>
 #include <bitset>
 #include <limits>
@@ -443,8 +444,5 @@ std::string http_server_control::generate_server_name() {
     return "http-{}"+std::to_string(idgen++);
 }
 }
-
-
-
 
 #endif /* APPS_HTTPD_HTTPD_HH_ */

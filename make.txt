@@ -1,2 +1,2 @@
-make: Nothing to be done for 'all'.
-.
+g++ -w -Wall -std=c++20 -g -Iinclude -pthread -MMD -c test/http_test/http_test.cc -o build/test/http_test/http_test.o
+g++ build/include/resource/resource.o build/test/http_test/http_test.o -o build/http_server_test -pthread -lboost_system -lboost_thread -lrt -lhwloc -lboost_program_options -laio  -lunwind -lboost_json

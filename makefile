@@ -105,14 +105,14 @@ LDFLAGS = -pthread -lboost_system -lboost_thread -lrt -lhwloc -lboost_program_op
 
 SRCS = \
 	include/resource/resource.cc \
-    test/http_test/http_test.cc \
+    test/http_test/http_server.cc \
 
 # 生成对象文件列表
 OBJS = $(SRCS:%.cc=build/%.o)
 DEPS = $(OBJS:.o=.d)
 
 # 可执行文件名称
-TEST_TARGET = build/http_server_test
+TEST_TARGET = build/http_server
 
 # 默认目标
 all: $(TEST_TARGET)

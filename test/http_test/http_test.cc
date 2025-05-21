@@ -12,7 +12,7 @@ using namespace httpd;
 
 class handl : public httpd::handler_base {
 public:
-    virtual future<std::unique_ptr<reply> > handle(const sstring& path,
+    virtual future<std::unique_ptr<reply> > handle(const std::string& path,
             std::unique_ptr<request> req, std::unique_ptr<reply> rep) {
         rep->done("html");
         return make_ready_future<std::unique_ptr<reply>>(std::move(rep));

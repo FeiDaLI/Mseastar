@@ -23,6 +23,11 @@
 #define HTTP_FILE_HANDLER_HH_
 
 #include "handlers.hh"
+#include <algorithm>
+#include <iostream>
+#include "../include/future/future_all12.hh"
+#include "../include/app/app-template.hh"
+#include "exception.hh"
 
 namespace httpd {
 /**
@@ -196,7 +201,7 @@ public:
     std::unique_ptr<reply> _rep;
 
     // for input_stream::consume():
-    using unconsumed_remainder = std::experimental::optional<temporary_buffer<char>>;
+    using unconsumed_remainder = std::optional<temporary_buffer<char>>;
     future<unconsumed_remainder> operator()(temporary_buffer<char> data) {
         if (data.empty()) {
             _rep->done();
