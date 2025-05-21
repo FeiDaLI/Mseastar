@@ -24,7 +24,7 @@
 #include <boost/program_options.hpp>
 #include <boost/optional.hpp>
 #include <functional>
-#include "../future/future_all10.hh"
+#include "../future/future_all12.hh"
 #include <string>
 #include <boost/program_options.hpp>
 #include <boost/program_options.hpp>
@@ -103,7 +103,7 @@ app_template::configuration() {
 int
 app_template::run(int ac, char ** av, std::function<future<int> ()>&& func) {
     return run_deprecated(ac, av, [func = std::move(func)] () mutable {
-        auto func_done = make_lw_shared<promise<>>();
+        auto func_done = std::make_shared<promise<>>();
         engine().at_exit([func_done] { return func_done->get_future(); });
         futurize_apply(func).finally([func_done] {
             func_done->set_value();

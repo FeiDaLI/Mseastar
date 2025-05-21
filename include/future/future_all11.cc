@@ -2208,27 +2208,21 @@
 // void connected_socket::shutdown_input() {
 //     _csi->shutdown_input();
 // }
-//
 // net::socket::~socket()
 // {}
-//
 // net::socket::socket(
 //         std::unique_ptr<::net::socket_impl> si)
 //         : _si(std::move(si)) {
 // }
-//
 // net::socket::socket(net::socket&&) noexcept = default;
 // net::socket& net::socket::operator=(net::socket&&) noexcept = default;
-//
 // future<connected_socket> net::socket::connect(socket_address sa, socket_address local, transport proto) {
 //     return _si->connect(sa, local, proto);
 // }
-//
 // void net::socket::shutdown() {
 //     _si->shutdown();
 // }
 // server_socket::server_socket() {}
-//
 // server_socket::server_socket(std::unique_ptr<net::server_socket_impl> ssi)
 //         : _ssi(std::move(ssi)) {}
 // server_socket::server_socket(server_socket&& ss) noexcept = default;
@@ -2238,7 +2232,6 @@
 // future<connected_socket, socket_address> server_socket::accept() {
 //     return _ssi->accept();
 // }
-//
 // future<udp_datagram>
 // posix_udp_channel::receive() {
 //     _recv.prepare();
@@ -2251,9 +2244,6 @@
 //         return make_exception_future<udp_datagram>(std::move(ep));
 //     });
 // }
-//
-//
-//
 // ipv4_addr::ipv4_addr(const std::string &addr) {
 //     std::vector<std::string> items;
 //     boost::split(items, addr, boost::is_any_of(":"));
@@ -2267,9 +2257,7 @@
 //         throw std::invalid_argument("invalid format: " + addr);
 //     }
 // }
-//
 // ipv4_addr::ipv4_addr(const std::string &addr, uint16_t port_) : ip(boost::asio::ip::address_v4::from_string(addr).to_ulong()),port(port_) {}
-//
 // ipv4_addr::ipv4_addr(const seastar::net::inet_address& a, uint16_t port)
 //     : ipv4_addr([&a] {
 //   ::in_addr in = a;
