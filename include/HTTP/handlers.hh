@@ -48,7 +48,7 @@ public:
      * @param req the original request
      * @param rep the reply
      */
-    virtual future<std::unique_ptr<reply> > handle(const sstring& path,
+    virtual future<std::unique_ptr<reply> > handle(const std::string& path,
             std::unique_ptr<request> req, std::unique_ptr<reply> rep) = 0;
 
     virtual ~handler_base() = default;
@@ -58,12 +58,12 @@ public:
      * @param param a parameter name
      * @return a reference to the handler
      */
-    handler_base& mandatory(const sstring& param) {
+    handler_base& mandatory(const std::string& param) {
         _mandatory_param.push_back(param);
         return *this;
     }
 
-    std::vector<sstring> _mandatory_param;
+    std::vector<std::string> _mandatory_param;
 
 };
 

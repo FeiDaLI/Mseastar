@@ -8,6 +8,8 @@
 #include <linux/fs.h> // 或者适当的头文件来定义BLKGETSIZE
 #include <sys/statfs.h> // 为fstatfs提供声明
 #include "../task/task.hh"
+#include <sys/vfs.h>
+#include <linux/magic.h>
 #include <stdexcept>
 #include <atomic>
 #include <memory>
@@ -18,6 +20,9 @@
 #include "../util/shared_ptr.hh"
 #include "../util/bitops.hh"
 #include <assert.h>
+// #include <sys/mount.h>
+
+
 #include <cstdlib>
 #include <chrono>
 #include <functional>
@@ -3213,6 +3218,74 @@ inline execution_stage::execution_stage(execution_stage&& other)
 
 
 
+#include <queue>
+
+template <typename T>
+class queue_ {
+    std::queue<T, std::deque<T>> _q;  // 第二个参数是底层实现.
+    size_t _max;
+    std::optional<promise<>> _not_empty;
+    std::optional<promise<>> _not_full;
+    std::exception_ptr _ex = nullptr;
+private:
+    void notify_not_empty();
+    void notify_not_full();
+public:
+    explicit queue_(size_t size);
+    // Push an item.
+    // Returns false if the queue was full and the item was not pushed.
+    bool push(T&& a);
+    // pops an item.
+    T pop();
+    // Consumes items from the queue, passing them to @func, until @func
+    // returns false or the queue it empty
+    // Returns false if func returned false.
+    template <typename Func>
+    bool consume(Func&& func);
+    // Returns true when the queue is empty.
+    bool empty() const;
+    // Returns true when the queue is full.
+    bool full() const;
+    // Returns a future<> that becomes available when pop() or consume()
+    // can be called.
+    future<> not_empty();
+    // Returns a future<> that becomes available when push() can be called.
+    future<> not_full();
+    // Pops element now or when ther is some. Returns a future that becomes
+    // available when some element is available.
+    future<T> pop_eventually();
+    future<> push_eventually(T&& data);
+    size_t size() const { return _q.size(); }
+    size_t max_size() const { return _max; }
+    // Pushes the element now or when there is room. Returns a future<> which
+    // resolves when data was pushed.
+    // Set the maximum size to a new value. If the queue's max size is reduced,
+    // items already in the queue will not be expunged and the queue will be temporarily
+    // bigger than its max_size.
+    void set_max_size(size_t max) {
+        _max = max;
+        if (!full()) {
+            notify_not_full();
+        }
+    }
+    // Destroy any items in the queue, and pass the provided exception to any
+    // waiting readers or writers.
+    void abort(std::exception_ptr ex) {
+        while (!_q.empty()) {
+            _q.pop();
+        }
+        _ex = ex;
+        if (_not_full) {
+            _not_full->set_exception(ex);
+            _not_full= std::nullopt;
+        }
+        if (_not_empty) {
+            _not_empty->set_exception(std::move(ex));
+            _not_empty = std::nullopt;
+        }
+    }
+};
+
 
 
 
@@ -4776,6 +4849,7 @@ private:
     struct entry {
         std::optional<T> payload;
         timer<Clock> tr;
+        entry() = default; // 添加默认构造函数
         entry(T&& payload_) : payload(std::move(payload_)) {}
         entry(const T& payload_) : payload(payload_) {}
         entry(T payload_, expiring_fifo& ef, time_point timeout)
@@ -4809,20 +4883,17 @@ public:
     explicit operator bool() const {
         return !empty();
     }
-
     T& front() {
         return *_list.front().payload;
     }
-
     const T& front() const {
         return *_list.front().payload;
     }
-
     size_t size() const {
         return _size;
     }
     void reserve(size_t size) {
-        return _list.reserve(size);
+        return _list.resize(size);
     }
     void push_back(const T& payload) {
         _list.emplace_back(payload);
@@ -5122,6 +5193,7 @@ public:
 };
 
 class priority_class {
+public:
     struct request {
         promise<> pr;
         unsigned weight;
@@ -5627,11 +5699,9 @@ public:
     ~output_stream() { assert(!_in_batch); }
     future<> write(const char_type* buf, size_t n);
     future<> write(const char_type* buf);
-
-    template <typename StringChar, typename SizeType, SizeType MaxSize>
-    future<> write(const basic_sstring<StringChar, SizeType, MaxSize>& s);
+    // template <typename StringChar>
+    // future<> write(const basic_sstring<StringChar, SizeType, MaxSize>& s);
     future<> write(const std::basic_string<char_type>& s);
-
     future<> write(net::packet p);
     future<> write(scattered_message<char_type> msg);
     future<> write(temporary_buffer<char_type>);
@@ -6112,6 +6182,8 @@ struct file_open_options {
 
 
 const io_priority_class& default_priority_class();
+
+
 
 class file;
 class file_impl;
@@ -6917,6 +6989,7 @@ struct reactor {
         uint64_t fstream_read_ahead_discarded_bytes = 0;
     };
     io_stats _io_stats;
+    uint64_t _fsyncs = 0;
     enum class idle_cpu_handler_result {
         no_more_work,
         interrupted_by_higher_priority_task
@@ -7056,6 +7129,9 @@ struct reactor {
     bool pure_poll_once();
     bool flush_tcp_batches();
     bool flush_pending_aio();
+    io_priority_class register_one_priority_class(std::string name, uint32_t shares) {
+        return io_queue::register_one_priority_class(std::move(name), shares);
+    }
     /*----------------------------------IO相关--------------------------------------------*/
     std::deque<output_stream<char>* > _flush_batching;
     io_context_t _io_context;
@@ -7079,7 +7155,7 @@ struct reactor {
     future<file> open_directory(std::string name);
     future<> make_directory(std::string name);
     future<> touch_directory(std::string name);
-    future<std::optional<directory_entry_type>> cfile_type(std::string name);
+    future<std::optional<directory_entry_type>>  file_type(std::string name);
     future<uint64_t> file_size(std::string pathname);
     future<bool> file_exists(std::string pathname);
     future<fs_type> file_system_at(std::string pathname);
@@ -7344,7 +7420,7 @@ private:
             return;
         }
         auto ra = _current_read_ahead + additional;
-        _read_buffers.reserve(ra); // prevent push_back() failure
+        // _read_buffers.reserve(ra); // prevent push_back() failure
         while (_read_buffers.size() < ra) {
             if (!_remain) {
                 if (_read_buffers.size() >= additional) {
@@ -7933,6 +8009,8 @@ public:
     }
 };
 
+
+
 class reactor::lowres_timer_pollfn final : public pollfn {
     reactor& _r;
     // A highres timer is implemented as a waking  signal; so
@@ -7971,6 +8049,132 @@ public:
         }
     }
 };
+
+template <typename T>
+inline
+queue_<T>::queue_(size_t size)
+    : _max(size) {
+}
+
+template <typename T>
+inline
+void queue_<T>::notify_not_empty() {
+    if (_not_empty) {
+        _not_empty->set_value();
+        _not_empty = std::optional<promise<>>();
+    }
+}
+
+template <typename T>
+inline
+void queue_<T>::notify_not_full() {
+    if (_not_full) {
+        _not_full->set_value();
+        _not_full = std::optional<promise<>>();
+    }
+}
+
+template <typename T>
+inline
+bool queue_<T>::push(T&& data) {
+    if (_q.size() < _max) {
+        _q.push(std::move(data));
+        notify_not_empty();
+        return true;
+    } else {
+        return false;
+    }
+}
+
+template <typename T>
+inline
+T queue_<T>::pop() {
+    if (_q.size() == _max) {
+        notify_not_full();
+    }
+    T data = std::move(_q.front());
+    _q.pop();
+    return data;
+}
+
+template <typename T>
+inline
+future<T> queue_<T>::pop_eventually() {
+    if (empty()) {
+        return not_empty().then([this] {
+            if (_ex) {
+                return make_exception_future<T>(_ex);
+            } else {
+                return make_ready_future<T>(pop());
+            }
+        });
+    } else {
+        return make_ready_future<T>(pop());
+    }
+}
+
+template <typename T>
+inline
+future<> queue_<T>::push_eventually(T&& data) {
+    if (full()) {
+        return not_full().then([this, data = std::move(data)] () mutable {
+            _q.push(std::move(data));
+            notify_not_empty();
+        });
+    } else {
+        _q.push(std::move(data));
+        notify_not_empty();
+        return make_ready_future<>();
+    }
+}
+
+template <typename T>
+template <typename Func>
+inline bool queue_<T>::consume(Func&& func) {
+    bool running = true;
+    while (!_q.empty() && running) {
+        running = func(std::move(_q.front()));
+        _q.pop();
+    }
+    if (!full()) {
+        notify_not_full();
+    }
+    return running;
+}
+
+template <typename T>
+inline bool queue_<T>::empty() const {
+    return _q.empty();
+}
+
+template <typename T>
+inline
+bool queue_<T>::full() const {
+    return _q.size() >= _max;
+}
+
+template <typename T>
+inline
+future<> queue_<T>::not_empty() {
+    if (!empty()) {
+        return make_ready_future<>();
+    }
+    else{
+        _not_empty = promise<>();
+        return _not_empty->get_future();
+    }
+}
+
+template <typename T>
+inline
+future<> queue_<T>::not_full() {
+    if (!full()) {
+        return make_ready_future<>();
+    } else {
+        _not_full = promise<>();
+        return _not_full->get_future();
+    }
+}
 
 
 void
@@ -9554,14 +9758,14 @@ template<typename... Futures>
 struct identity_futures_tuple {
     using future_type = future<std::tuple<Futures...>>;
     using promise_type = typename future_type::promise_type;
-
     static void set_promise(promise_type& p, std::tuple<Futures...> futures) {
         p.set_value(std::move(futures));
     }
 };
 
+
 template<typename ResolvedTupleTransform, typename... Futures>
-class when_all_state{
+class when_all_state: public std::enable_shared_from_this<when_all_state<ResolvedTupleTransform, Futures...>>{
     using type = std::tuple<Futures...>;
     type tuple;
 public:
@@ -10059,31 +10263,28 @@ public:
 
 /// \addtogroup smp-module
 /// @{
-
 /// Template helper to distribute a service across all logical cores.
-///
 /// The \c sharded template manages a sharded service, by creating
 /// a copy of the service on each logical core, providing mechanisms to communicate
 /// with each shard's copy, and a way to stop the service.
-///
 /// \tparam Service a class to be instantiated on each core.  Must expose
 ///         a \c stop() method that returns a \c future<>, to be called when
 ///         the service is stopped.
+
 template <typename Service>
 class sharded {
+    public:
     struct entry {
         std::shared_ptr<Service> service;
         promise<> freed;
     };
     std::vector<entry> _instances;
-private:
     void service_deleted() {
         _instances[engine().cpu_id()].freed.set_value();
     }
-    template <typename U, bool async>
-    // friend struct std::shared_ptr_make_helper;
+    // template <typename U, bool async>
+    // // friend struct std::shared_ptr_make_helper;
 
-public:
     /// Constructs an empty \c sharded object.  No instances of the service are
     /// created.
     sharded() {}
@@ -13566,17 +13767,17 @@ future<> output_stream<CharType>::write(const char_type* buf) {
     return write(buf, strlen(buf));
 }
 
-template<typename CharType>
-template<typename StringChar, typename SizeType, SizeType MaxSize>
-inline
-future<> output_stream<CharType>::write(const basic_sstring<StringChar, SizeType, MaxSize>& s) {
-    return write(reinterpret_cast<const CharType *>(s.c_str()), s.size());
-}
+// template<typename CharType>
+// template<typename StringChar, typename SizeType, SizeType MaxSize>
+// inline
+// future<> output_stream<CharType>::write(const std::basic_string<CharType>& s) {
+//     return write(reinterpret_cast<const CharType *>(s.data()), s.size());
+// }
 
 template<typename CharType>
 inline
 future<> output_stream<CharType>::write(const std::basic_string<CharType>& s) {
-    return write(s.c_str(), s.size());
+     return write(reinterpret_cast<const CharType *>(s.data()), s.size());
 }
 
 template<typename CharType>
@@ -14084,6 +14285,13 @@ void reactor::replace_poller(pollfn* old, pollfn* neww) {
 }
 
 
+void syscall_work_queue::submit_item(std::unique_ptr<syscall_work_queue::work_item> item) {
+    _queue_has_room.wait().then([this, item = std::move(item)] () mutable {
+        _pending.push(item.release());
+        _start_eventfd.signal(1);
+    });
+}
+
 
 unsigned syscall_work_queue::complete() {
     std::array<work_item*, queue_length> tmp_buf;
@@ -14172,7 +14380,7 @@ std::string network_stack_registry::default_stack() {
 }
 
 std::vector<std::string> network_stack_registry::list() {
-    std::vector<sstring> ret;
+    std::vector<std::string> ret;
     for (auto&& ns : _map()) {
         ret.push_back(ns.first);
     }
@@ -14427,8 +14635,7 @@ template <transport Transport>
 future<connected_socket, socket_address>
 posix_reuseport_server_socket_impl<Transport>::accept() {
     return _lfd.accept().then([] (pollable_fd fd, socket_address sa) {
-        std::unique_ptr<connected_socket_impl> csi(
-                new posix_connected_socket_impl<Transport>(std::make_shared(std::move(fd))));
+        std::unique_ptr<connected_socket_impl> csi(new posix_connected_socket_impl<Transport>(std::make_shared<pollable_fd>(std::move(fd))));
         return make_ready_future<connected_socket, socket_address>(
             connected_socket(std::move(csi)), sa);
     });
@@ -14445,7 +14652,7 @@ void  posix_ap_server_socket_impl<Transport>::move_connected_socket(socket_addre
     auto i = get_sockets().find(sa.as_posix_sockaddr_in());
     if (i != get_sockets().end()) {
         try {
-            std::unique_ptr<connected_socket_impl> csi(new posix_connected_socket_impl<Transport>(std::make_shared(std::move(fd))));
+            std::unique_ptr<connected_socket_impl> csi(new posix_connected_socket_impl<Transport>(std::make_shared<pollable_fd>(std::move(fd))));
             i->second.set_value(connected_socket(std::move(csi)), std::move(addr));
         } catch (...) {
             i->second.set_exception(std::current_exception());
@@ -14792,6 +14999,7 @@ future<connected_socket> net::socket::connect(socket_address sa, socket_address 
 void net::socket::shutdown() {
     _si->shutdown();
 }
+
 server_socket::server_socket() {}
 
 server_socket::server_socket(std::unique_ptr<net::server_socket_impl> ssi)
@@ -15658,6 +15866,7 @@ file::file(int fd, file_open_options options)
         : _file_impl(make_file_impl(fd, options)) {
 }
 
+
 future<file>
 reactor::open_file_dma(std::string name, open_flags flags, file_open_options options) {
     static constexpr mode_t mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH; // 0644
@@ -15687,15 +15896,15 @@ reactor::open_file_dma(std::string name, open_flags flags, file_open_options opt
             ::close(fd);
             return maybe_ret;
         }
-        if (fd != -1) {
-            fsxattr attr = {};
-            if (options.extent_allocation_size_hint) {
-                attr.fsx_xflags |= XFS_XFLAG_EXTSIZE;
-                attr.fsx_extsize = options.extent_allocation_size_hint;
-            }
-            // Ignore error; may be !xfs, and just a hint anyway
-            ::ioctl(fd, XFS_IOC_FSSETXATTR, &attr);
-        }
+        // if (fd != -1) {
+        //     fsxattr attr = {};
+        //     if (options.extent_allocation_size_hint) {
+        //         attr.fsx_xflags |= XFS_XFLAG_EXTSIZE;
+        //         attr.fsx_extsize = options.extent_allocation_size_hint;
+        //     }
+        //     // Ignore error; may be !xfs, and just a hint anyway
+        //     ::ioctl(fd, XFS_IOC_FSSETXATTR, &attr);
+        // }
         return wrap_syscall<int>(fd);
     }).then([options] (syscall_result<int> sr) {
         sr.throw_if_error();
@@ -15886,7 +16095,7 @@ file::file(File::file_handle&& handle)
         : _file_impl(std::move(std::move(handle).to_file()._file_impl)) {
 }
 
-::file_handle
+File::file_handle
 file::dup() {
     return File::file_handle(_file_impl->dup());
 }
@@ -16021,7 +16230,7 @@ posix_file_impl::size() {
 future<>
 posix_file_impl::close() noexcept {
     if (_fd == -1) {
-        seastar_logger.warn("double close() detected, contact support");
+        throw("double close detected,contact support");
         return make_ready_future<>();
     }
     auto fd = _fd;
@@ -16038,7 +16247,7 @@ posix_file_impl::close() noexcept {
                 return wrap_syscall<int>(::close(fd));
             });
         } catch (...) {
-            report_exception("Running ::close() in reactor thread, submission failed with exception", std::current_exception());
+            throw("Running::close() in reactor thread, submission failed with exception");
             return make_ready_future<syscall_result<int>>(wrap_syscall<int>(::close(fd)));
         }
     }();
@@ -16146,4 +16355,28 @@ posix_file_impl::list_directory(std::function<future<> (directory_entry de)> nex
         w->s.close();
     });
     return ret;
+}
+
+
+template <typename Func>
+future<io_event>
+reactor::submit_io_read(const io_priority_class& pc, size_t len, Func prepare_io) {
+    ++_io_stats.aio_reads;
+    _io_stats.aio_read_bytes += len;
+    return io_queue::queue_request(_io_coordinator, pc, len, std::move(prepare_io));
+}
+
+template <typename Func>
+future<io_event>
+reactor::submit_io_write(const io_priority_class& pc, size_t len, Func prepare_io) {
+    ++_io_stats.aio_writes;
+    _io_stats.aio_write_bytes += len;
+    return io_queue::queue_request(_io_coordinator, pc, len, std::move(prepare_io));
+}
+
+const io_priority_class& default_priority_class() {
+    static thread_local auto shard_default_class = [] {
+        return engine().register_one_priority_class("default", 1);
+    }();
+    return shard_default_class;
 }

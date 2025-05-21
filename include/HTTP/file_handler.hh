@@ -42,8 +42,8 @@ public:
      * @param req the request
      * @param extension the file extension originating the content
      */
-    virtual void transform(sstring& content, const request& req,
-            const sstring& extension) = 0;
+    virtual void transform(std::string& content, const request& req,
+            const std::string& extension) = 0;
 
     virtual ~file_transformer() = default;
 };
@@ -58,10 +58,7 @@ public:
 class file_interaction_handler : public handler_base {
 public:
     file_interaction_handler(file_transformer* p = nullptr)
-            : transformer(p) {
-
-    }
-
+            : transformer(p) {}
     ~file_interaction_handler();
 
     /**
@@ -73,7 +70,6 @@ public:
         transformer = t;
         return this;
     }
-
     /**
      * if the url ends without a slash redirect
      * @param req the request
@@ -81,14 +77,12 @@ public:
      * @return true on redirect
      */
     bool redirect_if_needed(const request& req, reply& rep) const;
-
     /**
      * A helper method that returns the file extension.
      * @param file the file to check
      * @return the file extension
      */
-    static sstring get_extension(const sstring& file);
-
+    static std::string get_extension(const std::string& file);
 protected:
 
     /**
@@ -97,11 +91,10 @@ protected:
      * @param req the reuest
      * @param rep the reply
      */
-    future<std::unique_ptr<reply> > read(const sstring& file,
+    future<std::unique_ptr<reply> > read(const std::string& file,
             std::unique_ptr<request> req, std::unique_ptr<reply> rep);
     file_transformer* transformer;
 };
-
 /**
  * The directory handler get a disk path in the
  * constructor.
@@ -113,23 +106,19 @@ protected:
  */
 class directory_handler : public file_interaction_handler {
 public:
-
     /**
      * The directory handler map a base path and a path parameter to a file
      * @param doc_root the root directory to search the file from.
      * For example if the root is '/usr/mgmt/public' and the path parameter
      * will be '/css/style.css' the file wil be /usr/mgmt/public/css/style.css'
      */
-    explicit directory_handler(const sstring& doc_root,
+    explicit directory_handler(const std::string& doc_root,
             file_transformer* transformer = nullptr);
-
-    future<std::unique_ptr<reply>> handle(const sstring& path,
+    future<std::unique_ptr<reply>> handle(const std::string& path,
             std::unique_ptr<request> req, std::unique_ptr<reply> rep) override;
-
 private:
-    sstring doc_root;
+    std::string doc_root;
 };
-
 /**
  * The file handler get a path to a file on the disk
  * in the constructor.
@@ -137,25 +126,127 @@ private:
  */
 class file_handler : public file_interaction_handler {
 public:
-
     /**
      * The file handler map a file to a url
      * @param file the full path to the file on the disk
      */
-    explicit file_handler(const sstring& file, file_transformer* transformer =
+    explicit file_handler(const std::string& file, file_transformer* transformer =
             nullptr, bool force_path = true)
             : file_interaction_handler(transformer), file(file), force_path(
                     force_path) {
     }
-
-    future<std::unique_ptr<reply>> handle(const sstring& path,
+    future<std::unique_ptr<reply>> handle(const std::string& path,
             std::unique_ptr<request> req, std::unique_ptr<reply> rep) override;
-
 private:
-    sstring file;
+    std::string file;
     bool force_path;
 };
 
 }
+
+namespace httpd {
+
+directory_handler::directory_handler(const std::string& doc_root,file_transformer* transformer): 
+    file_interaction_handler(transformer),doc_root(doc_root){}
+
+
+future<std::unique_ptr<reply>> directory_handler::handle(const std::string& path,
+        std::unique_ptr<request> req, std::unique_ptr<reply> rep) {
+    std::string full_path = doc_root + req->param["path"];
+    auto h = this;
+    return engine().file_type(full_path).then(
+            [h, full_path, req = std::move(req), rep = std::move(rep)](auto val) mutable {
+                if (val) {
+                    if (val.value() == directory_entry_type::directory) {
+                        if (h->redirect_if_needed(*req.get(), *rep.get())) {
+                            return make_ready_future<std::unique_ptr<reply>>(std::move(rep));
+                        }
+                        full_path += "/index.html";
+                    }
+                    return h->read(full_path, std::move(req), std::move(rep));
+                }
+                rep->set_status(reply::status_type::not_found).done();
+                return make_ready_future<std::unique_ptr<reply>>(std::move(rep));
+
+    });
+}
+
+file_interaction_handler::~file_interaction_handler() {
+    delete transformer;
+}
+
+std::string file_interaction_handler::get_extension(const std::string& file) {
+    size_t last_slash_pos = file.find_last_of('/');
+    size_t last_dot_pos = file.find_last_of('.');
+    std::string extension;
+    if (last_dot_pos != std::string::npos && last_dot_pos > last_slash_pos) {
+        extension = file.substr(last_dot_pos + 1);
+    }
+    return extension;
+}
+
+struct reader {
+private:
+public:
+    reader(file f, std::unique_ptr<reply> rep)
+            : is(make_file_input_stream(std::move(f)))
+            , _rep(std::move(rep)) {
+    }
+    input_stream<char> is;
+    std::unique_ptr<reply> _rep;
+
+    // for input_stream::consume():
+    using unconsumed_remainder = std::experimental::optional<temporary_buffer<char>>;
+    future<unconsumed_remainder> operator()(temporary_buffer<char> data) {
+        if (data.empty()) {
+            _rep->done();
+            return make_ready_future<unconsumed_remainder>(std::move(data));
+        } else {
+            _rep->_content.append(data.get(), data.size());
+            return make_ready_future<unconsumed_remainder>();
+        }
+    }
+};
+
+future<std::unique_ptr<reply>> file_interaction_handler::read(
+        const std::string& file_name, std::unique_ptr<request> req,
+        std::unique_ptr<reply> rep) {
+    std::string extension = get_extension(file_name);
+    rep->set_content_type(extension);
+    return open_file_dma(file_name, open_flags::ro).then(
+            [rep = std::move(rep), extension, this, req = std::move(req)](file f) mutable {
+                std::shared_ptr<reader> r = std::make_shared<reader>(std::move(f), std::move(rep));
+
+                return r->is.consume(*r).then([r, extension, this, req = std::move(req)]() {
+                            if (transformer != nullptr) {
+                                transformer->transform(r->_rep->_content, *req, extension);
+                            }
+                            r->_rep->done();
+                            return make_ready_future<std::unique_ptr<reply>>(std::move(r->_rep));
+                        });
+            });
+}
+
+bool file_interaction_handler::redirect_if_needed(const request& req,
+        reply& rep) const {
+    if (req._url.length() == 0 || req._url.back() != '/') {
+        rep.set_status(reply::status_type::moved_permanently);
+        rep._headers["Location"] = req.get_url() + "/";
+        rep.done();
+        return true;
+    }
+    return false;
+}
+
+future<std::unique_ptr<reply>> file_handler::handle(const std::string& path,
+        std::unique_ptr<request> req, std::unique_ptr<reply> rep) {
+    if (force_path && redirect_if_needed(*req.get(), *rep.get())) {
+        return make_ready_future<std::unique_ptr<reply>>(std::move(rep));
+    }
+    return read(file, std::move(req), std::move(rep));
+}
+
+}
+
 
 #endif /* HTTP_FILE_HANDLER_HH_ */

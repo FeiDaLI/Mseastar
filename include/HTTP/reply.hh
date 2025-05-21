@@ -86,7 +86,6 @@ struct reply {
         _version = version;
         return *this;
     }
-
     reply& set_status(status_type status, const std::string& content = "") {
         _status = status;
         if (content != "") {
@@ -94,7 +93,6 @@ struct reply {
         }
         return *this;
     }
-
     /**
      * Set the content type mime type.
      * Used when the mime type is known.
@@ -104,7 +102,6 @@ struct reply {
         _headers["Content-Type"] = mime;
         return *this;
     }
-
     /**
      * Set the content type mime type according to the file extension
      * that would have been used if it was a file: e.g. html, txt, json etc'
@@ -113,7 +110,6 @@ struct reply {
         set_mime_type(httpd::mime_types::extension_to_type(content_type));
         return *this;
     }
-
     reply& done(const std::string& content_type) {
         return set_content_type(content_type).done();
     }
@@ -129,3 +125,66 @@ struct reply {
 };
 
 } // namespace httpd
+namespace httpd {
+namespace status_strings {
+    const std::string ok = " 200 OK\r\n";
+    const std::string created = " 201 Created\r\n";
+    const std::string accepted = " 202 Accepted\r\n";
+    const std::string no_content = " 204 No Content\r\n";
+    const std::string multiple_choices = " 300 Multiple Choices\r\n";
+    const std::string moved_permanently = " 301 Moved Permanently\r\n"; 
+    const std::string moved_temporarily = " 302 Moved Temporarily\r\n";
+    const std::string not_modified = " 304 Not Modified\r\n";
+    const std::string bad_request = " 400 Bad Request\r\n";
+    const std::string unauthorized = " 401 Unauthorized\r\n";
+    const std::string forbidden = " 403 Forbidden\r\n";
+    const std::string not_found = " 404 Not Found\r\n";
+    const std::string internal_server_error = " 500 Internal Server Error\r\n";
+    const std::string not_implemented = " 501 Not Implemented\r\n";
+    const std::string bad_gateway = " 502 Bad Gateway\r\n";
+    const std::string service_unavailable = " 503 Service Unavailable\r\n";
+static const std::string& to_string(reply::status_type status) {
+    switch (status) {
+    case reply::status_type::ok:
+        return ok;
+    case reply::status_type::created:
+        return created;
+    case reply::status_type::accepted:
+        return accepted;
+    case reply::status_type::no_content:
+        return no_content;
+    case reply::status_type::multiple_choices:
+        return multiple_choices;
+    case reply::status_type::moved_permanently:
+        return moved_permanently;
+    case reply::status_type::moved_temporarily:
+        return moved_temporarily;
+    case reply::status_type::not_modified:
+        return not_modified;
+    case reply::status_type::bad_request:
+        return bad_request;
+    case reply::status_type::unauthorized:
+        return unauthorized;
+    case reply::status_type::forbidden:
+        return forbidden;
+    case reply::status_type::not_found:
+        return not_found;
+    case reply::status_type::internal_server_error:
+        return internal_server_error;
+    case reply::status_type::not_implemented:
+        return not_implemented;
+    case reply::status_type::bad_gateway:
+        return bad_gateway;
+    case reply::status_type::service_unavailable:
+        return service_unavailable;
+    default:
+        return internal_server_error;
+    }
+}
+} // namespace status_strings
+
+std::string reply::response_line() {
+    return "HTTP/" + _version + status_strings::to_string(_status);
+}
+
+} // namespace server

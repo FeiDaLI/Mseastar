@@ -106,7 +106,7 @@ public:
         %% write init;
     }
     char* parse(char* p, char* pe, char* eof) {
-        sstring_builder::guard g(_builder, p, pe);
+        string_builder::guard g(_builder, p, pe);
         auto str = [this, &g, &p] { g.mark_end(p); return get_str(); };
         bool done = false;
         if (p != pe) {

@@ -164,8 +164,8 @@ public:
         done,
     };
     std::unique_ptr<httpd::request> _req;
-    sstring _field_name;
-    sstring _value;
+    std::string _field_name;
+    std::string _value;
     state _state;
 public:
     void init() {
@@ -181,7 +181,7 @@ public:
 #line 117 "request_parser.rl"
     }
     char* parse(char* p, char* pe, char* eof) {
-        sstring_builder::guard g(_builder, p, pe);
+        string_builder::guard g(_builder, p, pe);
         auto str = [this, &g, &p] { g.mark_end(p); return get_str(); };
         bool done = false;
         if (p != pe) {

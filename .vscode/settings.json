@@ -78,6 +78,7 @@
         "io_context": "cpp",
         "*.ipp": "cpp",
         "strstream": "cpp",
-        "pthread.h": "c"
+        "pthread.h": "c",
+        "queue": "cpp"
     }
 }

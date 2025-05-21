@@ -22,12 +22,12 @@ build/test/http_test/http_test.o: test/http_test/http_test.cc \
  test/http_test/../../include/HTTP/matchrules.hh \
  test/http_test/../../include/HTTP/handlers.hh \
  test/http_test/../../include/HTTP/matcher.hh \
+ test/http_test/../../include/HTTP/exception.hh \
  test/http_test/../../include/HTTP/handlers.hh \
  test/http_test/../../include/HTTP/matcher.hh \
  test/http_test/../../include/HTTP/matchrules.hh \
  test/http_test/../../include/HTTP/routes.hh \
  test/http_test/../../include/HTTP/exception.hh \
- include/json/json_elements.hh include/json/formatter.hh \
  test/http_test/../../include/HTTP/transformers.hh \
  test/http_test/../../include/HTTP/file_handler.hh \
  test/http_test/../../include/app/app-template.hh

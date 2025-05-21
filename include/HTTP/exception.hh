@@ -23,8 +23,8 @@
 #define EXCEPTION_HH_
 
 #include "reply.hh"
-#include "json/json_elements.hh"
-
+#include <boost/json.hpp>
+#include <boost/json/serialize.hpp> // 确保包含 serialize 头文件
 namespace httpd {
 
 /**

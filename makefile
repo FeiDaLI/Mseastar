@@ -101,7 +101,7 @@
 CXX = g++
 # 编译选项
 CXXFLAGS = -w -Wall -std=c++20 -g -Iinclude -pthread -MMD
-LDFLAGS = -pthread -lboost_system -lboost_thread -lrt -lhwloc -lboost_program_options -laio  -lunwind
+LDFLAGS = -pthread -lboost_system -lboost_thread -lrt -lhwloc -lboost_program_options -laio  -lunwind -lboost_json
 
 SRCS = \
 	include/resource/resource.cc \

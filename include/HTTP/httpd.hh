@@ -1,24 +1,3 @@
-/*
- * This file is open source software, licensed to you under the terms
- * of the Apache License, Version 2.0 (the "License").  See the NOTICE file
- * distributed with this work for additional information regarding copyright
- * ownership.  You may not use this file except in compliance with the License.
- *
- * You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
-/*
- * Copyright 2015 Cloudius Systems
- */
-
 #ifndef APPS_HTTPD_HTTPD_HH_
 #define APPS_HTTPD_HTTPD_HH_
 
@@ -47,8 +26,8 @@ class http_stats;
 using namespace std::chrono_literals;
 
 class http_stats {
- //   seastar::metrics::metric_groups _metric_groups;
-public:
+    //seastar::metrics::metric_groups _metric_groups;
+    public:
     http_stats(http_server& server, const std::string& name);
 };
 
@@ -66,6 +45,13 @@ class http_server {
     bool _stopping = false;
     promise<> _all_connections_stopped;
     future<> _stopped = _all_connections_stopped.get_future();
+/*................待定.....*/
+    http_server() : _stats(*this, "default_server") { // 提供一个默认名称
+        _date_format_timer.arm_periodic(1s);
+    }
+/*.............................*/
+
+
 private:
     void maybe_idle() {
         if (_stopping && !_connections_being_accepted && !_current_connections) {
@@ -115,7 +101,7 @@ public:
                                 }
                             });
                     do_accepts(which);
-                }).then_wrapped([] (auto f) {
+                }).then_wrapped([] (auto f){
             try {
                 f.get();
             } catch (std::exception& ex) {
@@ -134,7 +120,7 @@ public:
         std::unique_ptr<request> _req;
         std::unique_ptr<reply> _resp;
         // null element marks eof
-        queue<std::unique_ptr<reply>> _replies { 10 };
+        queue_<std::unique_ptr<reply>> _replies { 10 };
         bool _done = false;
     public:
         connection(http_server& server, connected_socket&& fd,
@@ -185,7 +171,6 @@ public:
                 }
                 ++_server._requests_served;
                 std::unique_ptr<httpd::request> req = _parser.get_parsed_request();
-
                 return _replies.not_full().then([req = std::move(req), this] () mutable {
                     return generate_reply(std::move(req));
                 }).then([this](bool done) {
@@ -219,10 +204,9 @@ public:
         future<> start_response() {
             _resp->_headers["Server"] = "Seastar httpd";
             _resp->_headers["Date"] = _server._date;
-            _resp->_headers["Content-Length"] = to_std::string(
+            _resp->_headers["Content-Length"] = std::to_string(
                     _resp->_content.size());
-            return _write_buf.write(_resp->_response_line.begin(),
-                    _resp->_response_line.size()).then([this] {
+            return _write_buf.write(_resp->_response_line).then([this] {
                 return write_reply_headers(_resp->_headers.begin());
             }).then([this] {
                 return _write_buf.write("\r\n", 2);
@@ -239,11 +223,11 @@ public:
             if (hi == _resp->_headers.end()) {
                 return make_ready_future<>();
             }
-            return _write_buf.write(hi->first.begin(), hi->first.size()).then(
+            return _write_buf.write(hi->first).then(
                     [this] {
                         return _write_buf.write(": ", 2);
                     }).then([hi, this] {
-                return _write_buf.write(hi->second.begin(), hi->second.size());
+                return _write_buf.write(hi->second);
             }).then([this] {
                 return _write_buf.write("\r\n", 2);
             }).then([hi, this] () mutable {
@@ -367,8 +351,7 @@ public:
             });
         }
         future<> write_body() {
-            return _write_buf.write(_resp->_content.begin(),
-                    _resp->_content.size());
+            return _write_buf.write(_resp->_content);
         }
     };
     uint64_t total_connections() const {
@@ -401,24 +384,24 @@ private:
 /*
  *  A helper class to start, set and listen an http server
  *  typical use would be:
- *  auto server = new http_server_control();
- *                 server->start().then([server] {
+ *  auto server =
+ *          new http_server_control();
+ *                server->start().then([server] {
  *                 server->set_routes(set_routes);
- *              }).then([server, port] {
+ *          }).then([server, port] {
  *                  server->listen(port);
- *              }).then([port] {
+ *          }).then([port] {
  *                  std::cout << "Seastar HTTP server listening on port " << port << " ...\n";
- *              });
+ *          });
  */
+
 
 class http_server_control {
     distributed<http_server>* _server_dist;
 private:
     static std::string generate_server_name();
 public:
-    http_server_control():_server_dist(new distributed<http_server>) {
-    }
-
+    http_server_control():_server_dist(new distributed<http_server>()){}
 
     future<> start(const std::string& name = generate_server_name()) {
         return _server_dist->start(name);
@@ -444,5 +427,24 @@ public:
 };
 
 }
+
+using namespace std::chrono_literals;
+
+namespace httpd {
+http_stats::http_stats(http_server& server, const std::string& name)
+{
+    // namespace sm = seastar::metrics;
+    // std::vector<sm::label_instance> labels;
+    // labels.push_back(sm::label_instance("service", name));
+}
+
+std::string http_server_control::generate_server_name() {
+    static thread_local uint16_t idgen;
+    return "http-{}"+std::to_string(idgen++);
+}
+}
+
+
+
 
 #endif /* APPS_HTTPD_HTTPD_HH_ */

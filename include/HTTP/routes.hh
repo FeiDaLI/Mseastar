@@ -1,24 +1,3 @@
-/*
- * This file is open source software, licensed to you under the terms
- * of the Apache License, Version 2.0 (the "License").  See the NOTICE file
- * distributed with this work for additional information regarding copyright
- * ownership.  You may not use this file except in compliance with the License.
- *
- * You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
-/*
- * Copyright 2015 Cloudius Systems
- */
-
 #ifndef ROUTES_HH_
 #define ROUTES_HH_
 
@@ -26,17 +5,16 @@
 #include "handlers.hh"
 #include "common.hh"
 #include "reply.hh"
-
 #include <boost/program_options/variables_map.hpp>
 #include <unordered_map>
+#include <boost/json.hpp>
+#include <boost/json/serialize.hpp>
 #include <vector>
 #include "../../include/future/future_all12.hh"
+#include "exception.hh"
 
 namespace httpd {
-
-/**
- * The url helps defining a route.
- */
+    /** The url helps defining a route. */
 class url {
 public:
     /**
@@ -48,22 +26,21 @@ public:
      * Construct with a url path as it's parameter
      * @param path the url path to be used
      */
-    url(const sstring& path)
+    url(const std::string& path)
             : _path(path) {
     }
-
     /**
      * Adds a parameter that matches untill the end of the URL.
      * @param param the parmaeter name
      * @return the current url
      */
-    url& remainder(const sstring& param) {
+    url& remainder(const std::string& param) {
         this->_param = param;
         return *this;
     }
 
-    sstring _path;
-    sstring _param;
+    std::string _path;
+    std::string _param;
 };
 
 /**
@@ -86,7 +63,7 @@ public:
      * @param handler the desire handler
      * @return it self
      */
-    routes& put(operation_type type, const sstring& url,
+    routes& put(operation_type type, const std::string& url,
             handler_base* handler) {
         //FIXME if a handler is already exists, it need to be
         // deleted to prevent memory leak
@@ -128,14 +105,14 @@ public:
      * @param req the http request
      * @param rep the http reply
      */
-    future<std::unique_ptr<reply> > handle(const sstring& path, std::unique_ptr<request> req, std::unique_ptr<reply> rep);
+    future<std::unique_ptr<reply> > handle(const std::string& path, std::unique_ptr<request> req, std::unique_ptr<reply> rep);
 
     /**
      * Search and return an exact match
      * @param url the request url
      * @return the handler if exists or nullptr if it does not
      */
-    handler_base* get_exact_match(operation_type type, const sstring& url) {
+    handler_base* get_exact_match(operation_type type, const std::string& url) {
         return (_map[type].find(url) == _map[type].end()) ?
                 nullptr : _map[type][url];
     }
@@ -149,7 +126,7 @@ private:
      * @param params a parameter object that will be filled during the match
      * @return a handler based on the type/url match
      */
-    handler_base* get_handler(operation_type type, const sstring& url,
+    handler_base* get_handler(operation_type type, const std::string& url,
             parameters& params);
 
     /**
@@ -159,9 +136,9 @@ private:
      * @param param_part will hold the string with the parameters
      * @return the url from the request without the last /
      */
-    sstring normalize_url(const sstring& url);
+    std::string normalize_url(const std::string& url);
 
-    std::unordered_map<sstring, handler_base*> _map[NUM_OPERATION];
+    std::unordered_map<std::string, handler_base*> _map[NUM_OPERATION];
     std::vector<match_rule*> _rules[NUM_OPERATION];
 public:
     using exception_handler_fun = std::function<std::unique_ptr<reply>(std::exception_ptr eptr)>;
@@ -200,8 +177,122 @@ public:
  * @param params the parameters object
  * @param param the parameter to look for
  */
-void verify_param(const httpd::request& req, const sstring& param);
+void verify_param(const httpd::request& req, const std::string& param);
 
 }
+
+
+
+
+namespace httpd {
+
+using namespace std;
+
+void verify_param(const request& req, const std::string& param) {
+    if (req.get_query_param(param) == "") {
+        throw missing_param_exception(param);
+    }
+}
+routes::routes() : _general_handler([this](std::exception_ptr eptr) mutable {
+    return exception_reply(eptr);
+}) {}
+
+routes::~routes() {
+    for (int i = 0; i < NUM_OPERATION; i++) {
+        for (auto kv : _map[i]) {
+            delete kv.second;
+        }
+    }
+    for (int i = 0; i < NUM_OPERATION; i++) {
+        for (auto r : _rules[i]) {
+            delete r;
+        }
+    }
+}
+
+std::unique_ptr<reply> routes::exception_reply(std::exception_ptr eptr) {
+    auto rep = std::make_unique<reply>();
+    try {
+        for (auto e : _exceptions) {
+            try {
+                return e.second(eptr);
+            } catch (...) {
+                eptr = std::current_exception();
+            }
+        }
+        std::rethrow_exception(eptr);
+    } catch (const base_exception& e) {
+        rep->set_status(e.status(), boost::json::serialize(json_exception(e).to_json()));
+    } catch (exception& e) {
+        rep->set_status(reply::status_type::internal_server_error,
+                        boost::json::serialize(json_exception(e).to_json()));
+    } catch (...) {
+        rep->set_status(reply::status_type::internal_server_error,
+                        boost::json::serialize(json_exception(std::runtime_error("Unknown unhandled exception")).to_json()));
+    }
+    rep->done("json");
+    return rep;
+}
+
+future<std::unique_ptr<reply>> routes::handle(const std::string& path, std::unique_ptr<request> req, std::unique_ptr<reply> rep) {
+    handler_base* handler = get_handler(str2type(req->_method),
+            normalize_url(path), req->param);
+    if (handler != nullptr) {
+        try {
+            for (auto& i : handler->_mandatory_param) {
+                verify_param(*req.get(), i);
+            }
+            auto r = handler->handle(path, std::move(req), std::move(rep));
+            return r.handle_exception(_general_handler);
+        } catch (const redirect_exception& _e) {
+            rep.reset(new reply());
+            rep->add_header("Location", _e.url).set_status(_e.status()).done("json");
+        } catch (...) {
+            rep = exception_reply(std::current_exception());
+        }
+    } else {
+        rep.reset(new reply());
+        json_exception ex(not_found_exception("Not found"));
+        rep->set_status(reply::status_type::not_found, boost::json::serialize(ex.to_json())).done("json");
+    }
+    return make_ready_future<std::unique_ptr<reply>>(std::move(rep));
+}
+std::string routes::normalize_url(const std::string& url) {
+    if (url.length() < 2 || url.at(url.length() - 1) != '/') {
+        return url;
+    }
+    return url.substr(0, url.length() - 1);
+}
+
+handler_base* routes::get_handler(operation_type type, const std::string& url,
+        parameters& params) {
+    handler_base* handler = get_exact_match(type, url);
+    if (handler != nullptr) {
+        return handler;
+    }
+
+    for (auto rule = _rules[type].cbegin(); rule != _rules[type].cend();
+            ++rule) {
+        handler = (*rule)->get(url, params);
+        if (handler != nullptr) {
+            return handler;
+        }
+        params.clear();
+    }
+    return nullptr;
+}
+
+routes& routes::add(operation_type type, const url& url,
+        handler_base* handler) {
+    match_rule* rule = new match_rule(handler);
+    rule->add_str(url._path);
+    if (url._param != "") {
+        rule->add_param(url._param, true);
+    }
+    return add(rule, type);
+}
+
+}
+
 
 #endif /* ROUTES_HH_ */

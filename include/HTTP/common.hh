@@ -37,7 +37,18 @@ enum operation_type {
  * @param type the string "GET" or "POST"
  * @return the operation_type
  */
-operation_type str2type(const std::string& type);
+operation_type str2type(const std::string& type){
+    if (type == "DELETE") {
+        return DELETE;
+    }
+    if (type == "POST") {
+        return POST;
+    }
+    if (type == "PUT") {
+        return PUT;
+    }
+    return GET;
+}
 
 }
 
