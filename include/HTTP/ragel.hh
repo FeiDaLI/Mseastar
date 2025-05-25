@@ -36,8 +36,7 @@
 // After mark_end() has been called, use the get() method to obtain
 // the built string.
 // FIXME: switch to string_view.
-//
-class std::string_builder {
+class string_builder {
     std::string _value;
     const char* _start = nullptr;
 public:
@@ -53,11 +52,11 @@ public:
     friend class guard;
 };
 
-class std::string_builder::guard {
-    std::string_builder& _builder;
+class string_builder::guard {
+    string_builder& _builder;
     const char* _block_end;
 public:
-    guard(std::string_builder& builder, const char* block_start, const char* block_end)
+    guard(string_builder& builder, const char* block_start, const char* block_end)
         : _builder(builder), _block_end(block_end) {
         if (!_builder._value.empty()) {
             mark_start(block_start);
@@ -82,7 +81,6 @@ public:
     }
 };
 
-
 // CRTP
 template <typename ConcreteParser>
 class ragel_parser_base {
@@ -94,7 +92,7 @@ protected:
     int _fsm_act;
     char* _fsm_ts;
     char* _fsm_te;
-    std::string_builder _builder;
+    string_builder _builder;
 protected:
     void init_base() {
         _builder.reset();
