@@ -9795,6 +9795,114 @@ public:
 }
 
 
+
+/// Smart pointer wrapper which makes it safe to move across CPUs.
+/// \c foreign_ptr<> is a smart pointer wrapper which, unlike
+/// \ref shared_ptr and \ref lw_shared_ptr, is safe to move to a
+/// different core.
+/// As seastar avoids locking, any but the most trivial objects must
+/// be destroyed on the same core they were created on, so that,
+/// for example, their destructors can unlink references to the
+/// object from various containers.  In addition, for performance
+/// reasons, the shared pointer types do not use atomic operations
+/// to manage their reference counts.  As a result they cannot be
+/// used on multiple cores in parallel.
+/// \c foreign_ptr<> provides a solution to that problem.
+/// \c foreign_ptr<> wraps any pointer type -- raw pointer,
+/// \ref shared_ptr<>, or similar, and remembers on what core this
+/// happened.  When the \c foreign_ptr<> object is destroyed, it
+/// sends a message to the original core so that the wrapped object
+/// can be safely destroyed.
+/// \c foreign_ptr<> is a move-only object; it cannot be copied.
+
+template <typename PtrType>
+class foreign_ptr {
+private:
+    PtrType _value;
+    unsigned _cpu;
+private:
+    bool on_origin() {
+        return engine().cpu_id() == _cpu;
+    }
+public:
+    using element_type = typename std::pointer_traits<PtrType>::element_type;
+
+    /// Constructs a null \c foreign_ptr<>.
+    foreign_ptr()
+        : _value(PtrType())
+        , _cpu(engine().cpu_id()) {
+    }
+    /// Constructs a null \c foreign_ptr<>.
+    foreign_ptr(std::nullptr_t) : foreign_ptr() {}
+    /// Wraps a pointer object and remembers the current core.
+    foreign_ptr(PtrType value)
+        : _value(std::move(value))
+        , _cpu(engine().cpu_id()) {
+    }
+    // The type is intentionally non-copyable because copies
+    // are expensive because each copy requires across-CPU call.
+    foreign_ptr(const foreign_ptr&) = delete;
+    /// Moves a \c foreign_ptr<> to another object.
+    foreign_ptr(foreign_ptr&& other) = default;
+    /// Destroys the wrapped object on its original cpu.
+    ~foreign_ptr() {
+        if (_value && !on_origin()) {
+            smp::submit_to(_cpu, [v = std::move(_value)] () mutable {
+                auto local(std::move(v));
+            });
+        }
+    }
+    /// Creates a copy of this foreign ptr. Only works if the stored ptr is copyable.
+    future<foreign_ptr> copy() const {
+        return smp::submit_to(_cpu, [this] () mutable {
+            auto v = _value;
+            return make_foreign(std::move(v));
+        });
+    }
+    /// Accesses the wrapped object.
+    element_type& operator*() const { return *_value; }
+    /// Accesses the wrapped object.
+    element_type* operator->() const { return &*_value; }
+    /// Checks whether the wrapped pointer is non-null.
+    operator bool() const { return static_cast<bool>(_value); }
+    /// Move-assigns a \c foreign_ptr<>.
+    foreign_ptr& operator=(foreign_ptr&& other) = default;
+};
+
+/// Wraps a raw or smart pointer object in a \ref foreign_ptr<>.
+///
+/// \relates foreign_ptr
+template <typename T>
+foreign_ptr<T> make_foreign(T ptr) {
+    return foreign_ptr<T>(std::move(ptr));
+}
+
+#include <memory> // for std::unique_ptr
+
+template<typename T>
+struct is_smart_ptr : std::false_type {};
+
+template<typename T>
+struct is_smart_ptr<std::unique_ptr<T>> : std::true_type {};
+
+
+template<typename T>
+struct is_smart_ptr<::foreign_ptr<T>> : std::true_type {};
+
+/// @}
+
+
+
+
+
+
+
+
+
+
+
+
+
 GCC6_CONCEPT(
 namespace impl {
 // Want: folds
@@ -11378,8 +11486,141 @@ bool thread_context::should_yield() const {
     return need_preempt() || bool(_attr.scheduling_group->next_scheduling_point());
 }
 
+class vector_data_sink final : public data_sink_impl {
+public:
+    using vector_type = std::vector<net::packet>;
+private:
+    vector_type& _v;
+public:
+    vector_data_sink(vector_type& v) : _v(v) {}
+    virtual future<> put(net::packet p) override {
+        _v.push_back(std::move(p));
+        return make_ready_future<>();
+    }
+    virtual future<> close() override {
+        // TODO: close on local side
+        return make_ready_future<>();
+    }
+};
+namespace net {
 
+class packet_data_source final : public data_source_impl {
+    size_t _cur_frag = 0;
+    packet _p;
+public:
+    explicit packet_data_source(net::packet&& p)
+        : _p(std::move(p))
+    {}
+    virtual future<temporary_buffer<char>> get() override {
+        if (_cur_frag != _p.nr_frags()) {
+            auto& f = _p.fragments()[_cur_frag++];
+            return make_ready_future<temporary_buffer<char>>(
+                    temporary_buffer<char>(f.base, f.size,
+                            make_deleter(deleter(), [p = _p.share()] () mutable {})));
+        }
+        return make_ready_future<temporary_buffer<char>>(temporary_buffer<char>());
+    }
+};
 
+static inline input_stream<char> as_input_stream(packet&& p) {
+    return input_stream<char>(data_source(std::make_unique<packet_data_source>(std::move(p))));
+}
+
+}
+
+namespace net {
+
+constexpr size_t packet::internal_data_size;
+constexpr size_t packet::default_nr_frags;
+
+void packet::linearize(size_t at_frag, size_t desired_size) {
+    _impl->unuse_internal_data();
+    size_t nr_frags = 0;
+    size_t accum_size = 0;
+    while (accum_size < desired_size) {
+        accum_size += _impl->_frags[at_frag + nr_frags].size;
+        ++nr_frags;
+    }
+    std::unique_ptr<char[]> new_frag{new char[accum_size]};
+    auto p = new_frag.get();
+    for (size_t i = 0; i < nr_frags; ++i) {
+        auto& f = _impl->_frags[at_frag + i];
+        p = std::copy(f.base, f.base + f.size, p);
+    }
+    // collapse nr_frags into one fragment
+    std::copy(_impl->_frags + at_frag + nr_frags, _impl->_frags + _impl->_nr_frags,
+            _impl->_frags + at_frag + 1);
+    _impl->_nr_frags -= nr_frags - 1;
+    _impl->_frags[at_frag] = fragment{new_frag.get(), accum_size};
+    if (at_frag == 0 && desired_size == len()) {
+        // We can drop the old buffer safely
+        auto x = std::move(_impl->_deleter);
+        _impl->_deleter = make_deleter([buf = std::move(new_frag)] {});
+    } else {
+        _impl->_deleter = make_deleter(std::move(_impl->_deleter), [buf = std::move(new_frag)] {});
+    }
+}
+
+packet packet::free_on_cpu(unsigned cpu, std::function<void()> cb) {
+    // make new deleter that runs old deleter on an origin cpu
+    _impl->_deleter = make_deleter(deleter(), [d = std::move(_impl->_deleter), cpu, cb = std::move(cb)] () mutable {
+        smp::submit_to(cpu, [d = std::move(d), cb = std::move(cb)] () mutable {
+            // deleter needs to be moved from lambda capture to be destroyed here
+            // otherwise deleter destructor will be called on a cpu that called smp::submit_to()
+            // when work_item is destroyed.
+            deleter xxx(std::move(d));
+            cb();
+        });
+    });
+
+    return packet(impl::copy(_impl.get()));
+}
+
+// std::ostream& operator<<(std::ostream& os, const packet& p) {
+    // os << "packet{";
+    // bool first = true;
+    // for (auto&& frag : p.fragments()) {
+    //     if (!first) {
+    //         os << ", ";
+    //     }
+    //     first = false;
+    //     if (std::all_of(frag.base, frag.base + frag.size, [] (int c) { return c >= 9 && c <= 0x7f; })) {
+    //         os << '"';
+    //         for (auto p = frag.base; p != frag.base + frag.size; ++p) {
+    //             auto c = *p;
+    //             if (isprint(c)) {
+    //                 os << c;
+    //             } else if (c == '\r') {
+    //                 os << "\\r";
+    //             } else if (c == '\n') {
+    //                 os << "\\n";
+    //             } else if (c == '\t') {
+    //                 os << "\\t";
+    //             } else {
+    //                 uint8_t b = c;
+    //                 os << "\\x" << (b / 16) << (b % 16);
+    //             }
+    //         }
+    //         os << '"';
+    //     } else {
+    //         os << "{";
+    //         bool nfirst = true;
+    //         for (auto p = frag.base; p != frag.base + frag.size; ++p) {
+    //             if (!nfirst) {
+    //                 os << " ";
+    //             }
+    //             nfirst = false;
+    //             uint8_t b = *p;
+    //             os << sprint("%02x", unsigned(b));
+    //         }
+    //         os << "}";
+    //     }
+    // }
+    // os << "}";
+    // return os;
+// }
+
+}
 
 
 
