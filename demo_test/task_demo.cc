@@ -20,3 +20,8 @@ int main(){
     vec.push_back(std::move(lamba2));
     run();
 }
+/*
+正常输出：
+lambda 1
+lambda 2
+*/
