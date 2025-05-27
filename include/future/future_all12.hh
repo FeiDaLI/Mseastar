@@ -12069,7 +12069,7 @@ reactor::reactor(unsigned id)
     sigaddset(&mask, block_notifier_signal());
     r = ::pthread_sigmask(SIG_UNBLOCK, &mask, NULL);
     assert(r == 0);
-    memory::set_reclaim_hook([this] (std::function<void ()> reclaim_fn) {
+    memory::set_reclaim_hook([this] (std::function<void()> reclaim_fn) {
         add_high_priority_task(make_task([fn = std::move(reclaim_fn)] {
             fn();
         }));
