@@ -9561,8 +9561,8 @@ inline future<> parallel_for_each(Iterator begin, Iterator end, Func&& func) {
     while (begin != end) {
         ++state->waiting;
         try {
-            func(*begin++).then_wrapped([state = state.get()] (future<> f) {
-                if (f.failed()) {
+            func(*begin++).then_wrapped([state = std::move(state)] (future<> f) {
+                if (f.failed()) {//这个地方还是不理解
                     if (!state->ex) {
                         state->ex = f.get_exception();
                     } else {
@@ -10335,15 +10335,15 @@ struct extract_values_from_futures_vector<future<>> {
         return make_ready_future<>();
     }
 };
+}
 
-}
-template<typename... Futures>
-GCC6_CONCEPT( requires AllAreFutures<Futures...> )
-inline auto when_all_succeed(Futures&&... futures) {
-    using state = internal::when_all_state<internal::extract_values_from_futures_tuple<Futures...>, Futures...>;
-    auto s = std::make_shared<state>(std::forward<Futures>(futures)...);
-    return s->wait_all(std::make_index_sequence<sizeof...(Futures)>());
-}
+// template<typename... Futures>
+// GCC6_CONCEPT( requires AllAreFutures<Futures...> )
+// inline auto when_all_succeed(Futures&&... futures) {
+//     using state = internal::when_all_state<internal::extract_values_from_futures_tuple<Futures...>, Futures...>;
+//     auto s = std::make_shared<state>(std::forward<Futures>(futures)...);
+//     return s->wait_all(std::make_index_sequence<sizeof...(Futures)>());
+// }
 
 template <typename FutureIterator, typename = typename std::iterator_traits<FutureIterator>::value_type>
 GCC6_CONCEPT( requires requires (FutureIterator i) {
@@ -10352,11 +10352,11 @@ GCC6_CONCEPT( requires requires (FutureIterator i) {
      requires is_future<std::remove_reference_t<decltype(*i)>>::value;
 })
 
-inline auto when_all_succeed(FutureIterator begin, FutureIterator end) {
-    using itraits = std::iterator_traits<FutureIterator>;
-    using result_transform = internal::extract_values_from_futures_vector<typename itraits::value_type>;
-    return internal::do_when_all<result_transform>(std::move(begin), std::move(end));
-}
+// inline auto when_all_succeed(FutureIterator begin, FutureIterator end) {
+//     using itraits = std::iterator_traits<FutureIterator>;
+//     using result_transform = internal::extract_values_from_futures_vector<typename itraits::value_type>;
+//     return internal::do_when_all<result_transform>(std::move(begin), std::move(end));
+// }
 // Define the static member
 thread_local thread* thread::_current = nullptr;
 // Implementation of global functions
