@@ -2509,12 +2509,10 @@ public:
         using futurator = futurize<std::result_of_t<Func(T&&...)>>;
         // 如果当前 future,已经完成且不需要抢占.
         if (available() && !need_preempt()) {
-            //调试的时候这里不会执行到,need_preempt永远为true.
+            // 调试的时候这里不会执行到,need_preempt永远为true.
             if (failed()) {
-                // 如果失败，传播异常
                 return futurator::make_exception_future(get_available_state().get_exception());
             } else {
-                // 如果成功，执行回调函数
                 return futurator::apply(std::forward<Func>(func), get_available_state().get_value());
             }
         }
@@ -2523,7 +2521,7 @@ public:
         auto fut = pr.get_future();
         try {
             // std::cout<<"开始执行schedule"<<std::endl;
-            //schedule接受一个lambda函数,捕捉pr和func,参数为state
+            // schedule接受一个lambda函数,捕捉pr和func,参数为state
             schedule([pr = std::move(pr), func = std::forward<Func>(func)] (auto&& state) mutable
             {
                 //这个地方看不懂.auto &&state和state()有什么区别？为什么state不用引用捕获？
@@ -2537,12 +2535,13 @@ public:
                     // 返回一个 future<T>. 然后调用future的forward_to.
                 }
             },std::move(name));
-        } catch (...) {
+        }
+        catch (...)
+        {
             abort();
         }
         return fut;
     }
-
     template <typename Func, typename Result = futurize_t<std::result_of_t<Func(future)>>>
     GCC6_CONCEPT( requires CanApply<Func, future> )
     Result
@@ -2553,11 +2552,14 @@ public:
         }
         typename futurator::promise_type pr;
         auto fut = pr.get_future();
-        try {
+        try
+        {
             schedule([pr = std::move(pr), func = std::forward<Func>(func)] (auto&& state) mutable {
                 futurator::apply(std::forward<Func>(func), future(std::move(state))).forward_to(std::move(pr));
             });
-        } catch (...) {
+        }
+        catch(...)
+        {
             abort();
         }
         return fut;
@@ -2567,14 +2569,15 @@ public:
             // std::cout<<"state available future调用forward_to"<<std::endl;
             state()->forward_to(pr);
 
-        } else {
+        }
+        else
+        {
             // std::cout<<"state unavailable future调用forward_to"<<std::endl;
             _promise->_future = nullptr;
             *_promise = std::move(pr);
             _promise = nullptr;
         }
     }
-
     template <typename Func>
     GCC6_CONCEPT( requires CanApply<Func> )
     future<T...> finally(Func&& func) noexcept {
@@ -2695,19 +2698,19 @@ public:
     std::unique_ptr<task> _task;
     static constexpr bool copy_noexcept = future_state<T...>::copy_noexcept;
     /// \brief Constructs an empty \c promise.
-    ///
     /// Creates promise with no associated future yet (see get_future()).
     promise() noexcept : _state(&_local_state) {}
-
     /// \brief Moves a \c promise object.
     promise(promise&& x) noexcept : _future(x._future), _state(x._state), _task(std::move(x._task)) {
         if (_state == &x._local_state) {
             _state = &_local_state;
             _local_state = std::move(x._local_state);
-        }
+        }//这段代码有什么用?
         x._future = nullptr;
         x._state = nullptr;
-        migrated();
+        if (_future){
+            _future->_promise = this;
+        }
     }
     promise(const promise&) = delete;
     __attribute__((always_inline))
@@ -2748,6 +2751,7 @@ public:
     void set_exception(Exception&& e) noexcept {
         set_exception(make_exception_ptr(std::forward<Exception>(e)));
     }
+
     template<urgent Urgent>
     void do_set_value(std::tuple<T...> result) noexcept {
         assert(_state);
@@ -2773,15 +2777,16 @@ public:
     void set_urgent_exception(std::exception_ptr ex) noexcept {
         do_set_exception<urgent::yes>(std::move(ex));
     }
+
     template <typename Func>
     void schedule(Func&& func,std::string name) {
         auto tws = std::make_unique<continuation<Func, T...>>(std::move(func),std::move(name));
         _state = &tws->_state;
         _task = std::move(tws);
     }
+
     template<urgent Urgent>
     void make_ready() noexcept;
-    void migrated() noexcept;
     void abandoned() noexcept;
     template <typename... U>
     friend class future;
@@ -9506,44 +9511,77 @@ struct parallel_for_each_state {
 };
 
 //这里？
+// template <typename Iterator, typename Func>
+// GCC6_CONCEPT(requires requires (Func f, Iterator i) { { f(*i++) } -> std::same_as<future<>>; })
+// inline
+// future<>
+// parallel_for_each(Iterator begin, Iterator end, Func&& func) {
+//     if (begin == end) {
+//         return make_ready_future<>();
+//     }
+//     return do_with(parallel_for_each_state{}, [&] (parallel_for_each_state& state) -> future<> {
+//         // increase ref count to ensure all functions run
+//         ++state.waiting;
+//         while (begin != end) {
+//             ++state.waiting;
+//             try {
+//                 func(*begin++).then_wrapped([&] (future<> f) {
+//                     if (f.failed()) {
+//                         // We can only store one exception.  For more, use when_all().
+//                         if (!state.ex) {
+//                             state.ex = f.get_exception();
+//                         } else {
+//                             f.ignore_ready_future();
+//                         }
+//                     }
+//                     state.complete();
+//                 });
+//             } catch (...) {
+//                 if (!state.ex) {
+//                     state.ex = std::move(std::current_exception());
+//                 }
+//                 state.complete();
+//             }
+//         }
+//         // match increment on top
+//         state.complete();
+//         return state.pr.get_future();
+//     });
+// }
+
+
 template <typename Iterator, typename Func>
 GCC6_CONCEPT(requires requires (Func f, Iterator i) { { f(*i++) } -> std::same_as<future<>>; })
-inline
-future<>
-parallel_for_each(Iterator begin, Iterator end, Func&& func) {
+inline future<> parallel_for_each(Iterator begin, Iterator end, Func&& func) {
     if (begin == end) {
         return make_ready_future<>();
     }
-    return do_with(parallel_for_each_state(), [&] (parallel_for_each_state& state) -> future<> {
-        // increase ref count to ensure all functions run
-        ++state.waiting;
-        while (begin != end) {
-            ++state.waiting;
-            try {
-                func(*begin++).then_wrapped([&] (future<> f) {
-                    if (f.failed()) {
-                        // We can only store one exception.  For more, use when_all().
-                        if (!state.ex) {
-                            state.ex = f.get_exception();
-                        } else {
-                            f.ignore_ready_future();
-                        }
+    auto state = std::make_unique<parallel_for_each_state>();
+    ++state->waiting;
+    while (begin != end) {
+        ++state->waiting;
+        try {
+            func(*begin++).then_wrapped([state = state.get()] (future<> f) {
+                if (f.failed()) {
+                    if (!state->ex) {
+                        state->ex = f.get_exception();
+                    } else {
+                        f.ignore_ready_future();
                     }
-                    state.complete();
-                });
-            } catch (...) {
-                if (!state.ex) {
-                    state.ex = std::move(std::current_exception());
                 }
-                state.complete();
+                state->complete();
+            });
+        } catch (...) {
+            if (!state->ex) {
+                state->ex = std::current_exception();
             }
+            state->complete();
         }
-        // match increment on top
-        state.complete();
-        return state.pr.get_future();
-    });
+    }
+    state->complete();
+    auto result = state->pr.get_future();
+    return result;
 }
-
 
 template <typename Range, typename Func>
 GCC6_CONCEPT(requires requires (Func f, Range r) { { f(*r.begin()) } -> std::same_as<future<>>; })
@@ -13765,13 +13803,6 @@ void set_min_free_pages(size_t pages) {
 
 
 
-
-
-
-
-
-
-
 inline bool engine_is_ready() {
     return local_engine != nullptr;
 }
@@ -13792,21 +13823,16 @@ void promise<T...>::abandoned() noexcept {
 }
 
 template <typename Clock>
-inline
-timer<Clock>::timer(callback_t&& callback) : _callback(std::move(callback)) {
+inline timer<Clock>::timer(callback_t&& callback) : _callback(std::move(callback)) {
 }
 
-
 template <typename Clock>
-inline
-typename timer<Clock>::time_point timer<Clock>::get_timeout() {
+inline typename timer<Clock>::time_point timer<Clock>::get_timeout() {
     return _expiry;
 }
 
-
 template <typename Clock>
-inline
-bool timer<Clock>::cancel() {
+inline bool timer<Clock>::cancel() {
     if (!_armed) {
         return false;
     }
@@ -13818,14 +13844,6 @@ bool timer<Clock>::cancel() {
     return true;
 }
 
-
-template <typename... T>
-inline
-void promise<T...>::migrated() noexcept {
-    if (_future) {
-        _future->_promise = this;
-    }
-}
 
 template <typename Clock>
 inline
