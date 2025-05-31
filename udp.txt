@@ -1,0 +1,764 @@
+network_stack_registrator:posixmake_default1
+Entering app_template::run_deprecated
+Parsing command line options
+parse end
+Notifying configuration changes
+Configuring SMP
+Configuring SMP 2
+设置thread affinity
+thread affinity end
+ca::Available memory: 67271786496
+ca::Default reserve memory: 4709025280
+ca::Reserve memory: 4709025280
+ca::Minimum memory: 500000000
+ca::Adjusted available memory after reserve: 62562761216
+Requested memory: 62562761216
+Available memory: 67271786496
+Requested memory: 62562761216
+Available processing units: 12
+Requested processing units: 12
+Memory per processing unit: 5213519872
+分配CPU_SET
+coordinator0 128
+coordinator1 128
+coordinator2 128
+coordinator3 128
+coordinator4 128
+coordinator5 128
+coordinator6 128
+coordinator7 128
+coordinator8 128
+coordinator9 128
+coordinator10 128
+coordinator11 128
+shard_to_coordinator0
+shard_to_coordinator1
+shard_to_coordinator2
+shard_to_coordinator3
+shard_to_coordinator4
+shard_to_coordinator5
+shard_to_coordinator6
+shard_to_coordinator7
+shard_to_coordinator8
+shard_to_coordinator9
+shard_to_coordinator10
+shard_to_coordinator11
+res.cpus.size():12
+cpu.cpu_id:0
+mem.size:5213519872 mem.node_id:0
+cpu.cpu_id:1
+mem.size:5213519872 mem.node_id:0
+cpu.cpu_id:2
+mem.size:5213519872 mem.node_id:0
+cpu.cpu_id:3
+mem.size:5213519872 mem.node_id:0
+cpu.cpu_id:4
+mem.size:5213519872 mem.node_id:0
+cpu.cpu_id:5
+mem.size:5213519872 mem.node_id:0
+cpu.cpu_id:6
+mem.size:5213519872 mem.node_id:0
+cpu.cpu_id:7
+mem.size:5213519872 mem.node_id:0
+cpu.cpu_id:8
+mem.size:5213519872 mem.node_id:0
+cpu.cpu_id:9
+mem.size:5213519872 mem.node_id:0
+cpu.cpu_id:10
+mem.size:5213519872 mem.node_id:0
+cpu.cpu_id:11
+mem.size:5213519872 mem.node_id:0
+thread pind to 0
+mem config begin 
+=== 开始配置内存 ===
+计算总内存:
+  内存块[0] 大小: 5213519872 字节 NUMA节点: 0
+总内存量: 5213519872 字节
+使用默认匿名内存分配
+调整内存池大小至: 5213519872 字节
+第一次执行初始化
+调用初始化cpu_pages
+调用resize
+调用resize
+调用resize
+调用resize
+调整内存池end
+已分配内存块 [0 -> 5213519872) 大小: 5213519872 字节
+=== 内存配置完成 ===
+mem config end 
+开始执行smp::allocate_reactor
+thread_impl::init()
+smp::allocate_reactor结束
+create thread 7
+create thread 8
+create thread 6
+=== 开始配置内存 ===
+create thread 9
+计算总内存:
+  内存块[0] 大小: 5213519872=== 开始配置内存 === 字节
+create thread 11
+ NUMA节点: 0
+总内存量: 5213519872 字节
+create thread 使用默认匿名内存分配
+调整内存池大小至: 105213519872
+ 字节=== 开始配置内存 ===
+计算总内存:create thread 
+
+  内存块[0] 大小: 计算总内存:create thread 
+=== 开始配置内存 ===  内存块[05213519872
+create thread 3
+] 大小: 5213519872 字节第一次执行初始化 NUMA节点: 0
+总内存量: 5213519872 字节
+4使用默认匿名内存分配
+5调整内存池大小至: 5213519872 字节
+create thread 2
+第一次执行初始化
+调用初始化cpu_pages
+
+计算总内存: 字节 NUMA节点: 0
+
+总内存量: 
+5213519872 字节
+使用默认匿名内存分配
+调整内存池大小至: 5213519872 字节
+调用初始化cpu_pages
+第一次执行初始化
+=== 开始配置内存 ===调用初始化cpu_pages
+create thread 
+
+1
+计算总内存:
+  内存块[0] 大小:   内存块[0] 大小: 5213519872 字节5213519872 NUMA节点: 0
+总内存量: 5213519872 字节
+使用默认匿名内存分配
+调整内存池大小至: 5213519872 字节
+ 字节 NUMA节点: 0
+总内存量: 5213519872 字节
+使用默认匿名内存分配
+调整内存池大小至: 5213519872 字节
+第一次执行初始化
+调用初始化cpu_pages
+第一次执行初始化
+调用初始化cpu_pages
+调用resize
+调用resize
+=== 开始配置内存 ===
+计算总内存:
+  内存块[0] 大小: 5213519872 字节 NUMA节点: 0
+总内存量: 5213519872 字节
+使用默认匿名内存分配
+调整内存池大小至: 5213519872 字节
+第一次执行初始化
+调用初始化cpu_pages
+调用resize
+=== 开始配置内存 ===
+计算总内存:
+  内存块[0] 大小: 5213519872 字节调用resize
+=== 开始配置内存 ===
+计算总内存:
+  内存块[0] 大小: 5213519872 字节=== 开始配置内存 === NUMA节点: 0
+总内存量: 5213519872 字节
+使用默认匿名内存分配
+调整内存池大小至: 5213519872 字节
+ NUMA节点: 0
+总内存量: 
+第一次执行初始化
+调用初始化cpu_pages
+5213519872 字节
+使用默认匿名内存分配
+调整内存池大小至: 5213519872 字节
+计算总内存:
+  内存块[0] 大小: 5213519872 字节 NUMA节点: 0
+总内存量: 5213519872 字节
+使用默认匿名内存分配
+调整内存池大小至: 5213519872 字节
+第一次执行初始化
+调用初始化cpu_pages
+第一次执行初始化
+调用初始化cpu_pages
+调用resize
+调用resize
+调用resize
+调用resize
+调用resize
+调用resize
+调用resize
+调用resize
+调用resize
+调用resize
+调用resize
+调用resize
+=== 开始配置内存 ===
+计算总内存:
+  内存块[0] 大小: 5213519872 字节 NUMA节点: 0
+总内存量: 5213519872 字节
+使用默认匿名内存分配
+调整内存池大小至: 5213519872 字节
+第一次执行初始化
+调用初始化cpu_pages
+调用resize
+调用resize
+调用resize
+调整内存池end
+已分配内存块 [0 -> 5213519872) 大小: 5213519872 字节
+=== 内存配置完成 ===
+开始执行smp::allocate_reactor
+调用resize
+调用resize
+调用resize
+调用resize
+=== 开始配置内存 ===
+计算总内存:
+  内存块[0] 大小: 5213519872 字节 NUMA节点: 0
+总内存量: 5213519872 字节
+使用默认匿名内存分配
+调整内存池大小至: 5213519872 字节
+第一次执行初始化
+调用初始化cpu_pages
+调用resize
+调用resize
+调用resize
+调用resize
+调用resize
+调用resize
+调用resize
+调用resize
+调用resize
+调用resize
+thread_impl::init()
+调用resize
+调用resize
+调用resize
+smp::allocate_reactor结束
+调用resize
+调用resize
+调用resize
+调用resize
+调用resize
+调用resize
+调用resize
+调用resize
+调整内存池end
+已分配内存块 [0 -> 5213519872) 大小: 5213519872 字节
+=== 内存配置完成 ===
+开始执行smp::allocate_reactor
+调整内存池end
+已分配内存块 [0 -> 5213519872) 大小: 5213519872 字节
+=== 内存配置完成 ===
+开始执行smp::allocate_reactor
+调整内存池end
+已分配内存块 [0 -> 5213519872) 大小: 5213519872 字节
+=== 内存配置完成 ===
+开始执行smp::allocate_reactor
+thread_impl::init()
+调整内存池end
+已分配内存块 [0 -> 5213519872) 大小: 5213519872 字节
+=== 内存配置完成 ===
+smp::allocate_reactor结束
+开始执行smp::allocate_reactor
+调整内存池end
+已分配内存块 [0 -> 5213519872) 大小: 5213519872 字节
+=== 内存配置完成 ===
+开始执行smp::allocate_reactor
+调整内存池end
+已分配内存块 [0 -> 5213519872) 大小: 5213519872 字节
+=== 内存配置完成 ===
+开始执行smp::allocate_reactor
+调整内存池end
+已分配内存块 [0 -> 5213519872) 大小: 5213519872 字节
+=== 内存配置完成 ===
+开始执行smp::allocate_reactor
+thread_impl::init()
+thread_impl::init()
+thread_impl::init()
+smp::allocate_reactor结束
+smp::allocate_reactor结束
+smp::allocate_reactor结束
+thread_impl::init()
+thread_impl::init()
+smp::allocate_reactor结束
+smp::allocate_reactor结束
+thread_impl::init()
+smp::allocate_reactor结束
+调整内存池end
+已分配内存块 [0 -> 5213519872) 大小: 5213519872 字节
+=== 内存配置完成 ===
+开始执行smp::allocate_reactor
+thread_impl::init()
+调整内存池end
+已分配内存块 [调整内存池end0 -> 
+5213519872smp::allocate_reactor结束已分配内存块 [0) 大小: 5213519872 字节
+
+=== 内存配置完成 ===
+ -> 5213519872) 大小: 5213519872 字节
+=== 内存配置完成 ===
+开始执行smp::allocate_reactor
+开始执行smp::allocate_reactor
+thread_impl::init()thread_impl::init()
+
+smp::allocate_reactor结束smp::allocate_reactor结束
+
+reactors registered done
+smp qs begin
+smp qs end
+start all queues
+start all queues done
+assign io queues done
+reactor::configurereactor::configure
+inited done
+reactor::configurereactor::configurereactor::configure
+reactor::configure
+reactor::configurereactor::configure
+
+
+reactor::configure
+reactor::configure完成
+reactor::configure
+reactor::configure完成reactor::configure  _handle_sigint:
+reactor::configure
+reactor::configure  _handle_sigint:1
+
+reactor::configure  _task_quota:
+reactor::configure
+reactor::configure完成1
+reactor::configure完成reactor::configure
+reactor::configure完成reactor::configure  _handle_sigint:1
+reactor::configure  _task_quota:
+reactor::configure  blocked_time:
+reactor::configure  _tasks_processed_report_threshold:
+reactor::configure完成reactor::configure完成
+reactor::configure
+
+reactor::configure  _handle_sigint:1
+
+reactor::configure  _task_quota:reactor::configure  _task_quota:reactor::configure  _max_task_backlog:
+
+reactor::configure  _max_poll_time:
+reactor::configure  blocked_time:reactor::configure  _strict_dma
+
+
+reactor::configure
+reactor::configure  _handle_sigint:1
+reactor::configurereactor::configure  _task_quota:
+
+reactor::configure  _tasks_processed_report_threshold:
+reactor::configure  _max_task_backlog:
+reactor::configure  blocked_time:reactor::configure  _max_poll_time:
+
+reactor::configure  _strict_dmareactor::configure  blocked_time:reactor::configure  blocked_time:
+reactor::configure完成reactor::configure  _tasks_processed_report_threshold:
+没有设置aio_eventfd
+
+reactor::configure
+
+reactor::configure  _handle_sigint:1
+reactor::configure完成
+network_statck_ready
+
+reactor network_stackreactor::configure完成
+reactor::configure
+
+reactor::configure  _handle_sigint:1
+reactor::configurereactor::configure  _task_quota:
+reactor::configure  blocked_time:
+reactor::configure  _tasks_processed_report_threshold:
+reactor::configure  _max_task_backlog:
+reactor::configure  _max_poll_time:
+reactor::configure  _strict_dma
+reactor::configure
+
+reactor::configure  _handle_sigint:
+reactor::configure  _handle_sigint:1
+reactor::configurereactor::configure  _task_quota:
+reactor::configure  _task_quota:reactor::configure  blocked_time:
+reactor::configure  _max_task_backlog:reactor::configure  blocked_time:
+reactor::configure  _tasks_processed_report_threshold:
+reactor::configure  _max_task_backlog:
+reactor::configure  _max_poll_time:
+reactor::configure  _tasks_processed_report_threshold:reactor::configure  _strict_dma
+
+reactor::configure  _tasks_processed_report_threshold:
+没有设置aio_eventfdreactor::configure  _max_task_backlog:
+reactor::configure  _max_poll_time:
+engine configure donereactor::configure  _strict_dma
+reactor::configure完成
+reactor::configure
+1reactor::configure  _handle_sigint:1
+
+
+
+reactor::configure  _task_quota:
+
+reactor::configure  blocked_time:
+reactor::configure  _tasks_processed_report_threshold:
+
+reactor::configure  _max_task_backlog:
+
+
+reactor::configure  _handle_sigint:1
+reactor::configure  _task_quota:reactor::configure  _task_quota:
+network_statck_ready
+没有设置aio_eventfd
+reactor network_stack
+没有设置aio_eventfd
+
+reactor::configure  blocked_time:
+reactor::configure  _tasks_processed_report_threshold:
+thread_impl::get 
+thread_impl::get 
+
+reactor::configure  _max_poll_time:
+reactor::configure  _strict_dma
+reactor::configure  blocked_time:
+reactor::configure  _tasks_processed_report_threshold:
+reactor::configure  _max_task_backlog:
+reactor::configure  _max_poll_time:
+smp configure end
+reactor::configure  _strict_dma
+network_statck_ready
+reactor::configure  _tasks_processed_report_threshold:
+reactor network_stack
+没有设置aio_eventfd
+
+Starting engine
+app的engine id0
+reactor::configure  _max_task_backlog:when_started
+没有设置aio_eventfdthread_impl::get thread_impl::get 
+network_statck_ready
+
+reactor network_stack
+
+reactor::configure  _max_task_backlog:thread_impl::get 
+network_statck_ready
+reactor::configure  _max_poll_time:reactor network_stack
+thread_impl::get thread_impl::get 
+reactor::configure  _max_task_backlog:thread_impl::get 
+
+thread_impl::get 
+thread_impl::get 
+
+thread_impl::get 
+
+reactor::configure  _max_poll_time:
+reactor::configure  _max_poll_time:reactor::configure  _strict_dma
+
+reactor::configure  _max_poll_time:
+reactor::configure  _strict_dma
+
+reactor::configure  _strict_dmareactor::configure  _strict_dma
+没有设置aio_eventfd
+没有设置aio_eventfdthread_impl::get 
+thread_impl::get 
+
+
+network_statck_ready
+thread_impl::get 
+thread_impl::get thread_impl::get 
+Running engine
+thread_impl::get 
+
+thread_impl::get 
+没有设置aio_eventfd
+没有设置aio_eventfd没有设置aio_eventfd
+reactor network_stack
+network_statck_ready
+thread_impl::get 
+network_statck_ready
+network_statck_ready
+thread_impl::get 
+network_statck_readyreactor network_stack
+thread_impl::get 
+reactor network_stackthread_impl::get 
+reactor network_stackthread_impl::get thread_impl::get thread_impl::get 
+thread_impl::get 
+
+
+thread_impl::get 
+
+thread_impl::get 
+
+thread_impl::get 
+thread_impl::get 
+
+thread_impl::get 
+thread_impl::get 
+thread_impl::get thread_impl::get 
+
+
+network_statck_readythread_impl::get 
+thread_impl::get thread_impl::get 
+thread_impl::get 
+thread_impl::get 
+thread_impl::get 
+thread_impl::get 
+
+thread_impl::get thread_impl::get 
+thread_impl::get thread_impl::get 
+
+thread_impl::get 
+
+thread_impl::get 
+reactor network_stackthread_impl::get 
+
+thread_impl::get 
+thread_impl::get 
+thread_impl::get 
+thread_impl::get 
+thread_impl::get 
+thread_impl::get 
+reactor network_stackthread_impl::get 
+
+thread_impl::get 
+thread_impl::get thread_impl::get 
+thread_impl::get 
+thread_impl::get 
+thread_impl::get 
+
+thread_impl::get 
+thread_impl::get thread_impl::get 
+thread_impl::get 
+
+
+thread_impl::get 
+thread_impl::get thread_impl::get 
+
+thread_impl::get 
+
+thread_impl::get 
+thread_impl::get thread_impl::get 
+
+thread_impl::get thread_impl::get 
+thread_impl::get thread_impl::get 
+thread_impl::get 
+thread_impl::get thread_impl::get 
+thread_impl::get 
+
+thread_impl::get 
+thread_impl::get 
+thread_impl::get 
+thread_impl::get 
+thread_impl::get 
+thread_impl::get 
+thread_impl::get 
+thread_impl::get 
+thread_impl::get 
+thread_impl::get 
+thread_impl::get thread_impl::get 
+thread_impl::get 
+
+
+thread_impl::get thread_impl::get 
+thread_impl::get 
+thread_impl::get 
+
+thread_impl::get 
+thread_impl::get thread_impl::get 
+thread_impl::get 
+
+
+thread_impl::get 
+thread_impl::get 
+thread_impl::get 
+thread_impl::get 
+thread_impl::get 
+thread_impl::get 
+thread_impl::get 
+thread_impl::get 
+thread_impl::get 
+reactor::configure
+reactor::configure完成
+reactor::configure
+reactor::configure  _handle_sigint:1
+reactor::configure  _task_quota:
+reactor::configure  blocked_time:
+reactor::configure  _tasks_processed_report_threshold:
+reactor::configure  _max_task_backlog:
+reactor::configure  _max_poll_time:
+reactor::configure  _strict_dma
+没有设置aio_eventfd
+network_statck_ready
+reactor network_stack
+thread_impl::get 
+thread_impl::get 
+Engine started. Configuring metrics and scollectd
+thread_impl::get 
+thread_impl::get 
+thread_impl::get 
+thread_impl::get 
+thread_impl::get 
+thread_impl::get 
+thread_impl::get thread_impl::get 
+thread_impl::get 
+thread_impl::get 
+thread_impl::get 
+thread_impl::get 
+
+thread_impl::get thread_impl::get thread_impl::get 
+
+thread_impl::get 
+thread_impl::get 
+thread_impl::get 
+Configuration information loaded
+
+thread_impl::get 
+then1
+thread_impl::get 
+Future completed successfully
+thread_impl::get 
+then_wrapped 1
+thread_impl::get thread_impl::get thread_impl::get thread_impl::get thread_impl::get 
+
+thread_impl::get 
+thread_impl::get 
+thread_impl::get 
+
+
+thread_impl::get 
+
+thread_impl::get 
+thread_impl::get 
+thread_impl::get 
+thread_impl::get 
+run udp server start
+listen_addr: 0  10000
+posix_network_statck
+posix make udp channel  addr:10000
+sa start
+posix udp channel fd socket
+fd setsockpt
+engine reuseport
+bind start
+Bound to: 0.0.0.0:10000
+bind successful
+Bound to: 0.0.0.0:10000
+bind end
+_address
+_fd
+net::udp_channel consturct
+posix udp channel end########
+chan_._impl: 0x56446c1daf40
+Out: 0 pps
+Seastar UDP server listening on port 10000 ...
+run udp server start
+listen_addr: 0  10000
+访问到了posix_network_statck
+run udp server startposix make udp channel  addr:10000
+
+run udp server start
+run udp server start
+listen_addr: run udp server startrun udp server start0
+run udp server start
+run udp server start
+listen_addr: 0  10000
+访问到了posix_network_statck
+posix make udp channel  addr:10000
+run udp server startsa start
+posix udp channel fd socket
+
+listen_addr: 0  10000
+访问到了posix_network_statck
+posix make udp channel  addr:10000
+sa start
+
+sa start
+posix udp channel fd socket
+  fd setsockpt10000run udp server start
+访问到了posix_network_statck
+posix make udp channel  addr:10000
+listen_addr: sa start0  
+fd setsockptposix udp channel fd socket
+
+posix udp channel fd socket
+
+listen_addr: 0  10000
+访问到了posix_network_statck
+posix make udp channel  addr:10000
+sa start
+posix udp channel fd socket
+fd setsockpt
+engine reuseportengine reuseport
+bind start
+Bound to: 0.0.0.0:10000
+listen_addr: 0  10000fd setsockpt
+
+bind failed: fd setsockptlisten_addr: listen_addr: 
+10000engine reuseport
+访问到了posix_network_statck
+posix make udp channel  addr:10000
+
+sa start
+posix udp channel fd socket
+
+bind start
+Bound to: 00.0.0.0  10000
+bind start
+Bound to: 0.0.0.0:10000
+engine reuseportbind failed: 0访问到了posix_network_statck
+
+posix make udp channel  addr:10000
+  sa start
+posix udp channel fd socket
+run udp server start
+listen_addr: 访问到了posix_network_statck
+posix make udp channel  addr:10000
+sa start
+posix udp channel fd socket
+fd setsockpt
+0engine reuseport
+bind start
+Bound to: :0.0.0.0:10000
+fd setsockptbind failed:   
+10000engine reuseport
+bind start
+Bound to: 0.0.0.0
+:10000
+bind failed: 10000engine reuseport
+bind failed: bind start
+Bound to: 
+0.0.0.0:10000
+10000bind failed: 访问到了posix_network_statck
+posix make udp channel  addr:10000
+fd setsockptsa start
+posix udp channel fd socket
+
+
+engine reuseport
+bind start
+Bound to: fd setsockpt0.0.0.0:10000
+bind failed: 访问到了posix_network_statck
+posix make udp channel  addr:10000
+sa start
+posix udp channel fd socket
+
+fd setsockpt
+thread_impl::get engine reuseport
+thread_impl::get bind start
+thread_impl::get Bound to: 
+
+thread_impl::get 
+thread_impl::get 
+thread_impl::get 
+thread_impl::get 
+
+bind start
+0.0.0.0Bound to: 0.0.0.0:10000
+:bind failed: 
+10000
+engine reuseportbind failed: 
+bind start
+Bound to: 0.0.0.0:10000
+bind failed: thread_impl::get 
+thread_impl::get 
+thread_impl::get 
+listen_addr: 0  10000
+访问到了posix_network_statck
+posix make udp channel  addr:10000
+sa start
+posix udp channel fd socket
+fd setsockpt
+engine reuseport
+bind start
+Bound to: 0.0.0.0:10000
+bind failed: thread_impl::get 
+promise abandoned
+fail future####

@@ -773,11 +773,9 @@ public:
         }
         return _peers.invoke_on(cpu, &cache::cas<remote_origin_tag>, std::ref(insertion), std::move(version));
     }
-
     future<cache_stats> stats() {
         return _peers.map_reduce(adder<cache_stats>(), &cache::stats);
     }
-
     // The caller must keep @key live until the resulting future resolves.
     future<std::pair<item_ptr, bool>> incr(item_key& key, uint64_t delta) {
         auto cpu = get_cpu(key);

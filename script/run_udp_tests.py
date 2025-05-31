@@ -9,9 +9,9 @@ def run_udp_tests(output_csv):
         {'port': 10000, 'server_name': 'Mseastar'},
         # {'port': 41234, 'server_name': 'Node'}
     ]
-    num_clients = [10, 20, 50, 100]
-    num_packets = [1000, 10000]
-    packet_sizes = [1024, 2048]
+    num_clients = [10]
+    num_packets = [1000]
+    packet_sizes = [4096]
     server_ip = '127.0.0.1'
 
     # Generate all combinations

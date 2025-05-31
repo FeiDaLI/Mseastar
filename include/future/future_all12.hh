@@ -9226,7 +9226,7 @@ struct jmp_buf_link {
     }
 };
 
-thread_local jmp_buf_link g_unthreaded_context; //在jmp_buf_link init_switch_in的时候用来初始化g_current_context
+thread_local jmp_buf_link g_unthreaded_context;  // 在 jmp_buf_link init_switch_in 的时候用来初始化 g_current_context
 thread_local jmp_buf_link* g_current_context;
 
 struct thread_context {
@@ -9272,9 +9272,11 @@ struct thread_context {
 };
 namespace thread_impl {
     inline thread_context* get() {
+        std::cout<<"thread_impl::get "<<std::endl;
         return g_current_context->thread;
     }
     inline bool should_yield() {
+        std::cout<<"thread_impl::should yield"<<std::endl;
         if (need_preempt()) {
             return true;
         } else if (g_current_context->get_yield_at()) {
@@ -9284,15 +9286,19 @@ namespace thread_impl {
         }
     }
     void yield(){
+        std::cout<<"thread_impl::yield"<<std::endl;
         g_current_context->thread->yield();
     }
     void switch_in(thread_context* to){
+        std::cout<<"thread_impl::swtich in"<<std::endl;
         to->switch_in();
     }
     void switch_out(thread_context* from){
+         std::cout<<"thread_impl::swtich out"<<std::endl;
         from->switch_out();
     }
     void init(){
+        std::cout<<"thread_impl::init()"<<std::endl;
         g_unthreaded_context.link = nullptr;
         g_unthreaded_context.thread = nullptr;
         g_current_context = &g_unthreaded_context;
@@ -9344,12 +9350,13 @@ public:
     /// Need to take some cleanup action first.
     static bool should_yield();
 
-    static bool running_in_thread() {
-        return thread_impl::get() != nullptr;
-    }
+    // static bool running_in_thread() {
+    //     return thread_impl::get() != nullptr;
+    // }
     static bool try_run_one_yielded_thread();
 };
-
+// Define the static member
+thread_local thread* thread::_current = nullptr;
 
 
 class gate {
@@ -9511,77 +9518,44 @@ struct parallel_for_each_state {
 };
 
 //这里？
-// template <typename Iterator, typename Func>
-// GCC6_CONCEPT(requires requires (Func f, Iterator i) { { f(*i++) } -> std::same_as<future<>>; })
-// inline
-// future<>
-// parallel_for_each(Iterator begin, Iterator end, Func&& func) {
-//     if (begin == end) {
-//         return make_ready_future<>();
-//     }
-//     return do_with(parallel_for_each_state{}, [&] (parallel_for_each_state& state) -> future<> {
-//         // increase ref count to ensure all functions run
-//         ++state.waiting;
-//         while (begin != end) {
-//             ++state.waiting;
-//             try {
-//                 func(*begin++).then_wrapped([&] (future<> f) {
-//                     if (f.failed()) {
-//                         // We can only store one exception.  For more, use when_all().
-//                         if (!state.ex) {
-//                             state.ex = f.get_exception();
-//                         } else {
-//                             f.ignore_ready_future();
-//                         }
-//                     }
-//                     state.complete();
-//                 });
-//             } catch (...) {
-//                 if (!state.ex) {
-//                     state.ex = std::move(std::current_exception());
-//                 }
-//                 state.complete();
-//             }
-//         }
-//         // match increment on top
-//         state.complete();
-//         return state.pr.get_future();
-//     });
-// }
-
-
 template <typename Iterator, typename Func>
 GCC6_CONCEPT(requires requires (Func f, Iterator i) { { f(*i++) } -> std::same_as<future<>>; })
-inline future<> parallel_for_each(Iterator begin, Iterator end, Func&& func) {
+inline
+future<>
+parallel_for_each(Iterator begin, Iterator end, Func&& func) {
     if (begin == end) {
         return make_ready_future<>();
     }
-    auto state = std::make_unique<parallel_for_each_state>();
-    ++state->waiting;
-    while (begin != end) {
-        ++state->waiting;
-        try {
-            func(*begin++).then_wrapped([state = std::move(state)] (future<> f) {
-                if (f.failed()) {//这个地方还是不理解
-                    if (!state->ex) {
-                        state->ex = f.get_exception();
-                    } else {
-                        f.ignore_ready_future();
+    return do_with(parallel_for_each_state{}, [&] (parallel_for_each_state& state) -> future<> {
+        // increase ref count to ensure all functions run
+        ++state.waiting;
+        while (begin != end) {
+            ++state.waiting;
+            try {
+                func(*begin++).then_wrapped([&] (auto&& f) {
+                    if (f.failed()) {
+                        // We can only store one exception.  For more, use when_all().
+                        if (!state.ex) {
+                            state.ex = f.get_exception();
+                        } else {
+                            f.ignore_ready_future();
+                        }
                     }
+                    state.complete();
+                });
+            } catch (...) {
+                if (!state.ex) {
+                    state.ex = std::move(std::current_exception());
                 }
-                state->complete();
-            });
-        } catch (...) {
-            if (!state->ex) {
-                state->ex = std::current_exception();
+                state.complete();
             }
-            state->complete();
         }
-    }
-    state->complete();
-    auto result = state->pr.get_future();
-    return result;
+        // match increment on top
+        state.complete();
+        return state.pr.get_future();
+    });
 }
+
 
 template <typename Range, typename Func>
 GCC6_CONCEPT(requires requires (Func f, Range r) { { f(*r.begin()) } -> std::same_as<future<>>; })
@@ -9626,21 +9600,15 @@ void do_until_continued(StopCondition&& stop_cond, AsyncAction&& action, promise
     p.set_value();
 }
 
-
-
-
-
 template<typename AsyncAction>
 GCC6_CONCEPT( requires ApplyReturns<AsyncAction, stop_iteration> || ApplyReturns<AsyncAction, future<stop_iteration>> )
 static inline
 future<> repeat(AsyncAction&& action) {
     using futurator = futurize<std::result_of_t<AsyncAction()>>;
     static_assert(std::is_same<future<stop_iteration>, typename futurator::type>::value, "bad AsyncAction signature");
-
     try {
         do {
             auto f = futurator::apply(action);
-
             if (!f.available()) {
                 return f.then([action = std::forward<AsyncAction>(action)] (stop_iteration stop) mutable {
                     if (stop == stop_iteration::yes) {
@@ -9650,12 +9618,10 @@ future<> repeat(AsyncAction&& action) {
                     }
                 });
             }
-
             if (f.get0() == stop_iteration::yes) {
                 return make_ready_future<>();
             }
         } while (!need_preempt());
-
         promise<> p;
         auto f = p.get_future();
         schedule_normal(make_task([action = std::forward<AsyncAction>(action), p = std::move(p)]() mutable {
@@ -9745,13 +9711,11 @@ future<> do_until(StopCondition&& stop_cond, AsyncAction&& action) {
 }
 
 template<typename AsyncAction>
-// GCC6_CONCEPT( requires ApplyReturns<AsyncAction, future<>> )
+GCC6_CONCEPT( requires ApplyReturns<AsyncAction, future<>> )
 static inline
 future<> keep_doing(AsyncAction&& action) {
     return repeat([action = std::forward<AsyncAction>(action)] () mutable {
-        return action().then([] {
-            return stop_iteration::no;
-        });
+        return action().then([]{ return stop_iteration::no;});
     });
 }
 
@@ -10202,33 +10166,6 @@ future<> later(){
 
 
 
-struct default_timeout_exception_factory {
-    static auto timeout() {
-        return timed_out_error();
-    }
-};
-
-template<typename ExceptionFactory = default_timeout_exception_factory, typename Clock, typename Duration, typename... T>
-future<T...> with_timeout(std::chrono::time_point<Clock, Duration> timeout, future<T...> f) {
-    if (f.available()) {
-        return f;
-    }
-    auto pr = std::make_unique<promise<T...>>();
-    auto result = pr->get_future();
-    timer<Clock> timer([&pr = *pr] {
-        pr.set_exception(std::make_exception_ptr(ExceptionFactory::timeout()));
-    });
-    timer.arm(timeout);
-    f.then_wrapped([pr = std::move(pr), timer = std::move(timer)] (auto&& f) mutable {
-        if (timer.cancel()) {
-            f.forward_to(std::move(*pr));
-        } else {
-            f.ignore_ready_future();
-        }
-    });
-    return result;
-}
-
 namespace internal {
 template<typename Future>
 struct future_has_value {
@@ -10337,13 +10274,7 @@ struct extract_values_from_futures_vector<future<>> {
 };
 }
 
-// template<typename... Futures>
-// GCC6_CONCEPT( requires AllAreFutures<Futures...> )
-// inline auto when_all_succeed(Futures&&... futures) {
-//     using state = internal::when_all_state<internal::extract_values_from_futures_tuple<Futures...>, Futures...>;
-//     auto s = std::make_shared<state>(std::forward<Futures>(futures)...);
-//     return s->wait_all(std::make_index_sequence<sizeof...(Futures)>());
-// }
+
 
 template <typename FutureIterator, typename = typename std::iterator_traits<FutureIterator>::value_type>
 GCC6_CONCEPT( requires requires (FutureIterator i) {
@@ -10352,16 +10283,8 @@ GCC6_CONCEPT( requires requires (FutureIterator i) {
      requires is_future<std::remove_reference_t<decltype(*i)>>::value;
 })
 
-// inline auto when_all_succeed(FutureIterator begin, FutureIterator end) {
-//     using itraits = std::iterator_traits<FutureIterator>;
-//     using result_transform = internal::extract_values_from_futures_vector<typename itraits::value_type>;
-//     return internal::do_when_all<result_transform>(std::move(begin), std::move(end));
-// }
-// Define the static member
-thread_local thread* thread::_current = nullptr;
 // Implementation of global functions
-void enable_timer(steady_clock_type::time_point when)
-{
+void enable_timer(steady_clock_type::time_point when){
     engine().enable_timer(when);
 }
 
@@ -10519,8 +10442,7 @@ class sharded {
     }
 
     /// Invoke a callable on all instances of `Service` and reduce the results using
-    /// `Reducer`.
-    ///
+    /// Reducer
     /// \see map_reduce(Iterator begin, Iterator end, Mapper&& mapper, Reducer&& r)
     template <typename Reducer, typename Func>
     inline
@@ -10533,20 +10455,17 @@ class sharded {
                     auto inst = get_local_service();
                     return func(*inst);
                 });
-            }, std::forward<Reducer>(r));
+            },std::forward<Reducer>(r));
     }
 
     /// Applies a map function to all shards, then reduces the output by calling a reducer function.
-    ///
     /// \param map callable with the signature `Value (Service&)` or
     ///               `future<Value> (Service&)` (for some `Value` type).
     ///               used as the second input to \c reduce
     /// \param initial initial value used as the first input to \c reduce.
     /// \param reduce binary function used to left-fold the return values of \c map
     ///               into \c initial .
-    ///
     /// Each \c map invocation runs on the shard associated with the service.
-    ///
     /// \tparam  Mapper unary function taking `Service&` and producing some result.
     /// \tparam  Initial any value type
     /// \tparam  Reduce a binary function taking two Initial values and returning an Initial
@@ -11145,17 +11064,18 @@ thread::thread(Func func) : thread(thread_attributes(), std::move(func)){}
 // Constructor that takes thread attributes and a callable object
 template <typename Func>
 thread::thread(thread_attributes attr, Func func)
-    : _context(std::make_unique<thread_context>(std::move(attr), std::move(func))) {}
-    /*
-        因为context是使用unique_ptr管理,所以当退出作用域时，unique会析构到，在析构时自动释放管理的内存.
-    */
+    : _context(std::make_unique<thread_context>(std::move(attr), std::move(func))) {
+        std::cout<<"创建了一个用户态线程"<<std::endl;}
 
-
+//没调用过.
 void thread::yield() {
+    std::cout<<"thread::yield"<<std::endl;
     thread_impl::get()->yield();
 }
 
+//没调用过.
 bool thread::should_yield() {
+    std::cout<<"thread::should_yield"<<std::endl;
     return thread_impl::get()->should_yield();
 }
 
@@ -11176,9 +11096,6 @@ void manual_clock::expire_timers() {
 
 inline void jmp_buf_link::initial_switch_in(ucontext_t* initial_context, const void*, size_t)
 {
-    if(g_current_context){
-    }else{
-    }
     auto prev = std::exchange(g_current_context, this);
     link = prev;
     if (setjmp(prev->jmpbuf) == 0) {
@@ -11220,6 +11137,7 @@ inline void jmp_buf_link::final_switch_out(){
 
 thread_context::~thread_context() {
     _all_threads.erase(_all_it);//为什么？
+    std::cout<<"thread_context析构"<<std::endl;
 }
 
 
@@ -11429,6 +11347,7 @@ thread_context::thread_context(thread_attributes attr, std::function<void ()> fu
     setup();
     _all_threads.push_front(this);
     _all_it = _all_threads.begin();
+    std::cout<<"添加用户态线程"<<std::endl;
     //为什么这里是this,而不是*this，而不是_all_it?思考
     //因为_all_threads存放的就是thread_context*，所以添加的也是指针。
 }
@@ -11485,6 +11404,7 @@ void thread_context::stack_deleter::operator()(char* ptr) const noexcept {
 
 void
 thread_context::setup() {
+    std::cout<<"thread_context setup"<<std::endl;
     // use setcontext() for the initial jump, as it allows us
     // to set up a stack, but continue with longjmp() as it's much faster.
     ucontext_t initial_context;
@@ -11501,6 +11421,7 @@ thread_context::setup() {
 }
 
 void thread_context::switch_in() {
+    std::cout<<"thread_context switch_in"<<std::endl;
     if (_attr.scheduling_group) {
         _attr.scheduling_group->account_start();
         _context.set_yield_at(_attr.scheduling_group->_this_run_start + _attr.scheduling_group->_this_period_remain);
@@ -11511,6 +11432,7 @@ void thread_context::switch_in() {
 }
 
 void thread_context::switch_out() {
+    std::cout<<"thread_context switch_out"<<std::endl;
     if (_attr.scheduling_group) {
         _attr.scheduling_group->account_stop();
     }
@@ -11518,6 +11440,7 @@ void thread_context::switch_out() {
 }
 
 bool thread_context::should_yield() const {
+    std::cout<<"thread_context should_yield"<<std::endl;
     if (!_attr.scheduling_group) {
         return need_preempt();
     }
@@ -16023,47 +15946,9 @@ append_challenged_posix_file_impl::close() noexcept {
     });
 }
 
-// Some kernels can append to xfs filesystems, some cannot; determine
-// from kernel version.
 static
 unsigned
 xfs_concurrency_from_kernel_version() {
-    // auto num = [] (std::csub_match x) {
-    //     auto b = x.first;
-    //     auto e = x.second;
-    //     if (*b == '.') {
-    //         ++b;
-    //     }
-    //     return std::stoi(std::string(b, e));
-    // };
-    // struct utsname buf;
-    // auto r = ::uname(&buf);
-
-    // throw_system_error_on(r == -1);
-    // // 2-4 dotted decimal numbers, optional "-anything"
-    // auto generic_re = std::regex(R"XX((\d+)(\.\d+)(\.\d+)?(\.\d+)?(-.*)?)XX");
-    // std::cmatch m1;
-    // // try to see if this is a mainline kernel with xfs append fixed (3.15+)
-    // if (std::regex_match(buf.release, m1, generic_re)) {
-    //     auto maj = num(m1[1]);
-    //     auto min = num(m1[2]);
-    //     if (maj > 3 || (maj == 3 && min >= 15)) {
-    //         // Can append, but not concurrently
-    //         return 1;
-    //     }
-    // }
-    // // 3.10.0-num1.num2?.num3?.el7.anything
-    // auto rhel_re = std::regex(R"XX(3\.10\.0-(\d+)(\.\d+)?(\.\d+)?\.el7.*)XX");
-    // std::cmatch m2;
-    // // try to see if this is a RHEL kernel with the backported fix (3.10.0-325.el7+)
-    // if (std::regex_match(buf.release, m2, rhel_re)) {
-    //     auto rmaj = num(m2[1]);
-    //     if (rmaj >= 325) {
-    //         // Can append, but not concurrently
-    //         return 1;
-    //     }
-    // }
-    // Cannot append at all; need ftrucnate().
     return 0;
 }
 
