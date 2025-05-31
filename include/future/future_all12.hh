@@ -9272,7 +9272,14 @@ struct thread_context {
 };
 namespace thread_impl {
     inline thread_context* get() {
-        std::cout<<"thread_impl::get "<<std::endl;
+        // std::cout<<"thread_impl::get "<<std::endl;
+        // if(g_current_context->thread==nullptr){
+        //     std::cout<<"thread_impl::get() return nullptr."<<std::endl;
+        // }
+        // else{
+        //     std::cout<<" thread_impl::get() not NULL."<<std::endl;
+        // }
+        //每次都是nullptr.
         return g_current_context->thread;
     }
     inline bool should_yield() {
@@ -9349,10 +9356,6 @@ public:
     /// Useful where we cannot call yield() immediately because we
     /// Need to take some cleanup action first.
     static bool should_yield();
-
-    // static bool running_in_thread() {
-    //     return thread_impl::get() != nullptr;
-    // }
     static bool try_run_one_yielded_thread();
 };
 // Define the static member
@@ -11664,11 +11667,13 @@ void signals::action(int signo, siginfo_t* siginfo, void* ignore) {
 /// This method blocks the current thread until the future becomes available.
 template <typename... T>
 void future<T...>::wait() {
+    std::cout<<"future wait"<<std::endl;
     auto thread = thread_impl::get();
     assert(thread);//这里报错.
 
     schedule([this, thread] (future_state<T...>&& new_state) {
         *state() = std::move(new_state);
+        std::cout<<" future wait end"<<std::endl;
         thread_impl::switch_in(thread);
     });
     thread_impl::switch_out(thread);

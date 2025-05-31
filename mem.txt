@@ -87,121 +87,57 @@ mem config begin
 === 内存配置完成 ===
 mem config end 
 开始执行smp::allocate_reactor
+thread_impl::init()
 smp::allocate_reactor结束
 create thread 7
 create thread 8
 create thread 6
-create thread 9
-create thread 10
-create thread 5
 === 开始配置内存 ===
-create thread 计算总内存:
-  内存块[0] 大小: 5213519872 字节11
+create thread 10
+计算总内存:
+  内存块[0] 大小: create thread 5213519872=== 开始配置内存 ===9 字节
+
+create thread 11
  NUMA节点: 0
 总内存量: 5213519872 字节
-使用默认匿名内存分配
-create thread 3
-=== 开始配置内存 ====== 开始配置内存 ===
+=== 开始配置内存 ===使用默认匿名内存分配
+计算总内存:调整内存池大小至: 5213519872 字节
 
-create thread 2
-调整内存池大小至: 计算总内存:
-create thread   内存块[1
-0计算总内存:
+
+create thread 4
+=== 开始配置内存 ===
+create thread 3
+  内存块[0] 大小: 5213519872=== 开始配置内存 === 字节=== 开始配置内存 ===
+
+create thread 1
+ NUMA节点: 0=== 开始配置内存 ===
+计算总内存:
+  内存块[0] 大小: 5213519872 字节计算总内存:
+  内存块[0] 大小: === 开始配置内存 ===5213519872create thread 
+计算总内存:
   内存块[0] 大小: 5213519872 字节create thread  NUMA节点: 0
 总内存量: 5213519872 字节
 使用默认匿名内存分配
 调整内存池大小至: 5213519872 字节
-=== 开始配置内存 ===
+2
 第一次执行初始化
 调用初始化cpu_pages
-] 大小: 5213519872 字节 NUMA节点: 0
-总内存量: 5213519872 字节
-使用默认匿名内存分配
-调整内存池大小至: 5213519872 字节
-5213519872 字节
-第一次执行初始化
-调用初始化cpu_pages
-第一次执行初始化
-调用初始化cpu_pages
-计算总内存:
-  内存块[0] 大小: 52135198724 字节
  NUMA节点: 0
-总内存量: 5213519872 字节
-使用默认匿名内存分配
-调整内存池大小至: 5213519872 字节
-第一次执行初始化
-调用初始化cpu_pages
-调用resize
-调用resize
-调用resize
+总内存量: 5213519872 字节 字节
 === 开始配置内存 ===
 计算总内存:
   内存块[0] 大小: 5213519872 字节 NUMA节点: 0
 总内存量: 5213519872 字节
 使用默认匿名内存分配
 调整内存池大小至: 5213519872 字节
-第一次执行初始化
-调用初始化cpu_pages
-调用resize
-=== 开始配置内存 ===
-调用resize计算总内存:
-
-=== 开始配置内存 ===调用resize
-调用resize
-  内存块[调用resize
-
 计算总内存:
-  内存块[0] 大小: 05213519872 字节] 大小: 5213519872 字节 NUMA节点: 0
- NUMA节点: 0总内存量: 5213519872 字节
-
-使用默认匿名内存分配
-调整内存池大小至: 5213519872 字节
-总内存量: 5213519872 字节
-使用默认匿名内存分配
-调整内存池大小至: 5213519872 字节
-第一次执行初始化
+第一次执行初始化  内存块[0] 大小: 5213519872 字节
 调用初始化cpu_pages
-第一次执行初始化
+第一次执行初始化5
 调用初始化cpu_pages
-调用resize
-=== 开始配置内存 ===
 计算总内存:
-  内存块[0] 大小: 5213519872 字节 NUMA节点: 0
-总内存量: 5213519872 字节
-使用默认匿名内存分配
-调整内存池大小至: 5213519872 字节
-第一次执行初始化
-调用初始化cpu_pages
-调用resize
-调用resize
-调用resize
-=== 开始配置内存 ===
-计算总内存:
-  内存块[0] 大小: 5213519872 字节 NUMA节点: 0
-总内存量: 5213519872 字节
-使用默认匿名内存分配
-调整内存池大小至: 5213519872 字节
-第一次执行初始化
-调用初始化cpu_pages
-调用resize
-调用resize
-调用resize
-调用resize
-调用resize
-调用resize
-调整内存池end
-已分配内存块 [调用resize0 -> 
-5213519872) 大小: 5213519872 字节
-调用resize=== 内存配置完成 ===
-
-开始执行smp::allocate_reactor
-调用resize
-调用resize
-=== 开始配置内存 ===
-计算总内存:
-  内存块[0] 大小: 5213519872 字节=== 开始配置内存 ===
-计算总内存:
-  内存块[0] 大小: 5213519872 字节 NUMA节点: 0
+  内存块[0] 大小: 5213519872 字节
+ NUMA节点: 0
 总内存量: 5213519872 字节
 使用默认匿名内存分配
 调整内存池大小至: 5213519872 字节
@@ -209,73 +145,93 @@ create thread   内存块[1
 总内存量: 5213519872 字节
 使用默认匿名内存分配
 调整内存池大小至: 5213519872 字节
+ NUMA节点: 0
+总内存量: 5213519872 字节
+使用默认匿名内存分配
+调整内存池大小至: 5213519872 字节
+使用默认匿名内存分配
+第一次执行初始化
+调用resize
+第一次执行初始化
+调用初始化cpu_pages
+调整内存池大小至: 5213519872 字节
+第一次执行初始化计算总内存:
+  内存块[0] 大小: 5213519872 字节
+总内存量: 调用初始化cpu_pages
+ NUMA节点: 0
+总内存量: 5213519872 字节
+使用默认匿名内存分配
+调整内存池大小至: 5213519872 字节
+调用初始化cpu_pages
+
 第一次执行初始化
 调用初始化cpu_pages
 第一次执行初始化
 调用初始化cpu_pages
-调用resize
-调用resize
-调用resize
-调用resize
-调用resize
-调用resize
-调用resize
-调用resize
-调用resize
-调用resize
-调用resize
-调用resize
-调用resize
-smp::allocate_reactor结束
-调用resize
-调用resize
-调用resize
-调用resize
-调用resize
-调整内存池end
-已分配内存块 [0 -> 5213519872) 大小: 5213519872 字节
-=== 内存配置完成 ===
-开始执行smp::allocate_reactor
-smp::allocate_reactor结束
-调用resize
-调用resize
-调整内存池end
-已分配内存块 [0 -> 5213519872) 大小: 5213519872 字节
-=== 内存配置完成 ===
-开始执行smp::allocate_reactor
-调用resize
-调整内存池end
-已分配内存块 [0 -> 5213519872) 大小: 5213519872 字节
-=== 内存配置完成 ===
-开始执行smp::allocate_reactor
-调用resize
-调整内存池end调整内存池end
-
-已分配内存块 [已分配内存块 [0 -> 52135198720) 大小:  -> 5213519872) 大小: 52135198725213519872 字节
- 字节=== 内存配置完成 ===
-
-=== 内存配置完成 ===
-开始执行smp::allocate_reactor
-开始执行smp::allocate_reactor
-smp::allocate_reactor结束
-调整内存池end
-已分配内存块 [0 -> 5213519872) 大小: 5213519872 字节
-=== 内存配置完成 ===
-开始执行smp::allocate_reactor
-smp::allocate_reactor结束
-smp::allocate_reactor结束
-调整内存池end
-已分配内存块 [0 -> 5213519872smp::allocate_reactor结束) 大小: 调整内存池end
 5213519872 字节
-=== 内存配置完成 ===
+使用默认匿名内存分配
+调整内存池大小至: 5213519872 字节
+第一次执行初始化
+调用初始化cpu_pages
+调用resize
+调用resize
+调用resize
+调用resize
+调用resize
+调用resize
+调用resize
+调用resize
+调用resize
+=== 开始配置内存 ===
+计算总内存:
+  内存块[0] 大小: 5213519872 字节 NUMA节点: 0
+总内存量: 5213519872 字节
+使用默认匿名内存分配
+调整内存池大小至: 5213519872 字节
+第一次执行初始化
+调用初始化cpu_pages
+调用resize
+调用resize
+调用resize
+调用resize
+调用resize调用resize
 
-已分配内存块 [0 -> 开始执行smp::allocate_reactor5213519872) 大小: 5213519872 字节
+调用resize
+调用resize
+调用resize
+调用resize
+调用resize
+调用resize
+调用resize
+调用resize
+调用resize
+调用resize
+=== 开始配置内存 ===
+计算总内存:
+  内存块[0] 大小: 5213519872 字节 NUMA节点: 0
+总内存量: 5213519872 字节
+使用默认匿名内存分配
+调整内存池大小至: 5213519872 字节
+第一次执行初始化
+调用初始化cpu_pages
+调用resize
+调用resize
+调用resize
+调用resize
+调用resize
+调用resize
+调用resize
+调用resize调用resize
 
-=== 内存配置完成 ===
-开始执行smp::allocate_reactor
-smp::allocate_reactor结束
-smp::allocate_reactor结束
-smp::allocate_reactor结束
+调用resize
+调用resize
+调用resize
+调用resize
+调用resize
+调用resize
+调用resize
+调用resize
+调用resize
 调整内存池end
 已分配内存块 [0 -> 5213519872) 大小: 5213519872 字节
 === 内存配置完成 ===
@@ -284,7 +240,63 @@ smp::allocate_reactor结束
 已分配内存块 [0 -> 5213519872) 大小: 5213519872 字节
 === 内存配置完成 ===
 开始执行smp::allocate_reactor
+调整内存池end
+已分配内存块 [0 -> 5213519872) 大小: 5213519872 字节
+=== 内存配置完成 ===
+开始执行smp::allocate_reactor
+thread_impl::init()
 smp::allocate_reactor结束
+调整内存池end
+已分配内存块 [调整内存池end0 -> 5213519872) 大小: 5213519872
+ 字节
+=== 内存配置完成 ===
+已分配内存块 [0 -> 5213519872) 大小: 5213519872 字节
+=== 内存配置完成 ===
+开始执行smp::allocate_reactor开始执行smp::allocate_reactor
+
+调整内存池end
+已分配内存块 [0 -> 5213519872) 大小: 5213519872 字节
+=== 内存配置完成 ===
+开始执行smp::allocate_reactor
+调整内存池end
+已分配内存块 [0 -> 5213519872) 大小: 5213519872 字节
+=== 内存配置完成 ===
+开始执行smp::allocate_reactor
+调整内存池end
+已分配内存块 [0 -> 5213519872) 大小: 5213519872 字节
+=== 内存配置完成 ===
+开始执行smp::allocate_reactor
+调整内存池end
+已分配内存块 [0 -> 5213519872) 大小: 5213519872 字节
+=== 内存配置完成 ===
+开始执行smp::allocate_reactor
+thread_impl::init()thread_impl::init()
+
+thread_impl::init()thread_impl::init()
+
+smp::allocate_reactor结束
+thread_impl::init()
+smp::allocate_reactor结束
+smp::allocate_reactor结束
+smp::allocate_reactor结束
+thread_impl::init()
+调整内存池end
+已分配内存块 [0 -> 5213519872) 大小: 5213519872 字节
+=== 内存配置完成 ===
+smp::allocate_reactor结束开始执行smp::allocate_reactor
+
+thread_impl::init()
+thread_impl::init()
+调整内存池end
+已分配内存块 [0 -> 5213519872) 大小: 5213519872 字节
+=== 内存配置完成 ===
+smp::allocate_reactor结束开始执行smp::allocate_reactor
+
+smp::allocate_reactor结束
+smp::allocate_reactor结束
+thread_impl::init()
+smp::allocate_reactor结束
+thread_impl::init()
 smp::allocate_reactor结束
 reactors registered done
 smp qs begin
@@ -293,176 +305,357 @@ start all queues
 start all queues done
 assign io queues done
 inited done
-reactor::configurereactor::configure
+reactor::configure
+reactor::configure
 reactor::configurereactor::configurereactor::configure
-
+reactor::configure
 reactor::configure
 
 reactor::configure
-
 reactor::configure
+reactor::configure完成
+reactor::configure完成
+reactor::configure
+reactor::configure  _handle_sigint:reactor::configure完成1
 reactor::configure完成
 reactor::configure
 reactor::configure完成
 reactor::configure
-reactor::configure  _handle_sigint:reactor::configure完成reactor::configure完成
+reactor::configure  _handle_sigint:1
+
+reactor::configure完成reactor::configure完成reactor::configure  _task_quota:reactor::configure
+reactor::configure  _handle_sigint:reactor::configure  _handle_sigint:1
+
+reactor::configure  _task_quota:
+reactor::configure  blocked_time:
+reactor::configure  _tasks_processed_report_threshold:
+reactor::configure  _max_task_backlog:
+reactor::configurereactor::configure完成reactor::configure完成reactor::configure  _max_poll_time:
+
+
+reactor::configure  _task_quota:
+
+reactor::configure  blocked_time:
+reactor::configurereactor::configure  _tasks_processed_report_threshold:
+
+reactor::configure  _max_task_backlog:
+reactor::configure  _max_poll_time:
+
+reactor::configure  _strict_dma
+reactor::configure
+reactor::configure  _handle_sigint:1
+1reactor::configure
+reactor::configure  blocked_time:reactor::configure  _handle_sigint:1
+
+reactor::configure  _task_quota:
+reactor::configure  blocked_time:reactor::configure
+reactor::configure  _task_quota:
+reactor::configure  blocked_time:
+reactor::configure  _tasks_processed_report_threshold:
+
+reactor::configure  _max_task_backlog:
+reactor::configure
+
+reactor::configure  _strict_dmareactor::configure  _handle_sigint:
+reactor::configure  _task_quota:
+reactor::configure  blocked_time:
+reactor::configure  _tasks_processed_report_threshold:
+reactor::configure  _max_task_backlog:
+reactor::configure  _max_poll_time:
+
+reactor::configure  _strict_dma
+reactor::configure  _tasks_processed_report_threshold:
+reactor::configure  _max_poll_time:reactor::configure  _max_task_backlog:
+reactor::configure  _max_poll_time:
+没有设置aio_eventfd
+没有设置aio_eventfd
 reactor::configure完成
+reactor::configure
+没有设置aio_eventfd
+1network_statck_ready
+reactor::configure  _strict_dmanetwork_statck_ready
+
+reactor network_stack
+
+reactor::configure  _handle_sigint:network_statck_ready
+reactor::configure
+reactor::configure  _handle_sigint:1
+reactor::configure  _task_quota:reactor network_stack
+reactor::configure  _tasks_processed_report_threshold:reactor::configure  _strict_dma
+
+reactor::configure  _handle_sigint:reactor::configure  blocked_time:1
+reactor::configure  _tasks_processed_report_threshold:
+reactor::configure  _max_task_backlog:
+reactor::configure  _max_poll_time:
+
+reactor::configure  _strict_dma
+reactor::configure完成
+thread_impl::get() return nullptr.
 reactor::configure
 1reactor::configure  _handle_sigint:1
-reactor::configure完成reactor::configure  _task_quota:
-reactor::configure  _handle_sigint:reactor::configure  blocked_time:
-1
-
-reactor::configure  _tasks_processed_report_threshold:
-reactor::configure  _max_task_backlog:
-reactor::configure  _max_poll_time:
-
-reactor::configure  _task_quota:
-reactor::configure  _task_quota:
-reactor::configure  blocked_time:reactor::configure完成
-
-reactor::configure  _tasks_processed_report_threshold:
-reactor::configure  _max_task_backlog:
-reactor::configure  _max_poll_time:
-reactor::configure  blocked_time:reactor::configure  _strict_dma
-
-reactor::configure
-reactor::configurereactor::configure  _handle_sigint:1
-reactor::configure  _task_quota:
-
-reactor::configure  _tasks_processed_report_threshold:
-reactor::configure  _max_task_backlog:
-reactor::configure  _max_poll_time:
-
-reactor::configure  _strict_dmareactor::configure  _handle_sigint:1
-reactor::configurereactor::configure  _task_quota:
-reactor::configure  blocked_time:reactor::configure完成
-reactor::configure  _tasks_processed_report_threshold:
-
-reactor::configure  blocked_time:
-reactor::configure  _tasks_processed_report_threshold:
-reactor::configure  _max_task_backlog:
-
-reactor::configure  _strict_dmareactor::configure  _max_poll_time:
-reactor::configure  _max_task_backlog:
-reactor::configure  _max_poll_time:
-reactor::configurereactor::configure  _strict_dma
-reactor::configure
-reactor::configure  _handle_sigint:1
-没有设置aio_eventfdreactor::configure  _task_quota:
-reactor::configure  blocked_time:
-reactor::configure  _tasks_processed_report_threshold:
 没有设置aio_eventfd
-reactor::configure  _strict_dma
 
-
-没有设置aio_eventfd
-network_statck_ready
-没有设置aio_eventfdnetwork_statck_ready
-reactor network_stack
-reactor::configure  _max_task_backlog:reactor network_stack
-network_statck_ready
-
-reactor network_stack
-
+reactor::configure  _max_task_backlog:
 reactor::configure  _max_poll_time:
 
 reactor::configure  _strict_dma
-network_statck_ready
-engine configure done
-reactor::configure
 
-reactor::configure  _handle_sigint:1
-reactor network_stackreactor::configure  _task_quota:
-reactor::configure  blocked_time:
+reactor::configure  _task_quota:reactor::configure  _task_quota:
+reactor::configure  _task_quota:reactor::configure  blocked_time:
 reactor::configure  _tasks_processed_report_threshold:
 reactor::configure  _max_task_backlog:
-reactor::configure  _max_poll_time:
-reactor::configure  _handle_sigint:reactor::configure  _strict_dma
+reactor::configure  _max_poll_time:engine configure done
+network_statck_ready
+thread_impl::get() return nullptr.
+reactor network_stack
 smp configure end
 
-1Starting engine
-app的engine id0
+Starting engine
+
+app的engine id
+reactor::configure  blocked_time:
+reactor::configure  _tasks_processed_report_threshold:
+reactor::configure  _max_task_backlog:
+reactor::configure  _max_poll_time:
+thread_impl::get() return nullptr.
+reactor::configure  _strict_dma
+没有设置aio_eventfdreactor::configure  blocked_time:
+reactor::configure  _tasks_processed_report_threshold:
+reactor::configure  _max_task_backlog:没有设置aio_eventfd
+reactor::configure  _strict_dma
+
+
+network_statck_ready
+thread_impl::get() return nullptr.
+thread_impl::get() return nullptr.
+
+reactor::configure  _max_poll_time:
+thread_impl::get() return nullptr.
+
+network_statck_ready
+没有设置aio_eventfdreactor network_stack
+0reactor::configure  _task_quota:
 when_started
+
+reactor::configure  _strict_dma
+thread_impl::get() return nullptr.
+thread_impl::get() return nullptr.
+没有设置aio_eventfdnetwork_statck_readythread_impl::get() return nullptr.
+thread_impl::get() return nullptr.没有设置aio_eventfd
+thread_impl::get() return nullptr.
+
+
+reactor::configure  blocked_time:
+reactor::configure  _tasks_processed_report_threshold:
+reactor::configure  _max_task_backlog:
+reactor::configure  _max_poll_time:
+reactor network_stackreactor::configure  _strict_dma
+reactor network_stack
+network_statck_ready
 没有设置aio_eventfd
 
+
+thread_impl::get() return nullptr.
+network_statck_ready
+thread_impl::get() return nullptr.thread_impl::get() return nullptr.
+
+reactor network_stack
+thread_impl::get() return nullptr.reactor network_stack
+
+thread_impl::get() return nullptr.
+thread_impl::get() return nullptr.
+thread_impl::get() return nullptr.
+
+thread_impl::get() return nullptr.thread_impl::get() return nullptr.
+reactor network_stack
+thread_impl::get() return nullptr.thread_impl::get() return nullptr.
+
+thread_impl::get() return nullptr.
+thread_impl::get() return nullptr.
+
+thread_impl::get() return nullptr.
+network_statck_readythread_impl::get() return nullptr.
+thread_impl::get() return nullptr.
+thread_impl::get() return nullptr.
+thread_impl::get() return nullptr.thread_impl::get() return nullptr.
+thread_impl::get() return nullptr.
+thread_impl::get() return nullptr.
+thread_impl::get() return nullptr.
 Running engine
-reactor::configure  _task_quota:
+thread_impl::get() return nullptr.
+thread_impl::get() return nullptr.thread_impl::get() return nullptr.thread_impl::get() return nullptr.
+thread_impl::get() return nullptr.thread_impl::get() return nullptr.
+没有设置aio_eventfd
+thread_impl::get() return nullptr.
 
-reactor::configure  blocked_time:
-reactor::configure  _tasks_processed_report_threshold:
-reactor::configure  _max_task_backlog:
-reactor::configure  _max_poll_time:
-reactor::configure  _strict_dma
-没有设置aio_eventfd
-reactor::configure完成
-没有设置aio_eventfd
+thread_impl::get() return nullptr.
+thread_impl::get() return nullptr.
+thread_impl::get() return nullptr.thread_impl::get() return nullptr.
+network_statck_ready
+
+thread_impl::get() return nullptr.
+thread_impl::get() return nullptr.
+
+thread_impl::get() return nullptr.
+
+thread_impl::get() return nullptr.
+reactor network_stackthread_impl::get() return nullptr.
+
+thread_impl::get() return nullptr.
+
+thread_impl::get() return nullptr.
+
+thread_impl::get() return nullptr.
+thread_impl::get() return nullptr.
+thread_impl::get() return nullptr.thread_impl::get() return nullptr.
+thread_impl::get() return nullptr.
+thread_impl::get() return nullptr.
+thread_impl::get() return nullptr.
+thread_impl::get() return nullptr.reactor network_stack
+thread_impl::get() return nullptr.
+thread_impl::get() return nullptr.
+
+thread_impl::get() return nullptr.
+thread_impl::get() return nullptr.thread_impl::get() return nullptr.
+thread_impl::get() return nullptr.
+thread_impl::get() return nullptr.
+thread_impl::get() return nullptr.thread_impl::get() return nullptr.
+
+thread_impl::get() return nullptr.thread_impl::get() return nullptr.
+thread_impl::get() return nullptr.
+thread_impl::get() return nullptr.
+
+
+thread_impl::get() return nullptr.thread_impl::get() return nullptr.
+
+thread_impl::get() return nullptr.thread_impl::get() return nullptr.
+thread_impl::get() return nullptr.thread_impl::get() return nullptr.
+thread_impl::get() return nullptr.
+thread_impl::get() return nullptr.thread_impl::get() return nullptr.
+thread_impl::get() return nullptr.thread_impl::get() return nullptr.
+
+
+
+
+thread_impl::get() return nullptr.
+thread_impl::get() return nullptr.thread_impl::get() return nullptr.
+thread_impl::get() return nullptr.thread_impl::get() return nullptr.
+
+thread_impl::get() return nullptr.thread_impl::get() return nullptr.
+
+thread_impl::get() return nullptr.
+
+thread_impl::get() return nullptr.
+thread_impl::get() return nullptr.
+thread_impl::get() return nullptr.
+thread_impl::get() return nullptr.
+thread_impl::get() return nullptr.
+thread_impl::get() return nullptr.
+thread_impl::get() return nullptr.thread_impl::get() return nullptr.
+
+thread_impl::get() return nullptr.
+thread_impl::get() return nullptr.
+thread_impl::get() return nullptr.
+
+thread_impl::get() return nullptr.
+thread_impl::get() return nullptr.
+thread_impl::get() return nullptr.
+thread_impl::get() return nullptr.
+thread_impl::get() return nullptr.
+thread_impl::get() return nullptr.
+thread_impl::get() return nullptr.
+thread_impl::get() return nullptr.
 reactor::configure
-network_statck_ready
-network_statck_ready
+reactor::configure完成
+reactor::configure
 reactor::configure  _handle_sigint:1
-reactor network_stack
-reactor network_stack
-network_statck_ready
-没有设置aio_eventfd
-reactor network_stack
 reactor::configure  _task_quota:
 reactor::configure  blocked_time:
 reactor::configure  _tasks_processed_report_threshold:
 reactor::configure  _max_task_backlog:
 reactor::configure  _max_poll_time:
-network_statck_ready
-reactor::configure  _strict_dma
-reactor network_stack
-没有设置aio_eventfd
-network_statck_ready
-reactor network_stack
-reactor::configure
-reactor::configure
-reactor::configure完成
-reactor::configure
-reactor::configure  _handle_sigint:1
-reactor::configure  _task_quota:
-reactor::configure  blocked_time:
-reactor::configure  _tasks_processed_report_threshold:
-reactor::configure  _max_task_backlog:
-reactor::configure  _max_poll_time:
-reactor::configure完成
-reactor::configure
-reactor::configure  _handle_sigint:1
-reactor::configure  _task_quota:
-reactor::configure  blocked_time:
-reactor::configure  _tasks_processed_report_threshold:
-reactor::configure  _max_task_backlog:
-reactor::configure  _max_poll_time:
 reactor::configure  _strict_dma
 没有设置aio_eventfd
 network_statck_ready
 reactor network_stack
-reactor::configure  _strict_dma
-没有设置aio_eventfd
-network_statck_ready
-reactor network_stack
-reactor::configure
-reactor::configure完成
-reactor::configure
-reactor::configure  _handle_sigint:1
-reactor::configure  _task_quota:
-reactor::configure  blocked_time:
-reactor::configure  _tasks_processed_report_threshold:
-reactor::configure  _max_task_backlog:
-reactor::configure  _max_poll_time:
-reactor::configure  _strict_dma
-没有设置aio_eventfd
-network_statck_ready
-reactor network_stack
+thread_impl::get() return nullptr.
 Engine started. Configuring metrics and scollectd
 Configuration information loaded
+thread_impl::get() return nullptr.
+thread_impl::get() return nullptr.
+thread_impl::get() return nullptr.
+thread_impl::get() return nullptr.
+thread_impl::get() return nullptr.
+thread_impl::get() return nullptr.
+thread_impl::get() return nullptr.thread_impl::get() return nullptr.
+
+thread_impl::get() return nullptr.
+thread_impl::get() return nullptr.
+thread_impl::get() return nullptr.
+thread_impl::get() return nullptr.
 Future completed successfully
+thread_impl::get() return nullptr.
+thread_impl::get() return nullptr.
+thread_impl::get() return nullptr.
+thread_impl::get() return nullptr.
+thread_impl::get() return nullptr.
+thread_impl::get() return nullptr.
+thread_impl::get() return nullptr.
+thread_impl::get() return nullptr.
+thread_impl::get() return nullptr.
+thread_impl::get() return nullptr.
+thread_impl::get() return nullptr.thread_impl::get() return nullptr.
+
+thread_impl::get() return nullptr.
+thread_impl::get() return nullptr.
+thread_impl::get() return nullptr.
+thread_impl::get() return nullptr.
+thread_impl::get() return nullptr.
+thread_impl::get() return nullptr.
+thread_impl::get() return nullptr.
+thread_impl::get() return nullptr.
+thread_impl::get() return nullptr.
+thread_impl::get() return nullptr.
+thread_impl::get() return nullptr.thread_impl::get() return nullptr.
+thread_impl::get() return nullptr.thread_impl::get() return nullptr.thread_impl::get() return nullptr.
+thread_impl::get() return nullptr.
+thread_impl::get() return nullptr.
+thread_impl::get() return nullptr.
+thread_impl::get() return nullptr.
+
+thread_impl::get() return nullptr.
+
+thread_impl::get() return nullptr.
+
+thread_impl::get() return nullptr.
 seastar memcached v1.0
+thread_impl::get() return nullptr.
+thread_impl::get() return nullptr.thread_impl::get() return nullptr.
+thread_impl::get() return nullptr.
+thread_impl::get() return nullptr.
+thread_impl::get() return nullptr.
+thread_impl::get() return nullptr.
+thread_impl::get() return nullptr.
+
+thread_impl::get() return nullptr.
+thread_impl::get() return nullptr.
+thread_impl::get() return nullptr.
+thread_impl::get() return nullptr.
 Bound to: 0.0.0.0:11211
 bind successful
 Bound to: 0.0.0.0:11211
+thread_impl::get() return nullptr.
+thread_impl::get() return nullptr.thread_impl::get() return nullptr.
+thread_impl::get() return nullptr.
+thread_impl::get() return nullptr.
+thread_impl::get() return nullptr.thread_impl::get() return nullptr.
+thread_impl::get() return nullptr.
+
+thread_impl::get() return nullptr.
+
+thread_impl::get() return nullptr.
+thread_impl::get() return nullptr.
+thread_impl::get() return nullptr.
 posix make udp channel  addr:11211
 sa start
 posix udp channel fd socket
