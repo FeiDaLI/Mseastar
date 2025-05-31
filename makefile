@@ -45,45 +45,45 @@
 # .PHONY: all clean test
 
 #----------------------------------------simple test---------------------------------------------------------------------------
-# CXX = g++
-# CXXFLAGS = -w -Wall -std=c++20 -g -Iinclude -pthread -MMD
-# LDFLAGS = -pthread -lboost_system -lboost_thread -lrt -lhwloc -lboost_program_options -laio  -lunwind
+CXX = g++
+CXXFLAGS = -w -Wall -std=c++20 -g -Iinclude -pthread -MMD
+LDFLAGS = -pthread -lboost_system -lboost_thread -lrt -lhwloc -lboost_program_options -laio  -lunwind
 
-# SRCS = \
-#     include/resource/resource.cc \
-#     test/fiber_test/fiber.cc \
-# # 生成对象文件列表
-# OBJS = $(SRCS:%.cc=build/%.o)
-# DEPS = $(OBJS:.o=.d)
+SRCS = \
+    include/resource/resource.cc \
+    test/timer_test/timer_demo.cc \
+# 生成对象文件列表
+OBJS = $(SRCS:%.cc=build/%.o)
+DEPS = $(OBJS:.o=.d)
 
-# # 可执行文件名称
-# TEST_TARGET = build/fiber
+# 可执行文件名称
+TEST_TARGET = build/timer_test
 
-# # 默认目标
-# all: $(TEST_TARGET)
+# 默认目标
+all: $(TEST_TARGET)
 
-# # 包含自动生成的依赖
-# -include $(DEPS)
+# 包含自动生成的依赖
+-include $(DEPS)
 
-# # 创建构建目录结构
-# $(shell mkdir -p $(dir $(OBJS)) 2>/dev/null)
+# 创建构建目录结构
+$(shell mkdir -p $(dir $(OBJS)) 2>/dev/null)
 
-# # 编译规则：将.cc文件编译为.o文件
-# build/%.o: %.cc
-# 	$(CXX) $(CXXFLAGS) -c $< -o $@
+# 编译规则：将.cc文件编译为.o文件
+build/%.o: %.cc
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-# # 链接可执行文件
-# $(TEST_TARGET): $(OBJS)
-# 	$(CXX) $^ -o $@ $(LDFLAGS)
-# # 清理生成的文件
-# clean:
-# 	rm -rf build
+# 链接可执行文件
+$(TEST_TARGET): $(OBJS)
+	$(CXX) $^ -o $@ $(LDFLAGS)
+# 清理生成的文件
+clean:
+	rm -rf build
 
-# # 运行测试
-# test: $(TEST_TARGET)
-# 	./$(TEST_TARGET)
+# 运行测试
+test: $(TEST_TARGET)
+	./$(TEST_TARGET)
 
-# .PHONY: all clean test
+.PHONY: all clean test
 
 
 
@@ -174,41 +174,41 @@
 
 #-------------------------------------------memcached-----------------------------------------------------------------------------
 
-#编译器
-CXX = g++
-# 编译选项
-CXXFLAGS = -w -Wall -std=c++20 -g -Iinclude -pthread -MMD
-LDFLAGS = -pthread -lboost_system -lboost_thread -lrt -lhwloc -lboost_program_options -laio  -lunwind -lboost_json
-SRCS = \
-	include/resource/resource.cc \
-	include/memcached/memcache.cc
-    # test/http_test/http_server.cc \
+# #编译器
+# CXX = g++
+# # 编译选项
+# CXXFLAGS = -w -Wall -std=c++20 -g -Iinclude -pthread -MMD
+# LDFLAGS = -pthread -lboost_system -lboost_thread -lrt -lhwloc -lboost_program_options -laio  -lunwind -lboost_json
+# SRCS = \
+# 	include/resource/resource.cc \
+# 	include/memcached/memcache.cc
+#     # test/http_test/http_server.cc \
 
-# 生成对象文件列表
-OBJS = $(SRCS:%.cc=build/%.o)
-DEPS = $(OBJS:.o=.d)
-# 可执行文件名称
-TEST_TARGET = build/memcached
-# 默认目标
-all: $(TEST_TARGET)
-# 包含自动生成的依赖
--include $(DEPS)
-# 创建构建目录结构
-$(shell mkdir -p $(dir $(OBJS)) 2>/dev/null)
-# 编译规则：将.cc文件编译为.o文件
-build/%.o: %.cc
-	$(CXX) $(CXXFLAGS) -c $< -o $@
-# 链接可执行文件
-$(TEST_TARGET): $(OBJS)
-	$(CXX) $^ -o $@ $(LDFLAGS)
-# 清理生成的文件
-clean:
-	rm -rf build
-# 运行测试
-test: $(TEST_TARGET)
-	./$(TEST_TARGET)
+# # 生成对象文件列表
+# OBJS = $(SRCS:%.cc=build/%.o)
+# DEPS = $(OBJS:.o=.d)
+# # 可执行文件名称
+# TEST_TARGET = build/memcached
+# # 默认目标
+# all: $(TEST_TARGET)
+# # 包含自动生成的依赖
+# -include $(DEPS)
+# # 创建构建目录结构
+# $(shell mkdir -p $(dir $(OBJS)) 2>/dev/null)
+# # 编译规则：将.cc文件编译为.o文件
+# build/%.o: %.cc
+# 	$(CXX) $(CXXFLAGS) -c $< -o $@
+# # 链接可执行文件
+# $(TEST_TARGET): $(OBJS)
+# 	$(CXX) $^ -o $@ $(LDFLAGS)
+# # 清理生成的文件
+# clean:
+# 	rm -rf build
+# # 运行测试
+# test: $(TEST_TARGET)
+# 	./$(TEST_TARGET)
 
-.PHONY: all clean test
+# .PHONY: all clean test
 
 
 

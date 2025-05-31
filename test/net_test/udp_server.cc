@@ -88,19 +88,19 @@ int main(int ac, char ** av) {
         ("port", bpo::value<uint16_t>()->default_value(10000), "UDP server port") ;
     return app.run_deprecated(ac, av, [&] {
     /*测试代码*/
-        f(1).then([](int x){
-            // sleep(2);
-            std::cout<<"then1"<<std::endl;
-            return 11;
-        }).then_wrapped([](auto&& f) {
-            try {
-                auto x = f.get();
-                std::cout<<"x value"<<x<<std::endl;
-                std::cout<<"then_wrapped 1"<<std::endl;
-            } catch (...) {
-                std::cout<<"then_wrapped 2"<<std::endl;
-            }
-        });
+        // f(1).then([](int x){
+        //     // sleep(2);
+        //     std::cout<<"then1"<<std::endl;
+        //     return 11;
+        // }).then_wrapped([](auto&& f) {
+        //     try {
+        //         auto x = f.get();
+        //         std::cout<<"x value"<<x<<std::endl;
+        //         std::cout<<"then_wrapped 1"<<std::endl;
+        //     } catch (...) {
+        //         std::cout<<"then_wrapped 2"<<std::endl;
+        //     }
+        // });
     /*测试代码*/
         
         auto&& config = app.configuration();

@@ -1803,10 +1803,14 @@ public:
     /// \param timestamp 要计算的定时器时间戳
     /// \return 对应的桶索引
     int get_index(timestamp_t timestamp) const {
+        std::cout << "timestamp: " << timestamp << ", _last: " << _last << std::endl;
         if (timestamp <= _last) {
+            std::cout << " -> Using fallback bucket: " << (n_buckets - 1) << std::endl;
             return n_buckets - 1;
         }
         auto index = bitsets::count_leading_zeros(timestamp ^ _last);
+        std::cout << "timestamp ^ _last: " << (timestamp ^ _last) << std::endl;
+        std::cout << " -> Calculated index: " << index << std::endl;
         assert(index < n_buckets - 1);
         return index;
     }
@@ -1886,40 +1890,65 @@ public:
     timer_list_t expire(time_point now) {
         timer_list_t exp;
         auto timestamp = get_timestamp(now);
+
+        std::cout << "Expire: now=" << now.time_since_epoch().count()
+                << ", timestamp=" << timestamp
+                << ", _last=" << _last << std::endl;
+
         if (timestamp < _last) {
+            std::cerr << "ERROR: timestamp < _last, aborting!" << std::endl;
             abort();
         }
-        //当前时间一定>=_last
+
         auto index = get_index(timestamp);
-        // 处理所有在当前时间之前的非空桶
+        std::cout << " -> Calculated index: " << index << std::endl;
+
+        // 处理所有在当前 index 之前的非空桶
+        std::cout << "Scanning buckets up to index: " << index << std::endl;
         for (int i : bitsets::for_each_set(_non_empty_buckets, index + 1)) {
+            std::cout << "   Processing bucket[" << i << "] with " << _buckets[i].size() << " timers" << std::endl;
             exp.splice(exp.end(), _buckets[i]);
             _non_empty_buckets[i] = false;
         }
-        /*
-            把所有过期的链表添加到exp后面(exp是一个临时的链表，操作时间间复杂度O(1)).
-        */
-        _last = timestamp;//所以_last就是最后一次处理过期定时器的时间.
-        _next = max_timestamp;//_next设置为无穷.
+        _last = timestamp;
+        _next = max_timestamp;
         auto& list = _buckets[index];
-        // 处理当前索引的桶中的定时器
+        std::cout << "Processing current bucket[" << index << "] with " << list.size() << " timers" << std::endl;
+
         while (!list.empty()) {
             auto* timer = list.front();
             list.pop_front();
+
+            auto timer_timeout = timer->get_timeout();
+            auto timer_timestamp = get_timestamp(timer_timeout);
+
+            std::cout << "   Timer timeout: " << timer_timeout.time_since_epoch().count()
+                    << ", timestamp: " << timer_timestamp
+                    << ", is_expired: " << (timer->get_timeout() <= now ? "YES" : "NO") << std::endl;
+
             if (timer->get_timeout() <= now) {
                 exp.push_back(timer);
             } else {
-                insert(*timer);
+                insert(*timer); // 重新插入未过期的定时器
             }
         }
+
         _non_empty_buckets[index] = !list.empty();
+
         if (_next == max_timestamp && _non_empty_buckets.any()) {
-            // 更新_next为最后一个非空桶中的最小时间戳
-            for (auto* timer : _buckets[get_last_non_empty_bucket()]) {
-                _next = std::min(_next, get_timestamp(*timer));
+            int last_bucket = get_last_non_empty_bucket();
+            std::cout << "Updating _next from non-empty bucket[" << last_bucket << "]" << std::endl;
+
+            for (auto* timer : _buckets[last_bucket]) {
+                auto ts = get_timestamp(*timer);
+                _next = std::min(_next, ts);
+                std::cout << "   Min timestamp found: " << ts << std::endl;
             }
         }
-        return exp;//返回这个链表
+
+        std::cout << "Returning " << exp.size() << " expired timers." << std::endl;
+
+        return exp;
     }
 
     time_point get_next_timeout() const {
@@ -1942,7 +1971,7 @@ public:
         return _non_empty_buckets.none();
     }
     time_point now() {
-        return Timer::clock::now();
+        return Timer::clock::now(); // now获取的就是当前时间.
     }
 };
 
@@ -10893,15 +10922,17 @@ void reactor::add_timer(manual_timer* tmr) {
     queue_timer(tmr);
 }
 bool reactor::queue_timer(lowres_timer* tmr) {
+    // std::cout<< "reactor add lowres timer"<<std::endl;
     return _lowres_timers.insert(*tmr);
 }
 
 bool reactor::queue_timer(manual_timer* tmr) {
+    // std::cout<< "reactor add manual timer"<<std::endl;
     return _manual_timers.insert(*tmr);
 }
 
 bool reactor::queue_timer(steady_timer* tmr) {
-    // std::cout<<"reaactor queue timer"<<std::endl;
+    // std::cout<< "reactor add steady timer"<<std::endl;
     return _timers.insert(*tmr);
 }
 
