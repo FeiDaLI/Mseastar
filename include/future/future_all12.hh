@@ -21,8 +21,6 @@
 #include "../util/bitops.hh"
 #include <assert.h>
 // #include <sys/mount.h>
-
-
 #include <cstdlib>
 #include <chrono>
 #include <functional>
@@ -1805,12 +1803,12 @@ public:
     int get_index(timestamp_t timestamp) const {
         std::cout << "timestamp: " << timestamp << ", _last: " << _last << std::endl;
         if (timestamp <= _last) {
-            std::cout << " -> Using fallback bucket: " << (n_buckets - 1) << std::endl;
+            std::cout << "-> Using fallback bucket: " << (n_buckets - 1) << std::endl;
             return n_buckets - 1;
         }
         auto index = bitsets::count_leading_zeros(timestamp ^ _last);
-        std::cout << "timestamp ^ _last: " << (timestamp ^ _last) << std::endl;
-        std::cout << " -> Calculated index: " << index << std::endl;
+        // std::cout << "timestamp ^ _last: " << (timestamp ^ _last) << std::endl;
+        // std::cout << " -> Calculated index: " << index << std::endl;
         assert(index < n_buckets - 1);
         return index;
     }
@@ -1890,30 +1888,27 @@ public:
     timer_list_t expire(time_point now) {
         timer_list_t exp;
         auto timestamp = get_timestamp(now);
-
-        std::cout << "Expire: now=" << now.time_since_epoch().count()
-                << ", timestamp=" << timestamp
-                << ", _last=" << _last << std::endl;
+        // std::cout << "Expire: now=" << now.time_since_epoch().count()
+        //         << ", timestamp=" << timestamp
+        //         << ", _last=" << _last << std::endl;
 
         if (timestamp < _last) {
             std::cerr << "ERROR: timestamp < _last, aborting!" << std::endl;
             abort();
         }
-
         auto index = get_index(timestamp);
-        std::cout << " -> Calculated index: " << index << std::endl;
-
+        // std::cout << " -> Calculated index: " << index << std::endl;
         // 处理所有在当前 index 之前的非空桶
-        std::cout << "Scanning buckets up to index: " << index << std::endl;
+        // std::cout << "Scanning buckets up to index: " << index << std::endl;
         for (int i : bitsets::for_each_set(_non_empty_buckets, index + 1)) {
-            std::cout << "   Processing bucket[" << i << "] with " << _buckets[i].size() << " timers" << std::endl;
+            // std::cout << "   Processing bucket[" << i << "] with " << _buckets[i].size() << " timers" << std::endl;
             exp.splice(exp.end(), _buckets[i]);
             _non_empty_buckets[i] = false;
         }
         _last = timestamp;
         _next = max_timestamp;
         auto& list = _buckets[index];
-        std::cout << "Processing current bucket[" << index << "] with " << list.size() << " timers" << std::endl;
+        // std::cout << "Processing current bucket[" << index << "] with " << list.size() << " timers" << std::endl;
 
         while (!list.empty()) {
             auto* timer = list.front();
@@ -1922,9 +1917,9 @@ public:
             auto timer_timeout = timer->get_timeout();
             auto timer_timestamp = get_timestamp(timer_timeout);
 
-            std::cout << "   Timer timeout: " << timer_timeout.time_since_epoch().count()
-                    << ", timestamp: " << timer_timestamp
-                    << ", is_expired: " << (timer->get_timeout() <= now ? "YES" : "NO") << std::endl;
+            // std::cout << "   Timer timeout: " << timer_timeout.time_since_epoch().count()
+            //         << ", timestamp: " << timer_timestamp
+            //         << ", is_expired: " << (timer->get_timeout() <= now ? "YES" : "NO") << std::endl;
 
             if (timer->get_timeout() <= now) {
                 exp.push_back(timer);
@@ -1937,17 +1932,15 @@ public:
 
         if (_next == max_timestamp && _non_empty_buckets.any()) {
             int last_bucket = get_last_non_empty_bucket();
-            std::cout << "Updating _next from non-empty bucket[" << last_bucket << "]" << std::endl;
+            // std::cout << "Updating _next from non-empty bucket[" << last_bucket << "]" << std::endl;
 
             for (auto* timer : _buckets[last_bucket]) {
                 auto ts = get_timestamp(*timer);
                 _next = std::min(_next, ts);
-                std::cout << "   Min timestamp found: " << ts << std::endl;
+                // std::cout << "   Min timestamp found: " << ts << std::endl;
             }
         }
-
-        std::cout << "Returning " << exp.size() << " expired timers." << std::endl;
-
+        // std::cout << "Returning " << exp.size() << " expired timers." << std::endl;
         return exp;
     }
 
