@@ -4750,8 +4750,7 @@ public:
 
 bool drain_cross_cpu_freelist();
 
-void set_reclaim_hook(
-        std::function<void (std::function<void ()>)> hook);
+void set_reclaim_hook(std::function<void (std::function<void ()>)> hook);
 
 using physical_address = uint64_t;
 
@@ -13055,7 +13054,7 @@ fsu.free_spans 是一个数组，每个元素是一个 page_list 类型，存储
 
 page*
 cpu_pages::find_and_unlink_span_reclaiming(unsigned n_pages) {
-    while (true) {
+    while(true) {
         auto span = find_and_unlink_span(n_pages);
         if(span){
             return span;
@@ -13287,9 +13286,7 @@ bool cpu_pages::initialize() {
     all_cpus[cpu_id] = this;
     auto base = mem_base() + (size_t(cpu_id) << cpu_id_shift);
     auto size = 32 << 20;  // Small size for bootstrap
-    auto r = ::mmap(base, size,
-            PROT_READ | PROT_WRITE,
-            MAP_PRIVATE | MAP_ANONYMOUS | MAP_FIXED,
+    auto r = ::mmap(base, size,PROT_READ | PROT_WRITE,MAP_PRIVATE | MAP_ANONYMOUS | MAP_FIXED,
             -1, 0);
     if (r == MAP_FAILED) {
         abort();
@@ -13309,7 +13306,6 @@ bool cpu_pages::initialize() {
     live_cpus[cpu_id].store(true, std::memory_order_relaxed);
     return true;
 }
-
 
 mmap_area
 allocate_anonymous_memory(std::optional<void*> where, size_t how_much) {
@@ -13469,7 +13465,7 @@ void cpu_pages::schedule_reclaim() {
             }
         }
         current_min_free_pages = min_free_pages;
-    });
+    });//把lamdba对象加到reactor的任务队列中.
 }
 
 memory::memory_layout cpu_pages::memory_layout() {
@@ -13611,9 +13607,9 @@ abort_on_underflow(size_t size) {
     }
 }
 /*
-abort_on_underflow(size_t size)的作用是:
-检测一个无符号整数是否发生了下溢(underflow),
-如果发生下溢,则立即终止程序。
+    abort_on_underflow(size_t size)的作用是:
+    检测一个无符号整数是否发生了下溢(underflow),
+    如果发生下溢,则立即终止程序.
 */
 
 void* allocate_large(size_t size) {
@@ -13625,8 +13621,8 @@ void* allocate_large(size_t size) {
         throw std::bad_alloc();
     }
     return cpu_mem.allocate_large(size_in_pages);
-
 }
+
 
 void* allocate_large_aligned(size_t align, size_t size) {
     abort_on_underflow(size);
@@ -13757,7 +13753,6 @@ void configure(std::vector<resource::memory> m, std::optional<std::string> huget
     cpu_mem.resize(total, sys_alloc);
     //这句代码卡住. (传入的函数都是sys_alloc)
     std::cout << "调整内存池end"<<std::endl;
-
     size_t pos = 0;
     for (auto&& x : m) {
         // 调试：显示每个内存块的分配进度
@@ -13765,16 +13760,12 @@ void configure(std::vector<resource::memory> m, std::optional<std::string> huget
                   << ") 大小: " << x.bytes << " 字节" << std::endl;
         pos += x.bytes;
     }
-
     if (hugetlbfs_path) {
         std::cout << "初始化HugeTLBFS虚拟地址到物理地址映射" << std::endl;
         cpu_mem.init_virt_to_phys_map();
     }
-
     std::cout << "=== 内存配置完成 ===" << std::endl;
 }
-
-
 
 statistics stats() {
     return statistics{g_allocs, g_frees, g_cross_cpu_frees,
@@ -13785,8 +13776,7 @@ bool drain_cross_cpu_freelist() {
     return cpu_mem.drain_cross_cpu_freelist();
 }
 
-translation
-translate(const void* addr, size_t size) {
+translation translate(const void* addr, size_t size) {
     auto cpu_id = object_cpu_id(addr);
     if (cpu_id >= max_cpus) {
         return {};
