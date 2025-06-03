@@ -1801,9 +1801,9 @@ public:
     /// \param timestamp 要计算的定时器时间戳
     /// \return 对应的桶索引
     int get_index(timestamp_t timestamp) const {
-        std::cout << "timestamp: " << timestamp << ", _last: " << _last << std::endl;
+        // std::cout << "timestamp: " << timestamp << ", _last: " << _last << std::endl;
         if (timestamp <= _last) {
-            std::cout << "-> Using fallback bucket: " << (n_buckets - 1) << std::endl;
+            // std::cout << "-> Using fallback bucket: " << (n_buckets - 1) << std::endl;
             return n_buckets - 1;
         }
         auto index = bitsets::count_leading_zeros(timestamp ^ _last);
@@ -12776,15 +12776,14 @@ private:
 
 // index 0b0001'1100 -> size (1 << 4) + 0b11 << (4 - 2)
 
-constexpr unsigned
+constexpr unsigned 
 small_pool::idx_to_size(unsigned idx) {
     return (((1 << idx_frac_bits) | (idx & ((1 << idx_frac_bits) - 1)))
               << (idx >> idx_frac_bits))
                   >> idx_frac_bits;
 }
 
-constexpr unsigned
-small_pool::size_to_idx(unsigned size) {
+constexpr unsigned small_pool::size_to_idx(unsigned size) {
     return ((log2floor(size) << idx_frac_bits) - ((1 << idx_frac_bits) - 1))
             + ((size - 1) >> (log2floor(size) - idx_frac_bits));
 }
@@ -12813,7 +12812,6 @@ static constexpr size_t max_small_allocation
     = small_pool::idx_to_size(small_pool_array::nr_small_pools - 1);
 
 constexpr size_t object_size_with_alloc_site(size_t size) {
-
     return size;
 }
 
@@ -12922,7 +12920,7 @@ void set_heap_profiling_enabled(bool enable) {
     cpu_mem.collect_backtrace = enable;
 }
 
-// Free spans are store in the largest index i such that nr_pages >= 1 << i.
+//Free spans are store in the largest index i such that nr_pages >= 1 << i.
 static inline
 unsigned index_of(unsigned pages) {
     return std::numeric_limits<unsigned>::digits - count_leading_zeros(pages) - 1;
@@ -12936,6 +12934,10 @@ unsigned index_of_conservative(unsigned pages) {
     }
     return std::numeric_limits<unsigned>::digits - count_leading_zeros(pages - 1);
 }
+/*
+这个函数的作用是：给定一个页面数量 pages，找到最小的 i，使得 2^i >= pages，
+从而定位到第一个可能满足请求的 free_span 列表。
+*/
 
 void
 cpu_pages::unlink(page_list& list, page* span) {
@@ -12981,7 +12983,11 @@ void cpu_pages::free_span(uint32_t span_start, uint32_t nr_pages) {
 
 page*
 cpu_pages::find_and_unlink_span(unsigned n_pages) {
+    std::cout<<"find_and_unlink_span"<<std::endl;
+    std::cout<<"n_pages: "<<n_pages<<std::endl;
+    /* 找到合适的index. */
     auto idx = index_of_conservative(n_pages);
+    std::cout<<"查找的idx: "<<idx<<std::endl;
     auto orig_idx = idx;
     if (n_pages >= (2u << idx)) {
         throw std::bad_alloc();
@@ -12989,6 +12995,7 @@ cpu_pages::find_and_unlink_span(unsigned n_pages) {
     while (idx < nr_span_lists && fsu.free_spans[idx].empty()) {
         ++idx;
     }
+    //找到idx可能有free span的idx.
     if (idx == nr_span_lists) {
         if (initialize()) {
             return find_and_unlink_span(n_pages);
@@ -12999,6 +13006,7 @@ cpu_pages::find_and_unlink_span(unsigned n_pages) {
             return nullptr;
         }
     }
+    /*通过idx获取这个free_list*/
     auto& list = fsu.free_spans[idx];
     page* span = list.find(n_pages, pages);
     if (!span) {
@@ -13007,12 +13015,48 @@ cpu_pages::find_and_unlink_span(unsigned n_pages) {
     unlink(list, span);
     return span;
 }
+/*
+find_and_unlink_span(unsigned n_pages)：
+Seastar 内存分配器中用于处理大内存块分配的核心函数之一。
+
+在当前CPU的空闲链表(free_spans)中查找一个包含至少n_pages个连续页的span,
+并将其从链表中移除.
+当找不到合适的span时,该函数会尝试初始化当前 CPU 的内存池(如果尚未初始化),然后重试.
+如果仍然失败，则返回 nullptr.
+
+
+🔍 第一部分：查找非空的空闲链表
+while (idx < nr_span_lists && fsu.free_spans[idx].empty()) {
+    ++idx;
+}
+目的：
+查找第一个 非空的 free_span 链表，其索引大于等于通过 index_of_conservative(n_pages) 计算出的初始值。
+每个 free_spans[i] 中的 span 至少包含 2^𝑖个页面。
+细节说明：
+fsu.free_spans 是一个数组，每个元素是一个 page_list 类型，存储着一组大小相近的 span。
+如果当前索引 idx 对应的链表为空，则递增 idx，尝试更大的 span。
+当循环结束时，idx 可能是：
+一个有效的非空链表索引；
+或者等于 nr_span_lists，表示所有链表都为空。
+处理找不到合适span的情况，尝试初始化内存池或检查更小的链表。
+详细流程:
+检查是否需要初始化内存池：如果idx == nr_span_lists，说明当前 CPU 的空闲链表全部为空。
+调用initialize()初始化当前 CPU 的内存池（首次调用时才会执行）。
+如果初始化成功（返回 true），则递归调用 find_and_unlink_span(n_pages)，因为此时可能已经有可用的 span。
+如果初始化失败或已初始化过：
+使用 index_of(n_pages) 找到最接近 n_pages 的精确幂次方对应的索引。
+如果这个新的 idx 等于原来的 orig_idx，说明请求的大小正好是某个 2 的幂次方，且没有可用的 span，因此直接返回 nullptr。
+否则继续在更小的索引上搜索。
+
+
+*/
+
 
 page*
 cpu_pages::find_and_unlink_span_reclaiming(unsigned n_pages) {
     while (true) {
         auto span = find_and_unlink_span(n_pages);
-        if (span) {
+        if(span){
             return span;
         }
         if (run_reclaimers(reclaimer_scope::sync) == reclaiming_result::reclaimed_nothing) {
@@ -13036,12 +13080,15 @@ void*
 cpu_pages::allocate_large_and_trim(unsigned n_pages, Trimmer trimmer) {
     // Avoid exercising the reclaimers for requests we'll not be able to satisfy
     // nr_pages might be zero during startup, so check for that too
+    std::cout<<"开始执行allocate_large_and_trim"<<std::endl;
+    std::cout<<"n_pages: "<<n_pages<<" nr_pages: "<<nr_pages<<std::endl;
     if (nr_pages && n_pages >= nr_pages) {
+        std::cout<<"n_pages >= nr_pages"<<std::endl;
         return nullptr;
     }
     page* span = find_and_unlink_span_reclaiming(n_pages);
     if (!span) {
-        return nullptr;
+        return nullptr; // 找不到合适的span
     }
     auto span_size = span->span_size;
     auto span_idx = span - pages;
@@ -13065,8 +13112,9 @@ cpu_pages::allocate_large_and_trim(unsigned n_pages, Trimmer trimmer) {
     return mem() + span_idx * page_size;
 }
 
-void*
+void* 
 cpu_pages::allocate_large(unsigned n_pages) {
+    std::cout<<"调用cpu_pages::allocate_large"<<std::endl;
     return allocate_large_and_trim(n_pages, [n_pages] (unsigned idx, unsigned n) {
         return trim{0, std::min(n, n_pages)};
     });
@@ -13230,6 +13278,7 @@ bool cpu_pages::is_initialized() const {
 bool cpu_pages::initialize() {
     std::cout<<"调用初始化cpu_pages"<<std::endl;
     if (is_initialized()) {
+        std::cout<<"cpu_pages已经初始化"<<std::endl;
         return false;
     }
     cpu_id = cpu_id_gen.fetch_add(1, std::memory_order_relaxed);
@@ -13241,25 +13290,14 @@ bool cpu_pages::initialize() {
             PROT_READ | PROT_WRITE,
             MAP_PRIVATE | MAP_ANONYMOUS | MAP_FIXED,
             -1, 0);
-    if (r == MAP_FAILED) {
+    if(r==MAP_FAILED) {
         abort();
-    }
-    ::madvise(base, size, MADV_HUGEPAGE);
-    pages = reinterpret_cast<page*>(base);
-    memory = base;
-    nr_pages = size / page_size;
-    // we reserve the end page so we don't have to special case
-    // the last span.
-    auto reserved = align_up(sizeof(page) * (nr_pages + 1), page_size) / page_size;
-    for (pageidx i = 0; i < reserved; ++i) {
-        pages[i].free = false;
     }
     pages[nr_pages].free = false;
     free_span_no_merge(reserved, nr_pages - reserved);
     live_cpus[cpu_id].store(true, std::memory_order_relaxed);
     return true;
 }
-
 
 mmap_area
 allocate_anonymous_memory(std::optional<void*> where, size_t how_much) {
@@ -13560,6 +13598,11 @@ abort_on_underflow(size_t size) {
         abort();
     }
 }
+/*
+abort_on_underflow(size_t size)的作用是:
+检测一个无符号整数是否发生了下溢(underflow),
+如果发生下溢,则立即终止程序。
+*/
 
 void* allocate_large(size_t size) {
     abort_on_underflow(size);
@@ -13591,16 +13634,20 @@ size_t object_size(void* ptr) {
 void* allocate(size_t size) {
     if (size <= sizeof(free_object)) {
         size = sizeof(free_object);
+        std::cout << "Adjusted allocation size to match free_object size: " 
+                  << size << std::endl;
     }
     void* ptr;
     if (size <= max_small_allocation) {
         size = object_size_with_alloc_site(size);
+        std::cout << "Allocating small object with adjusted size: " << size << std::endl;
         ptr = cpu_mem.allocate_small(size);
     } else {
         std::cout<<"huge alloc"<<std::endl;
         ptr = allocate_large(size);
     }
     if (!ptr) {
+        std::cout << "Allocation failed for size: " << size << std::endl;
         on_allocation_failure(size);
     }
     ++g_allocs;

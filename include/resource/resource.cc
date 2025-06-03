@@ -15,9 +15,7 @@
 #include <boost/range/algorithm/copy.hpp>
 #include <boost/lexical_cast.hpp>
 #include <regex>
-void validate(boost::any& v,
-              const std::vector<std::string>& values,
-              cpuset_bpo_wrapper* target_type, int) {
+void validate(boost::any& v, const std::vector<std::string>& values, cpuset_bpo_wrapper* target_type, int) {
     using namespace boost::program_options;
     static std::regex r("(\\d+-)?(\\d+)(,(\\d+-)?(\\d+))*");
     validators::check_first_occurrence(v);
@@ -58,7 +56,6 @@ std::string read_file_content(const std::string& path) {
     if (!file.is_open()) {
         throw std::runtime_error("Failed to open file: " + path);
     }
-    
     std::string content;
     std::getline(file, content);
     return content;
@@ -76,7 +73,6 @@ namespace resource {
 // Helper function to detect available CPUs
 std::vector<unsigned> get_available_cpus() {
     std::vector<unsigned> available_cpus;
-    
     // Try to read from /proc/cpuinfo
     try {
         std::ifstream cpuinfo("/proc/cpuinfo");
@@ -91,14 +87,13 @@ std::vector<unsigned> get_available_cpus() {
                 }
             }
         }
-    } catch (...) {
+    }catch (...) {
         // Fallback to sysconf
         int nprocs = sysconf(_SC_NPROCESSORS_ONLN);
         for (int i = 0; i < nprocs; i++) {
             available_cpus.push_back(i);
         }
     }
-    
     return available_cpus;
 }
 
@@ -108,21 +103,19 @@ size_t get_machine_memory() {
     if (sysinfo(&info) != 0) {
         // Fallback to sysconf
         return ::sysconf(_SC_PAGESIZE) * size_t(::sysconf(_SC_PHYS_PAGES));
-    }
-    
+    }    
     return info.totalram * info.mem_unit;
 }
+
 
 // Replacement for distribute_objects
 std::vector<unsigned> distribute_cpus(unsigned num_cpus) {
     auto available_cpus = get_available_cpus();
     unsigned requested = std::min(num_cpus, (unsigned)available_cpus.size());
-    
     std::vector<unsigned> result;
     for (unsigned i = 0; i < requested; i++) {
         result.push_back(available_cpus[i]);
     }
-    
     return result;
 }
 
@@ -144,7 +137,7 @@ static io_queue_topology allocate_io_queues(configuration c, std::vector<cpu> cp
         }
         numa_nodes.at(node_id).insert(shard);
     }
-    
+
     io_queue_topology ret;
     ret.shard_to_coordinator.resize(cpus.size());
     
@@ -183,7 +176,6 @@ static io_queue_topology allocate_io_queues(configuration c, std::vector<cpu> cp
         node_coordinators.at(node_id).push_back(io_coordinator);
         numa_nodes[node_id].erase(io_coordinator);
     }
-    
     // Assign remaining processors to existing coordinators within the same NUMA node
     for (auto& node: numa_nodes) {
         auto cid_idx = 0;
