@@ -13006,6 +13006,7 @@ cpu_pages::find_and_unlink_span(unsigned n_pages) {
             return nullptr;
         }
     }
+
     /*通过idx获取这个free_list*/
     auto& list = fsu.free_spans[idx];
     page* span = list.find(n_pages, pages);
@@ -13290,14 +13291,25 @@ bool cpu_pages::initialize() {
             PROT_READ | PROT_WRITE,
             MAP_PRIVATE | MAP_ANONYMOUS | MAP_FIXED,
             -1, 0);
-    if(r==MAP_FAILED) {
+    if (r == MAP_FAILED) {
         abort();
+    }
+    ::madvise(base, size, MADV_HUGEPAGE);
+    pages = reinterpret_cast<page*>(base);
+    memory = base;
+    nr_pages = size / page_size;
+    // we reserve the end page so we don't have to special case
+    // the last span.
+    auto reserved = align_up(sizeof(page) * (nr_pages + 1), page_size) / page_size;
+    for (pageidx i = 0; i < reserved; ++i) {
+        pages[i].free = false;
     }
     pages[nr_pages].free = false;
     free_span_no_merge(reserved, nr_pages - reserved);
     live_cpus[cpu_id].store(true, std::memory_order_relaxed);
     return true;
 }
+
 
 mmap_area
 allocate_anonymous_memory(std::optional<void*> where, size_t how_much) {
