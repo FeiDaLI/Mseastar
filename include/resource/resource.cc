@@ -110,7 +110,7 @@ size_t get_machine_memory() {
 
 // Replacement for distribute_objects
 std::vector<unsigned> distribute_cpus(unsigned num_cpus) {
-    auto available_cpus = get_available_cpus();
+    auto available_cpus = get_available_cpus();//vector<int>
     unsigned requested = std::min(num_cpus, (unsigned)available_cpus.size());
     std::vector<unsigned> result;
     for (unsigned i = 0; i < requested; i++) {
@@ -159,16 +159,13 @@ static io_queue_topology allocate_io_queues(configuration c, std::vector<cpu> cp
         assert(0);
         return 0u;
     };
-    
     // Distribute io queues
     std::vector<unsigned> distributed_cpus = distribute_cpus(num_io_queues);
     std::unordered_map<int, std::vector<unsigned>> node_coordinators;
-    
     for (unsigned i = 0; i < num_io_queues; i++) {
         auto io_coordinator = find_shard(distributed_cpus[i]);
         ret.coordinators.emplace_back(io_queue{io_coordinator, std::max(max_io_requests / num_io_queues, 1u)});
         ret.shard_to_coordinator[io_coordinator] = io_coordinator;
-        
         auto node_id = node_of_shard(io_coordinator);
         if (node_coordinators.count(node_id) == 0) {
             node_coordinators.emplace(node_id, std::vector<unsigned>());
@@ -185,7 +182,6 @@ static io_queue_topology allocate_io_queues(configuration c, std::vector<cpu> cp
             ret.shard_to_coordinator[remaining_shard] = io_coordinator;
         }
     }
-    
     return ret;
 }
 
@@ -212,13 +208,13 @@ size_t calculate_memory(configuration c, size_t available_memory, float panic_fa
     size_t default_reserve_memory = std::max<size_t>(1536 * 1024 * 1024, 0.07 * available_memory) * panic_factor;
     auto reserve = c.reserve_memory.value_or(default_reserve_memory);
     size_t min_memory = 500'000'000;
-    std::cout << "ca::Available memory: " << available_memory << std::endl;
-    std::cout << "ca::Default reserve memory: " << default_reserve_memory << std::endl;
-    std::cout << "ca::Reserve memory: " << reserve << std::endl;
-    std::cout << "ca::Minimum memory: " << min_memory << std::endl;
+    std::cout << "ca::Available memory: " << available_memory << std::endl;             // ca::Available memory: 67271786496
+    std::cout << "ca::Default reserve memory: " << default_reserve_memory << std::endl; // ca::Default reserve memory: 4709025280
+    std::cout << "ca::Reserve memory: " << reserve << std::endl;                        // ca::Reserve memory: 4709025280
+    std::cout << "ca::Minimum memory: " << min_memory << std::endl;                     // ca::Minimum memory: 500000000
     if (available_memory >= reserve + min_memory) {
         available_memory -= reserve;
-        std::cout << "ca::Adjusted available memory after reserve: " << available_memory << std::endl;
+        std::cout << "ca::Adjusted available memory after reserve: " << available_memory << std::endl; // ca::Adjusted available memory after reserve: 62562761216
     } else {
         // Allow starting up even in low memory configurations (e.g. 2GB boot2docker VM)
         available_memory = min_memory;
@@ -226,12 +222,12 @@ size_t calculate_memory(configuration c, size_t available_memory, float panic_fa
     }
 
     size_t mem = c.total_memory.value_or(available_memory);
-    std::cout << "Requested memory: " << mem << std::endl;
+    std::cout << "Requested memory: " << mem << std::endl;    // Requested memory: 62562761216
 
     if (mem > available_memory) {
         throw std::runtime_error("insufficient physical memory");
     }
-    return mem;
+    return mem;//62562761216
 }
 
 
@@ -241,34 +237,27 @@ resources allocate(configuration c) {
     auto available_memory = get_machine_memory();
     auto available_cpus = get_available_cpus();
     unsigned available_procs = available_cpus.size();
-    
-    size_t mem = calculate_memory(c, available_memory);
+    size_t mem = calculate_memory(c, available_memory);  // 62562761216
     unsigned procs = c.cpus.value_or(available_procs);
-    
     if (procs > available_procs) {
         throw std::runtime_error("insufficient processing units");
     }
-    
-    auto mem_per_proc = align_down(mem/procs, 2 << 20);
-    
-    std::cout << "Available memory: " << available_memory << std::endl;
-    std::cout << "Requested memory: " << mem << std::endl;
+    auto mem_per_proc = align_down(mem/procs, 2 << 20);  // 每个cpu分配的内存
+    std::cout << "Available memory: " << available_memory << std::endl; // Requested memory: 62562761216
+    std::cout << "Requested memory: " << mem << std::endl;   // Available memory: 67271786496
     std::cout << "Available processing units: " << available_procs << std::endl;
-    std::cout << "Requested processing units: " << procs << std::endl;
-    std::cout << "Memory per processing unit: " << mem_per_proc << std::endl;
-    
+    std::cout << "Requested processing units: " << procs << std::endl; // Available processing units: 12
+    std::cout << "Memory per processing unit: " << mem_per_proc << std::endl; // Memory per processing unit: 5213519872
     resources ret;
-    
     // Process CPU restrictions if specified
     std::vector<unsigned> cpu_ids;
     if (c.cpu_set) {
-        std::cout << "分配CPU_SET\n";
+        std::cout << "分配CPU_SET\n";  // 分配 CPU_SET
         for (auto idx : *c.cpu_set) {
             if (idx < available_procs) {
                 cpu_ids.push_back(idx);
             }
         }
-        
         // If no valid CPUs were specified, fall back to all available
         if (cpu_ids.empty()) {
             for (unsigned i = 0; i < procs && i < available_procs; i++) {
@@ -276,26 +265,22 @@ resources allocate(configuration c) {
             }
         }
     } else {
-        // Use first 'procs' number of CPUs
+        // Use first procs number of CPUs
         for (unsigned i = 0; i < procs && i < available_procs; i++) {
             cpu_ids.push_back(available_cpus[i]);
         }
     }
-    
+    // cpu_ids 是 { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 }.
     // Assign memory to CPUs - assuming single NUMA node in virtualized environment
     for (unsigned i = 0; i < cpu_ids.size(); i++) {
         cpu this_cpu;
         this_cpu.cpu_id = cpu_ids[i];
-        
         // Assign memory to this CPU - all from node 0 since we're assuming single node
         this_cpu.mem.push_back({mem_per_proc, 0});
-        
         ret.cpus.push_back(std::move(this_cpu));
     }
-    
     // Allocate IO queues
-    ret.io_queues = allocate_io_queues(c, ret.cpus);
-    
+    ret.io_queues = allocate_io_queues(c, ret.cpus); //
     print_io_queue(ret.io_queues);
     print_resource(ret);
     
