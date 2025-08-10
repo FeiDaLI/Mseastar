@@ -30,24 +30,24 @@ make
 
 ### Todo
 
-1. **UDP Server 性能优化**
-   - 当前状态: 需改进压测结果
-     	server_name	server_port	num_clients	num_packets	packet_size	total_packets_sent	total_errors	success_rate	throughput_mbps	duration_seconds
-1	Mseastar	10000	500	5000	2048	2500000	0	100.00%	387.10	105.81
-2	Node	41234	500	5000	2048	2500000	0	100.00%	446.71	91.69
-3	Go	41235	500	5000	2048	2500000	0	100.00%	434.89	94.18
-
-   - 目标: 优化现有实现，提升吞吐量和延迟表现
-
  **架构改进**
    - 实现与定义分离，遵循清晰的分层设计
-
-
+      
 **使用boost MPI和openMP重构项目**
+去掉parrel for each，mapreduce等辅助性功能。
 
 **提高boost无锁队列的性能**
 
 **去掉不必要的功能**
+（1）networkstack不需要写这么多抽象，只需要一个posix即可.
+
+（2）使用epoll和aio即可，不需要考虑io_uring.
+
+（3）future和promise只需要实现最基本的功能。目前的future和promise的代码太臃肿了，需要精简。
+
+
+
+
 
 
 
