@@ -50,6 +50,7 @@ CXXFLAGS = -w -Wall -std=c++20 -g -Iinclude -pthread -MMD
 LDFLAGS = -pthread -lboost_system -lboost_thread -lrt -lhwloc -lboost_program_options -laio  -lunwind
 SRCS = \
     include/resource/resource.cc \
+	include/future/future_all12.cc\
     test/mem_test/mem_test.cc \
 # 生成对象文件列表
 OBJS = $(SRCS:%.cc=build/%.o)
