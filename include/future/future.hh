@@ -12,6 +12,9 @@
 
 #include "../task/task.hh"
 
+void schedule_normal(std::unique_ptr<task> t);
+void schedule_urgent(std::unique_ptr<task> t);
+
 
 template<typename T>
 struct function_traits;
@@ -421,6 +424,9 @@ struct futurize<void> {
     static type make_exception_future(Arg&& arg);
 };
 
+inline bool need_preempt();
+
+
 template <typename... Args>
 struct futurize<future<Args...>> {
     using type = future<Args...>;
@@ -465,32 +471,36 @@ concept ApplyReturnsAnyFuture = requires (Func f, T... args) {
 void engine_exit(std::exception_ptr eptr = {});
 void report_failed_future(std::exception_ptr ex);
 
-
-
 template <typename... T>
 class future {
 public:
     promise<T...>* _promise;
     future_state<T...> _local_state;  // valid if !_promise
     static constexpr bool copy_noexcept = future_state<T...>::copy_noexcept;
+    
     future(promise<T...>* pr) noexcept : _promise(pr) {
         _promise->_future = this;
     }
+
     template <typename... A>
     future(ready_future_marker, A&&... a) : _promise(nullptr) {
         _local_state.set(std::forward<A>(a)...);
     }
+
     template <typename... A>
     future(ready_future_from_tuple_marker, std::tuple<A...>&& data) : _promise(nullptr) {
         _local_state.set(std::move(data));
     }
+
     future(exception_future_marker, std::exception_ptr ex) noexcept : _promise(nullptr) {
         _local_state.set_exception(std::move(ex));
     }
+
     [[gnu::always_inline]]
     explicit future(future_state<T...>&& state) noexcept
             : _promise(nullptr), _local_state(std::move(state)) {
     }
+
     [[gnu::always_inline]]
     future_state<T...>* state() noexcept {
         return _promise ? _promise->_state : &_local_state;
@@ -508,7 +518,7 @@ public:
             _promise = nullptr;
         }
     }
-
+    
     [[gnu::always_inline]]
     future_state<T...> get_available_state() noexcept {
         auto st = state();

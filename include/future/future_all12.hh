@@ -20,7 +20,6 @@
 #include <regex>
 #include <tuple>
 #include <type_traits>
-
 #include "../util/bitops.hh"
 #include <assert.h>
 #include <cstdlib>

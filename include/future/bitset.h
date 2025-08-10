@@ -8,21 +8,21 @@
 #include <variant>
 
 namespace bitsets {
-static constexpr int ulong_bits = std::numeric_limits<unsigned long>::digits;
-template<typename T>
-inline size_t count_leading_zeros(T value);
-template<typename T>
-static inline size_t count_trailing_zeros(T value);
-template<>
-inline size_t count_leading_zeros<unsigned long>(unsigned long value)
-{
-    return __builtin_clzl(value);
-}
-template<>
-inline size_t count_leading_zeros<long>(long value)
-{
-    return __builtin_clzl((unsigned long)value) - 1;
-}
+    static constexpr int ulong_bits = std::numeric_limits<unsigned long>::digits;
+    template<typename T>
+    inline size_t count_leading_zeros(T value);
+    template<typename T>
+    static inline size_t count_trailing_zeros(T value);
+    template<>
+    inline size_t count_leading_zeros<unsigned long>(unsigned long value)
+    {
+        return __builtin_clzl(value);
+    }
+    template<>
+    inline size_t count_leading_zeros<long>(long value)
+    {
+        return __builtin_clzl((unsigned long)value) - 1;
+    }
 template<>
 inline size_t count_leading_zeros<long long>(long long value)
 {
