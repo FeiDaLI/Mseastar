@@ -18,6 +18,7 @@
 ```bash
 # 安装必要系统依赖
 sudo apt update
+sudo apt install g++ make
 sudo apt install -y libboost-all-dev libsctp-dev lksctp-tools libaio-dev libunwind-dev
 
 
@@ -45,5 +46,6 @@ make
 **使用boost MPI和openMP重构项目**
 
 **提高boost无锁队列的性能**
+
 
 
