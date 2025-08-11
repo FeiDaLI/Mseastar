@@ -79,6 +79,15 @@
         "*.ipp": "cpp",
         "strstream": "cpp",
         "pthread.h": "c",
-        "queue": "cpp"
+        "queue": "cpp",
+        "csignal": "cpp",
+        "codecvt": "cpp",
+        "source_location": "cpp",
+        "numbers": "cpp",
+        "semaphore": "cpp",
+        "cfenv": "cpp",
+        "buffer": "cpp",
+        "internet": "cpp",
+        "netfwd": "cpp"
     }
 }

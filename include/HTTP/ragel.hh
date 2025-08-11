@@ -36,6 +36,9 @@
 // After mark_end() has been called, use the get() method to obtain
 // the built string.
 // FIXME: switch to string_view.
+#include "../../include/future/temp_buffer.hh"
+#include "../../include/future/future.hh"
+
 class string_builder {
     std::string _value;
     const char* _start = nullptr;
@@ -46,7 +49,7 @@ public:
         return std::move(_value);
     }
     void reset() {
-        _value.reset();
+        // _value.reset();
         _start = nullptr;
     }
     friend class guard;

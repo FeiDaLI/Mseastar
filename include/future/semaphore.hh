@@ -26,7 +26,6 @@ struct semaphore_default_exception_factory {
     }
 };
 
-
 template<typename ExceptionFactory, typename Clock = typename timer<>::clock>
 class basic_semaphore {
 public:
@@ -61,7 +60,6 @@ public:
     future<> wait(size_t nr = 1) {
         return wait(time_point::max(), nr);
     }
-
     future<> wait(duration timeout, size_t nr = 1) {
         return wait(Clock::now() + timeout, nr);
     }
@@ -78,7 +76,7 @@ public:
         _wait_list.push_back(entry(std::move(pr), nr), timeout);
         return fut;
     }
-     void signal(size_t nr = 1) {
+    void signal(size_t nr = 1) {
         if (_ex) {
             return;
         }
@@ -90,7 +88,6 @@ public:
             _wait_list.pop_front();
         }
     }
-
     void consume(size_t nr = 1) {
         if (_ex) {
             return;

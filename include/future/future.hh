@@ -9,12 +9,10 @@
 #include <cassert>      
 #include <cstdlib>        
 #include <memory>      
-
 #include "../task/task.hh"
 
 void schedule_normal(std::unique_ptr<task> t);
 void schedule_urgent(std::unique_ptr<task> t);
-
 
 template<typename T>
 struct function_traits;
@@ -35,29 +33,19 @@ struct function_traits<Ret(Args...)>
 };
 
 template<typename Ret, typename... Args>
-struct function_traits<Ret(*)(Args...)> : public function_traits<Ret(Args...)>
-{};
+struct function_traits<Ret(*)(Args...)> : public function_traits<Ret(Args...)>{};
 
 template <typename T, typename Ret, typename... Args>
-struct function_traits<Ret(T::*)(Args...)> : public function_traits<Ret(Args...)>
-{};
+struct function_traits<Ret(T::*)(Args...)> : public function_traits<Ret(Args...)>{};
 
 template <typename T, typename Ret, typename... Args>
-struct function_traits<Ret(T::*)(Args...) const> : public function_traits<Ret(Args...)>
-{};
+struct function_traits<Ret(T::*)(Args...) const> : public function_traits<Ret(Args...)>{};
 
 template <typename T>
-struct function_traits : public function_traits<decltype(&T::operator())>
-{};
+struct function_traits : public function_traits<decltype(&T::operator())>{};
 
 template<typename T>
-struct function_traits<T&> : public function_traits<std::remove_reference_t<T>>
-{};
-
-
-
-
-
+struct function_traits<T&> : public function_traits<std::remove_reference_t<T>>{};
 
 template <typename... T> class future;
 template <typename... T> class promise;

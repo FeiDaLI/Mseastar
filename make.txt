@@ -1,2 +1,15 @@
-g++ -w -Wall -std=c++20 -g -Iinclude -pthread -MMD -c include/memcached/memcache.cc -o build/include/memcached/memcache.o
-g++ build/include/resource/resource.o build/include/memcached/memcache.o -o build/memcached -pthread -lboost_system -lboost_thread -lrt -lhwloc -lboost_program_options -laio  -lunwind -lboost_json
+g++ -w -Wall -std=c++20 -g -Iinclude -I/usr/include/boost -pthread -MMD -c include/future/future_all12.cc -o build/include/future/future_all12.o
+g++ -w -Wall -std=c++20 -g -Iinclude -I/usr/include/boost -pthread -MMD -c test/http_test/http_server.cc -o build/test/http_test/http_server.o
+g++ build/include/resource/resource.o build/include/future/future_all12.o build/test/http_test/http_server.o -o build/http_server -pthread -lboost_system -lboost_thread -lrt -lhwloc -lboost_program_options -laio  -lunwind -lboost_json
+/usr/bin/ld: build/test/http_test/http_server.o: in function `httpd::http_server::connection::start_response()':
+/home/lifd/Mseastar/test/http_test/../../include/HTTP/httpd.hh:212: undefined reference to `output_stream<char>::write(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)'
+/usr/bin/ld: build/test/http_test/http_server.o: in function `httpd::http_server::connection::write_reply_headers(std::__detail::_Node_iterator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, false, true>)::{lambda()#2}::operator()() const':
+/home/lifd/Mseastar/test/http_test/../../include/HTTP/httpd.hh:233: undefined reference to `output_stream<char>::write(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)'
+/usr/bin/ld: build/test/http_test/http_server.o: in function `httpd::http_server::connection::write_reply_headers(std::__detail::_Node_iterator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, false, true>)':
+/home/lifd/Mseastar/test/http_test/../../include/HTTP/httpd.hh:229: undefined reference to `output_stream<char>::write(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)'
+/usr/bin/ld: build/test/http_test/http_server.o: in function `httpd::http_server::connection::write_body()':
+/home/lifd/Mseastar/test/http_test/../../include/HTTP/httpd.hh:357: undefined reference to `output_stream<char>::write(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)'
+/usr/bin/ld: build/test/http_test/http_server.o: in function `output_stream<char>::flush()':
+/home/lifd/Mseastar/test/http_test/../../include/HTTP/../../include/future/stream.hh:1324: undefined reference to `output_stream<char>::zero_copy_put(net::packet)'
+collect2: error: ld returned 1 exit status
+make: *** [makefile:153: build/http_server] Error 1

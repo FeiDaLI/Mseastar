@@ -26,6 +26,7 @@
 #include <algorithm>
 #include <iostream>
 #include "../include/future/future_all12.hh"
+#include "../include/future/stream.hh"
 #include "../include/app/app-template.hh"
 #include "exception.hh"
 

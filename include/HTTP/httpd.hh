@@ -18,12 +18,15 @@
 #include <boost/intrusive/list.hpp>
 #include "reply.hh"
 #include "routes.hh"
+#include "request_parser.hh"
+#include "../../include/future/net.hh"
+#include "../../include/future/queue_.hh"
+#include "../../include/future/distributed.hh"
 
 namespace httpd {
 
 class http_server;
 class http_stats;
-
 using namespace std::chrono_literals;
 
 class http_stats {
@@ -51,7 +54,6 @@ class http_server {
         _date_format_timer.arm_periodic(1s);
     }
 /*.............................*/
-
 
 private:
     void maybe_idle() {
@@ -85,7 +87,7 @@ public:
     future<> do_accepts(int which) {
         ++_connections_being_accepted;
         return _listeners[which].accept().then_wrapped(
-                [this, which] (future<connected_socket, socket_address> f_cs_sa) mutable {
+                [this, which] (future<connected_socket, net::socket_address> f_cs_sa) mutable {
                     --_connections_being_accepted;
                     if (_stopping) {
                         maybe_idle();
@@ -125,7 +127,7 @@ public:
         bool _done = false;
     public:
         connection(http_server& server, connected_socket&& fd,
-                socket_address addr)
+                net::socket_address addr)
                 : _server(server), _fd(std::move(fd)), _read_buf(_fd.input()), _write_buf(
                         _fd.output()) {
             ++_server._total_connections;

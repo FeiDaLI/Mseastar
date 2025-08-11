@@ -2,10 +2,6 @@
 #define TEMP_BUFFER_HH
 #include "../util/deleter.hh"
 
-
-
-
-
 template <typename CharType>
 class temporary_buffer {
     static_assert(sizeof(CharType) == 1, "must buffer stream of bytes");

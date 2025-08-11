@@ -1,26 +1,5 @@
-/*
- * This file is open source software, licensed to you under the terms
- * of the Apache License, Version 2.0 (the "License").  See the NOTICE file
- * distributed with this work for additional information regarding copyright
- * ownership.  You may not use this file except in compliance with the License.
- *
- * You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
-/*
- * Copyright (C) 2014 Cloudius Systems, Ltd.
- */
-
 #include "../../include/app/app-template.hh"
-
+#include "../../include/future/distributed.hh"
 using namespace net;
 using namespace std::chrono_literals;
 
@@ -33,7 +12,6 @@ public:
     void start(uint16_t port) {
         std::cout<<"run udp server start"<<std::endl;
         ipv4_addr listen_addr{port};
-        std::cout<<"listen_addr: "<<listen_addr.ip<<"  "<<listen_addr.port<<std::endl;
         engine().net().print_stack();
         _chan = engine().net().make_udp_channel(listen_addr);
         if(_chan._impl!=nullptr)
@@ -84,25 +62,9 @@ future<int> f(int x){
 
 int main(int ac, char ** av) {
     app_template app;
-    app.add_options()
-        ("port", bpo::value<uint16_t>()->default_value(10000), "UDP server port") ;
+    app.add_options()("port", bpo::value<uint16_t>()->default_value(10000), "UDP server port");
+
     return app.run_deprecated(ac, av, [&] {
-    /*测试代码*/
-        // f(1).then([](int x){
-        //     // sleep(2);
-        //     std::cout<<"then1"<<std::endl;
-        //     return 11;
-        // }).then_wrapped([](auto&& f) {
-        //     try {
-        //         auto x = f.get();
-        //         std::cout<<"x value"<<x<<std::endl;
-        //         std::cout<<"then_wrapped 1"<<std::endl;
-        //     } catch (...) {
-        //         std::cout<<"then_wrapped 2"<<std::endl;
-        //     }
-        // });
-    /*测试代码*/
-        
         auto&& config = app.configuration();
         uint16_t port = config["port"].as<uint16_t>();
         auto server = new distributed<udp_server>;

@@ -66,13 +66,16 @@
 #include <atomic>
 #include "../util/align.hh"
 #include "../util/spinlock.hh"
+#include "distributed.hh"
+#include "stream.hh"
+#include "queue_.hh"
+#include "net.hh"
+#include "smp.hh"
 
 
 
 
-inline
-size_t iovec_len(const iovec* begin, size_t len)
-{
+inline size_t iovec_len(const iovec* begin, size_t len){
     size_t ret = 0;
     auto end = begin + len;
     while (begin != end) {
@@ -80,8 +83,6 @@ size_t iovec_len(const iovec* begin, size_t len)
     }
     return ret;
 }
-
-
 
 /// Wraps reference in a reference_wrapper
 template<typename T>
@@ -94,11 +95,6 @@ inline reference_wrapper<const T> cref(const T& object) noexcept {
     return reference_wrapper<const T>(object);
 }
 
-
-
-
-
-
 __thread bool g_need_preempt;
 inline bool need_preempt() {
     return true;
@@ -107,9 +103,7 @@ inline bool need_preempt() {
     return g_need_preempt;
 }
 
-
-void
-systemwide_memory_barrier() {
+void systemwide_memory_barrier() {
     // FIXME: use sys_membarrier() when available
     static thread_local char* mem = [] {
        void* mem = mmap(nullptr, getpagesize(),
@@ -786,73 +780,7 @@ inline execution_stage::execution_stage(execution_stage&& other)
 
 
 
-#include <queue>
 
-template <typename T>
-class queue_ {
-    std::queue<T, std::deque<T>> _q;  // 第二个参数是底层实现.
-    size_t _max;
-    std::optional<promise<>> _not_empty;
-    std::optional<promise<>> _not_full;
-    std::exception_ptr _ex = nullptr;
-private:
-    void notify_not_empty();
-    void notify_not_full();
-public:
-    explicit queue_(size_t size);
-    // Push an item.
-    // Returns false if the queue was full and the item was not pushed.
-    bool push(T&& a);
-    // pops an item.
-    T pop();
-    // Consumes items from the queue, passing them to @func, until @func
-    // returns false or the queue it empty
-    // Returns false if func returned false.
-    template <typename Func>
-    bool consume(Func&& func);
-    // Returns true when the queue is empty.
-    bool empty() const;
-    // Returns true when the queue is full.
-    bool full() const;
-    // Returns a future<> that becomes available when pop() or consume()
-    // can be called.
-    future<> not_empty();
-    // Returns a future<> that becomes available when push() can be called.
-    future<> not_full();
-    // Pops element now or when ther is some. Returns a future that becomes
-    // available when some element is available.
-    future<T> pop_eventually();
-    future<> push_eventually(T&& data);
-    size_t size() const { return _q.size(); }
-    size_t max_size() const { return _max; }
-    // Pushes the element now or when there is room. Returns a future<> which
-    // resolves when data was pushed.
-    // Set the maximum size to a new value. If the queue's max size is reduced,
-    // items already in the queue will not be expunged and the queue will be temporarily
-    // bigger than its max_size.
-    void set_max_size(size_t max) {
-        _max = max;
-        if (!full()) {
-            notify_not_full();
-        }
-    }
-    // Destroy any items in the queue, and pass the provided exception to any
-    // waiting readers or writers.
-    void abort(std::exception_ptr ex) {
-        while (!_q.empty()) {
-            _q.pop();
-        }
-        _ex = ex;
-        if (_not_full) {
-            _not_full->set_exception(ex);
-            _not_full= std::nullopt;
-        }
-        if (_not_empty) {
-            _not_empty->set_exception(std::move(ex));
-            _not_empty = std::nullopt;
-        }
-    }
-};
 
 
 
@@ -1086,34 +1014,6 @@ bool is_port_unspecified(ipv4_addr &addr) {
 static inline
 std::ostream& operator<<(std::ostream &os, ipv4_addr addr) {
 }
-
-static inline
-net::socket_address make_ipv4_address(ipv4_addr addr) {
-    net::socket_address sa;
-    sa.u.in.sin_family = AF_INET;
-    sa.u.in.sin_port = htons(addr.port);
-    sa.u.in.sin_addr.s_addr = htonl(addr.ip);
-    return sa;
-}
-inline
-net::socket_address make_ipv4_address(uint32_t ip, uint16_t port) {
-    net::socket_address sa;
-    sa.u.in.sin_family = AF_INET;
-    sa.u.in.sin_port = htons(port);
-    sa.u.in.sin_addr.s_addr = htonl(ip);
-    return sa;
-}
-
-
-
-
-
-
-
-
-
-
-
 
 class network_stack_registry {
 public:
@@ -1732,131 +1632,6 @@ public:
     }
 };
 
-template <typename T>
-inline
-queue_<T>::queue_(size_t size)
-    : _max(size) {
-}
-
-template <typename T>
-inline
-void queue_<T>::notify_not_empty() {
-    if (_not_empty) {
-        _not_empty->set_value();
-        _not_empty = std::optional<promise<>>();
-    }
-}
-
-template <typename T>
-inline
-void queue_<T>::notify_not_full() {
-    if (_not_full) {
-        _not_full->set_value();
-        _not_full = std::optional<promise<>>();
-    }
-}
-
-template <typename T>
-inline
-bool queue_<T>::push(T&& data) {
-    if (_q.size() < _max) {
-        _q.push(std::move(data));
-        notify_not_empty();
-        return true;
-    } else {
-        return false;
-    }
-}
-
-template <typename T>
-inline
-T queue_<T>::pop() {
-    if (_q.size() == _max) {
-        notify_not_full();
-    }
-    T data = std::move(_q.front());
-    _q.pop();
-    return data;
-}
-
-template <typename T>
-inline
-future<T> queue_<T>::pop_eventually() {
-    if (empty()) {
-        return not_empty().then([this] {
-            if (_ex) {
-                return make_exception_future<T>(_ex);
-            } else {
-                return make_ready_future<T>(pop());
-            }
-        });
-    } else {
-        return make_ready_future<T>(pop());
-    }
-}
-
-template <typename T>
-inline
-future<> queue_<T>::push_eventually(T&& data) {
-    if (full()) {
-        return not_full().then([this, data = std::move(data)] () mutable {
-            _q.push(std::move(data));
-            notify_not_empty();
-        });
-    } else {
-        _q.push(std::move(data));
-        notify_not_empty();
-        return make_ready_future<>();
-    }
-}
-
-template <typename T>
-template <typename Func>
-inline bool queue_<T>::consume(Func&& func) {
-    bool running = true;
-    while (!_q.empty() && running) {
-        running = func(std::move(_q.front()));
-        _q.pop();
-    }
-    if (!full()) {
-        notify_not_full();
-    }
-    return running;
-}
-
-template <typename T>
-inline bool queue_<T>::empty() const {
-    return _q.empty();
-}
-
-template <typename T>
-inline
-bool queue_<T>::full() const {
-    return _q.size() >= _max;
-}
-
-template <typename T>
-inline
-future<> queue_<T>::not_empty() {
-    if (!empty()) {
-        return make_ready_future<>();
-    }
-    else{
-        _not_empty = promise<>();
-        return _not_empty->get_future();
-    }
-}
-
-template <typename T>
-inline
-future<> queue_<T>::not_full() {
-    if (!full()) {
-        return make_ready_future<>();
-    } else {
-        _not_full = promise<>();
-        return _not_full->get_future();
-    }
-}
 
 
 void
@@ -2438,8 +2213,7 @@ future<size_t> pollable_fd::sendto(net::socket_address addr, const void* buf, si
         return make_ready_future<size_t>(*r);
     });
 }
-struct stop_iteration_tag { };
-using stop_iteration = bool_class<stop_iteration_tag>;
+
 
 
 /* not yet implemented for OSv. TODO: do the notification like we do class smp. */
@@ -2676,307 +2450,6 @@ thread_local std::list<thread_context*> thread_context::_all_threads;
 
 
 // #include "../util/shared_ptr.hh"
-#include "../util/bool_class.hh"
-#include <tuple>
-#include <iterator>
-#include <vector>
-#include <experimental/optional>
-// #include "util/tuple_utils.hh"
-extern __thread size_t task_quota;
-struct parallel_for_each_state {
-    // use optional<> to avoid out-of-line constructor
-    std::optional<std::exception_ptr> ex;
-    size_t waiting = 0;
-    promise<> pr;
-    void complete() {
-        if (--waiting == 0) {
-            if (ex) {
-                pr.set_exception(std::move(*ex));
-            } else {
-                pr.set_value();
-            }
-        }
-    }
-};
-
-//这里？
-template <typename Iterator, typename Func>
-GCC6_CONCEPT(requires requires (Func f, Iterator i) { { f(*i++) } -> std::same_as<future<>>; })
-inline
-future<>
-parallel_for_each(Iterator begin, Iterator end, Func&& func) {
-    if (begin == end) {
-        return make_ready_future<>();
-    }
-    return do_with(parallel_for_each_state{}, [&] (parallel_for_each_state& state) -> future<> {
-        // increase ref count to ensure all functions run
-        ++state.waiting;
-        while (begin != end) {
-            ++state.waiting;
-            try {
-                func(*begin++).then_wrapped([&] (auto&& f) {
-                    if (f.failed()) {
-                        // We can only store one exception.  For more, use when_all().
-                        if (!state.ex) {
-                            state.ex = f.get_exception();
-                        } else {
-                            f.ignore_ready_future();
-                        }
-                    }
-                    state.complete();
-                });
-            } catch (...) {
-                if (!state.ex) {
-                    state.ex = std::move(std::current_exception());
-                }
-                state.complete();
-            }
-        }
-        // match increment on top
-        state.complete();
-        return state.pr.get_future();
-    });
-}
-
-
-template <typename Range, typename Func>
-GCC6_CONCEPT(requires requires (Func f, Range r) { { f(*r.begin()) } -> std::same_as<future<>>; })
-inline
-future<>
-parallel_for_each(Range&& range, Func&& func) {
-    return parallel_for_each(std::begin(range), std::end(range),
-            std::forward<Func>(func));
-}
-
-
-template<typename AsyncAction, typename StopCondition>
-static inline
-void do_until_continued(StopCondition&& stop_cond, AsyncAction&& action, promise<> p) {
-    while (!stop_cond()) {
-        try {
-            auto&& f = action();
-            if (!f.available() || need_preempt()) {
-                f.then_wrapped([action = std::forward<AsyncAction>(action),
-                                stop_cond = std::forward<StopCondition>(stop_cond),
-                                p = std::move(p)]  // 修复：移动捕获p
-                                (std::result_of_t<AsyncAction()> fut) mutable {
-                    if (!fut.failed()) {
-                        do_until_continued(std::forward<StopCondition>(stop_cond),
-                                          std::forward<AsyncAction>(action),
-                                          std::move(p));  // 修复：移动p
-                    } else {
-                        p.set_exception(fut.get_exception());  // 此时p已经被捕获
-                    }
-                });
-                return;
-            }
-            if (f.failed()) {
-                f.forward_to(std::move(p));
-                return;
-            }
-        } catch (...) {
-            p.set_exception(std::current_exception());
-            return;
-        }
-    }
-    p.set_value();
-}
-
-template<typename AsyncAction>
-GCC6_CONCEPT( requires ApplyReturns<AsyncAction, stop_iteration> || ApplyReturns<AsyncAction, future<stop_iteration>> )
-static inline
-future<> repeat(AsyncAction&& action) {
-    using futurator = futurize<std::result_of_t<AsyncAction()>>;
-    static_assert(std::is_same<future<stop_iteration>, typename futurator::type>::value, "bad AsyncAction signature");
-    try {
-        do {
-            auto f = futurator::apply(action);
-            if (!f.available()) {
-                return f.then([action = std::forward<AsyncAction>(action)] (stop_iteration stop) mutable {
-                    if (stop == stop_iteration::yes) {
-                        return make_ready_future<>();
-                    } else {
-                        return repeat(std::forward<AsyncAction>(action));
-                    }
-                });
-            }
-            if (f.get0() == stop_iteration::yes) {
-                return make_ready_future<>();
-            }
-        } while (!need_preempt());
-        promise<> p;
-        auto f = p.get_future();
-        schedule_normal(make_task([action = std::forward<AsyncAction>(action), p = std::move(p)]() mutable {
-            repeat(std::forward<AsyncAction>(action)).forward_to(std::move(p));
-        }));
-        return f;
-    } catch (...) {
-        return make_exception_future(std::current_exception());
-    }
-}
-
-
-template <typename T>
-struct repeat_until_value_type_helper;
-
-
-/// Type helper for repeat_until_value()
-template <typename T>
-struct repeat_until_value_type_helper<future<std::optional<T>>> {
-    using value_type = T;
-    using optional_type = std::optional<T>;
-    using future_type = future<value_type>;
-    using future_optional_type = future<optional_type>;
-};
-
-template <typename AsyncAction>
-using repeat_until_value_return_type
-        = typename repeat_until_value_type_helper<std::result_of_t<AsyncAction()>>::future_type;
-
-template<typename AsyncAction>
-GCC6_CONCEPT( requires requires (AsyncAction aa) {
-    requires is_future<decltype(aa())>::value;
-    bool(aa().get0());
-    aa().get0().value();
-} )
-repeat_until_value_return_type<AsyncAction>
-repeat_until_value(AsyncAction&& action) {
-    using type_helper = repeat_until_value_type_helper<std::result_of_t<AsyncAction()>>;
-    // the "T" in the documentation
-    using value_type = typename type_helper::value_type;
-    using optional_type = typename type_helper::optional_type;
-    using futurator = futurize<typename type_helper::future_optional_type>;
-    do {
-        auto f = futurator::apply(action);
-
-        if (!f.available()) {
-            return f.then([action = std::forward<AsyncAction>(action)] (auto&& optional) mutable {
-                if (optional) {
-                    return make_ready_future<value_type>(std::move(optional.value()));
-                } else {
-                    return repeat_until_value(std::forward<AsyncAction>(action));
-                }
-            });
-        }
-
-        if (f.failed()) {
-            return make_exception_future<value_type>(f.get_exception());
-        }
-
-        optional_type&& optional = std::move(f).get0();
-        if (optional) {
-            return make_ready_future<value_type>(std::move(optional.value()));
-        }
-    } while (!need_preempt());
-
-    try {
-        promise<value_type> p;
-        auto f = p.get_future();
-        schedule_normal(make_task([action = std::forward<AsyncAction>(action), p = std::move(p)] () mutable {
-            repeat_until_value(std::forward<AsyncAction>(action)).forward_to(std::move(p));
-        }));
-        return f;
-    } catch (...) {
-        return make_exception_future<value_type>(std::current_exception());
-    }
-}
-
-template<typename AsyncAction, typename StopCondition>
-GCC6_CONCEPT( requires ApplyReturns<StopCondition, bool> && ApplyReturns<AsyncAction, future<>> )
-static inline
-future<> do_until(StopCondition&& stop_cond, AsyncAction&& action) {
-    promise<> p;
-    auto f = p.get_future();
-    do_until_continued(std::forward<StopCondition>(stop_cond),
-        std::forward<AsyncAction>(action), std::move(p));
-    return f;
-}
-
-template<typename AsyncAction>
-GCC6_CONCEPT( requires ApplyReturns<AsyncAction, future<>> )
-static inline
-future<> keep_doing(AsyncAction&& action) {
-    return repeat([action = std::forward<AsyncAction>(action)] () mutable {
-        return action().then([]{ return stop_iteration::no;});
-    });
-}
-
-
-
-
-template<typename Iterator, typename AsyncAction>
-GCC6_CONCEPT( requires requires (Iterator i, AsyncAction aa) { { aa(*i) } -> std::same_as<future<>>; } )
-static inline
-future<> do_for_each(Iterator begin, Iterator end, AsyncAction&& action) {
-    if (begin == end) {
-        return make_ready_future<>();
-    }
-    while (true) {
-        auto f = action(*begin++);
-        if (begin == end) {
-            return f;
-        }
-        if (!f.available() || need_preempt()) {
-            return std::move(f).then([action = std::forward<AsyncAction>(action),
-                    begin = std::move(begin), end = std::move(end)] () mutable {
-                return do_for_each(std::move(begin), std::move(end), std::forward<AsyncAction>(action));
-            });
-        }
-        if (f.failed()) {
-            return std::move(f);
-        }
-    }
-}
-
-template<typename Container, typename AsyncAction>
-GCC6_CONCEPT( requires requires (Container c, AsyncAction aa) { { aa(*c.begin()) } -> std::same_as<future<>>; } )
-static inline
-future<> do_for_each(Container& c, AsyncAction&& action) {
-    return do_for_each(std::begin(c), std::end(c), std::forward<AsyncAction>(action));
-}
-
-namespace internal {
-
-template<typename... Futures>
-struct identity_futures_tuple {
-    using future_type = future<std::tuple<Futures...>>;
-    using promise_type = typename future_type::promise_type;
-    static void set_promise(promise_type& p, std::tuple<Futures...> futures) {
-        p.set_value(std::move(futures));
-    }
-};
-
-
-template<typename ResolvedTupleTransform, typename... Futures>
-class when_all_state: public std::enable_shared_from_this<when_all_state<ResolvedTupleTransform, Futures...>>{
-    using type = std::tuple<Futures...>;
-    type tuple;
-public:
-    typename ResolvedTupleTransform::promise_type p;
-    when_all_state(Futures&&... t) : tuple(std::make_tuple(std::move(t)...)) {}
-    ~when_all_state() {
-        ResolvedTupleTransform::set_promise(p, std::move(tuple));
-    }
-private:
-    template<size_t Idx>
-    int wait() {
-        auto& f = std::get<Idx>(tuple);
-        static_assert(is_future<std::remove_reference_t<decltype(f)>>::value, "when_all parameter must be a future");
-        if (!f.available()) {
-            f = f.then_wrapped([s = this->shared_from_this()] (auto&& f) {
-                return std::move(f);
-            });
-        }
-        return 0;
-    }
-public:
-    template <size_t... Idx>
-    typename ResolvedTupleTransform::future_type wait_all(std::index_sequence<Idx...>) {
-        [] (...) {} (this->template wait<Idx>()...);
-        return p.get_future();
-    }
-};
-}
 
 
 
@@ -3091,99 +2564,78 @@ GCC6_CONCEPT(
 namespace impl {
 // Want: folds
 template <typename T>
-struct is_tuple_of_futures : std::false_type {
-};
+struct is_tuple_of_futures : std::false_type {};
 
-template <>
-struct is_tuple_of_futures<std::tuple<>> : std::true_type {
-};
-
+template <> struct is_tuple_of_futures<std::tuple<>> : std::true_type {};
 template <typename... T, typename... Rest>
-struct is_tuple_of_futures<std::tuple<future<T...>, Rest...>> : is_tuple_of_futures<std::tuple<Rest...>> {
+    struct is_tuple_of_futures<std::tuple<future<T...>, Rest...>> : is_tuple_of_futures<std::tuple<Rest...>> {
 };
 }
-
 template <typename... Futs>
 concept AllAreFutures = impl::is_tuple_of_futures<std::tuple<Futs...>>::value;
-
-
-
-// template <typename Func, typename... T>
-// concept ApplyReturnsAnyFuture = requires (Func f, T... args) {
-//     requires is_future<decltype(f(std::forward<T>(args)...))>::value;
-// };
 )
 
 
-template <typename... Futs>
-GCC6_CONCEPT( requires AllAreFutures<Futs...> )
-inline
-future<std::tuple<Futs...>>
-when_all(Futs&&... futs) {
-    namespace si = internal;
-    using state = si::when_all_state<si::identity_futures_tuple<Futs...>, Futs...>;
-    auto s = std::make_shared<state>(std::forward<Futs>(futs)...);
-    return s->wait_all(std::make_index_sequence<sizeof...(Futs)>());
-}
+
 
 /// \cond internal
 namespace internal {
 
-template <typename Iterator, typename IteratorCategory>
-inline
-size_t
-when_all_estimate_vector_capacity(Iterator begin, Iterator end, IteratorCategory category) {
-    // For InputIterators we can't estimate needed capacity
-    return 0;
-}
+// template <typename Iterator, typename IteratorCategory>
+// inline
+// size_t
+// when_all_estimate_vector_capacity(Iterator begin, Iterator end, IteratorCategory category) {
+//     // For InputIterators we can't estimate needed capacity
+//     return 0;
+// }
 
-template <typename Iterator>
-inline
-size_t
-when_all_estimate_vector_capacity(Iterator begin, Iterator end, std::forward_iterator_tag category) {
-    // May be linear time below random_access_iterator_tag, but still better than reallocation
-    return std::distance(begin, end);
-}
+// template <typename Iterator>
+// inline
+// size_t
+// when_all_estimate_vector_capacity(Iterator begin, Iterator end, std::forward_iterator_tag category) {
+//     // May be linear time below random_access_iterator_tag, but still better than reallocation
+//     return std::distance(begin, end);
+// }
 
-template<typename Future>
-struct identity_futures_vector {
-    using future_type = future<std::vector<Future>>;
-    static future_type run(std::vector<Future> futures) {
-        return make_ready_future<std::vector<Future>>(std::move(futures));
-    }
-};
+// template<typename Future>
+// struct identity_futures_vector {
+//     using future_type = future<std::vector<Future>>;
+//     static future_type run(std::vector<Future> futures) {
+//         return make_ready_future<std::vector<Future>>(std::move(futures));
+//     }
+// };
 
-// Internal function for when_all().
-template <typename ResolvedVectorTransform, typename Future>
-inline
-typename ResolvedVectorTransform::future_type
-complete_when_all(std::vector<Future>&& futures, typename std::vector<Future>::iterator pos) {
-    // If any futures are already ready, skip them.
-    while (pos != futures.end() && pos->available()) {
-        ++pos;
-    }
-    // Done?
-    if (pos == futures.end()) {
-        return ResolvedVectorTransform::run(std::move(futures));
-    }
-    // Wait for unready future, store, and continue.
-    return pos->then_wrapped([futures = std::move(futures), pos] (auto fut) mutable {
-        *pos++ = std::move(fut);
-        return complete_when_all<ResolvedVectorTransform>(std::move(futures), pos);
-    });
-}
+// // Internal function for when_all().
+// template <typename ResolvedVectorTransform, typename Future>
+// inline
+// typename ResolvedVectorTransform::future_type
+// complete_when_all(std::vector<Future>&& futures, typename std::vector<Future>::iterator pos) {
+//     // If any futures are already ready, skip them.
+//     while (pos != futures.end() && pos->available()) {
+//         ++pos;
+//     }
+//     // Done?
+//     if (pos == futures.end()) {
+//         return ResolvedVectorTransform::run(std::move(futures));
+//     }
+//     // Wait for unready future, store, and continue.
+//     return pos->then_wrapped([futures = std::move(futures), pos] (auto fut) mutable {
+//         *pos++ = std::move(fut);
+//         return complete_when_all<ResolvedVectorTransform>(std::move(futures), pos);
+//     });
+// }
 
-template<typename ResolvedVectorTransform, typename FutureIterator>
-inline auto
-do_when_all(FutureIterator begin, FutureIterator end) {
-    using itraits = std::iterator_traits<FutureIterator>;
-    std::vector<typename itraits::value_type> ret;
-    ret.reserve(when_all_estimate_vector_capacity(begin, end, typename itraits::iterator_category()));
-    // Important to invoke the *begin here, in case it's a function iterator,
-    // so we launch all computation in parallel.
-    std::move(begin, end, std::back_inserter(ret));
-    return complete_when_all<ResolvedVectorTransform>(std::move(ret), ret.begin());
-}
+// template<typename ResolvedVectorTransform, typename FutureIterator>
+// inline auto
+// do_when_all(FutureIterator begin, FutureIterator end) {
+//     using itraits = std::iterator_traits<FutureIterator>;
+//     std::vector<typename itraits::value_type> ret;
+//     ret.reserve(when_all_estimate_vector_capacity(begin, end, typename itraits::iterator_category()));
+//     // Important to invoke the *begin here, in case it's a function iterator,
+//     // so we launch all computation in parallel.
+//     std::move(begin, end, std::back_inserter(ret));
+//     return complete_when_all<ResolvedVectorTransform>(std::move(ret), ret.begin());
+// }
 
 }
 
@@ -3195,142 +2647,142 @@ GCC6_CONCEPT( requires requires (FutureIterator i) { { *i++ }; requires is_futur
 
 
 
-inline
-future<std::vector<typename std::iterator_traits<FutureIterator>::value_type>>
-when_all(FutureIterator begin, FutureIterator end) {
-    namespace si = internal;
-    using itraits = std::iterator_traits<FutureIterator>;
-    using result_transform = si::identity_futures_vector<typename itraits::value_type>;
-    return si::do_when_all<result_transform>(std::move(begin), std::move(end));
-}
+// inline
+// future<std::vector<typename std::iterator_traits<FutureIterator>::value_type>>
+// when_all(FutureIterator begin, FutureIterator end) {
+//     namespace si = internal;
+//     using itraits = std::iterator_traits<FutureIterator>;
+//     using result_transform = si::identity_futures_vector<typename itraits::value_type>;
+//     return si::do_when_all<result_transform>(std::move(begin), std::move(end));
+// }
 
-template <typename T, bool IsFuture>
-struct reducer_with_get_traits;
+// template <typename T, bool IsFuture>
+// struct reducer_with_get_traits;
 
-template <typename T>
-struct reducer_with_get_traits<T, false> {
-    using result_type = decltype(std::declval<T>().get());
-    using future_type = future<result_type>;
-    static future_type maybe_call_get(future<> f, std::shared_ptr<T> r) {
-        return f.then([r = std::move(r)] () mutable {
-            return make_ready_future<result_type>(std::move(*r).get());
-        });
-    }
-};
+// template <typename T>
+// struct reducer_with_get_traits<T, false> {
+//     using result_type = decltype(std::declval<T>().get());
+//     using future_type = future<result_type>;
+//     static future_type maybe_call_get(future<> f, std::shared_ptr<T> r) {
+//         return f.then([r = std::move(r)] () mutable {
+//             return make_ready_future<result_type>(std::move(*r).get());
+//         });
+//     }
+// };
 
-template <typename T>
-struct reducer_with_get_traits<T, true> {
-    using future_type = decltype(std::declval<T>().get());
-    static future_type maybe_call_get(future<> f, std::shared_ptr<T> r) {
-        return f.then([r = std::move(r)] () mutable {
-            return r->get();
-        }).then_wrapped([r] (future_type f) {
-            return f;
-        });
-    }
-};
+// template <typename T>
+// struct reducer_with_get_traits<T, true> {
+//     using future_type = decltype(std::declval<T>().get());
+//     static future_type maybe_call_get(future<> f, std::shared_ptr<T> r) {
+//         return f.then([r = std::move(r)] () mutable {
+//             return r->get();
+//         }).then_wrapped([r] (future_type f) {
+//             return f;
+//         });
+//     }
+// };
 
-template <typename T, typename V = void>
-struct reducer_traits {
-    using future_type = future<>;
-    static future_type maybe_call_get(future<> f, std::shared_ptr<T> r) {
-        return f.then([r = std::move(r)] {});
-    }
-};
+// template <typename T, typename V = void>
+// struct reducer_traits {
+//     using future_type = future<>;
+//     static future_type maybe_call_get(future<> f, std::shared_ptr<T> r) {
+//         return f.then([r = std::move(r)] {});
+//     }
+// // };
 
-template <typename T>
-struct reducer_traits<T, decltype(std::declval<T>().get(), void())> : public reducer_with_get_traits<T, is_future<std::result_of_t<decltype(&T::get)(T)>>::value> {};
-
-
-template <typename Iterator, typename Mapper, typename Reducer>
-inline
-auto
-map_reduce(Iterator begin, Iterator end, Mapper&& mapper, Reducer&& r)
-    -> typename reducer_traits<Reducer>::future_type
-{
-    auto r_ptr = std::make_shared<Reducer>(std::forward<Reducer>(r));
-    future<> ret = make_ready_future<>();
-    using futurator = futurize<decltype(mapper(*begin))>;
-    while (begin != end) {
-        ret = futurator::apply(mapper, *begin++).then_wrapped([ret = std::move(ret), r_ptr] (auto f) mutable {
-            return ret.then_wrapped([f = std::move(f), r_ptr] (auto rf) mutable {
-                if (rf.failed()) {
-                    f.ignore_ready_future();
-                    return std::move(rf);
-                } else {
-                    return futurize<void>::apply(*r_ptr, std::move(f.get()));
-                }
-            });
-        });
-    }
-    return reducer_traits<Reducer>::maybe_call_get(std::move(ret), r_ptr);
-}
+// template <typename T>
+// struct reducer_traits<T, decltype(std::declval<T>().get(), void())> : public reducer_with_get_traits<T, is_future<std::result_of_t<decltype(&T::get)(T)>>::value> {};
 
 
-template <typename Iterator, typename Mapper, typename Initial, typename Reduce>
-GCC6_CONCEPT( requires requires (Iterator i, Mapper mapper, Initial initial, Reduce reduce) {
-    *i++;
-    { i != i } -> std::same_as<bool>;//为什么?
-    mapper(*i);
-    requires is_future<decltype(mapper(*i))>::value;
-    { reduce(std::move(initial), mapper(*i).get0()) } -> std::same_as<Initial>;
-} )
-inline
-future<Initial>
-map_reduce(Iterator begin, Iterator end, Mapper&& mapper, Initial initial, Reduce reduce) {
-    struct state {
-        Initial result;
-        Reduce reduce;
-    };
-    auto s = std::make_shared(state{std::move(initial), std::move(reduce)});
-    future<> ret = make_ready_future<>();
-    using futurator = futurize<decltype(mapper(*begin))>;
-    while (begin != end) {
-        ret = futurator::apply(mapper, *begin++).then_wrapped([s = s.get(), ret = std::move(ret)] (auto f) mutable {
-            try {
-                s->result = s->reduce(std::move(s->result), std::move(f.get0()));
-                return std::move(ret);
-            } catch (...) {
-                return std::move(ret).then_wrapped([ex = std::current_exception()] (auto f) {
-                    f.ignore_ready_future();
-                    return make_exception_future<>(ex);
-                });
-            }
-        });
-    }
-    return ret.then([s] {
-        return make_ready_future<Initial>(std::move(s->result));
-    });
-}
+// template <typename Iterator, typename Mapper, typename Reducer>
+// inline
+// auto
+// map_reduce(Iterator begin, Iterator end, Mapper&& mapper, Reducer&& r)
+//     -> typename reducer_traits<Reducer>::future_type
+// {
+//     auto r_ptr = std::make_shared<Reducer>(std::forward<Reducer>(r));
+//     future<> ret = make_ready_future<>();
+//     using futurator = futurize<decltype(mapper(*begin))>;
+//     while (begin != end) {
+//         ret = futurator::apply(mapper, *begin++).then_wrapped([ret = std::move(ret), r_ptr] (auto f) mutable {
+//             return ret.then_wrapped([f = std::move(f), r_ptr] (auto rf) mutable {
+//                 if (rf.failed()) {
+//                     f.ignore_ready_future();
+//                     return std::move(rf);
+//                 } else {
+//                     return futurize<void>::apply(*r_ptr, std::move(f.get()));
+//                 }
+//             });
+//         });
+//     }
+//     return reducer_traits<Reducer>::maybe_call_get(std::move(ret), r_ptr);
+// }
 
-template <typename Range, typename Mapper, typename Initial, typename Reduce>
-GCC6_CONCEPT( requires requires (Range range, Mapper mapper, Initial initial, Reduce reduce) {
-     std::begin(range);
-     std::end(range);
-     mapper(*std::begin(range));
-     requires is_future<std::remove_reference_t<decltype(mapper(*std::begin(range)))>>::value;
-    { reduce(std::move(initial), mapper(*std::begin(range)).get0()) } -> std::same_as<Initial>;
-} )
-inline
-future<Initial>
-map_reduce(Range&& range, Mapper&& mapper, Initial initial, Reduce reduce) {
-    return map_reduce(std::begin(range), std::end(range), std::forward<Mapper>(mapper),
-            std::move(initial), std::move(reduce));
-}
 
-template <typename Result, typename Addend = Result>
-class adder {
-private:
-    Result _result;
-public:
-    future<> operator()(const Addend& value) {
-        _result += value;
-        return make_ready_future<>();
-    }
-    Result get() && {
-        return std::move(_result);
-    }
-};
+// template <typename Iterator, typename Mapper, typename Initial, typename Reduce>
+// GCC6_CONCEPT( requires requires (Iterator i, Mapper mapper, Initial initial, Reduce reduce) {
+//     *i++;
+//     { i != i } -> std::same_as<bool>;//为什么?
+//     mapper(*i);
+//     requires is_future<decltype(mapper(*i))>::value;
+//     { reduce(std::move(initial), mapper(*i).get0()) } -> std::same_as<Initial>;
+// } )
+// inline
+// future<Initial>
+// map_reduce(Iterator begin, Iterator end, Mapper&& mapper, Initial initial, Reduce reduce) {
+//     struct state {
+//         Initial result;
+//         Reduce reduce;
+//     };
+//     auto s = std::make_shared(state{std::move(initial), std::move(reduce)});
+//     future<> ret = make_ready_future<>();
+//     using futurator = futurize<decltype(mapper(*begin))>;
+//     while (begin != end) {
+//         ret = futurator::apply(mapper, *begin++).then_wrapped([s = s.get(), ret = std::move(ret)] (auto f) mutable {
+//             try {
+//                 s->result = s->reduce(std::move(s->result), std::move(f.get0()));
+//                 return std::move(ret);
+//             } catch (...) {
+//                 return std::move(ret).then_wrapped([ex = std::current_exception()] (auto f) {
+//                     f.ignore_ready_future();
+//                     return make_exception_future<>(ex);
+//                 });
+//             }
+//         });
+//     }
+//     return ret.then([s] {
+//         return make_ready_future<Initial>(std::move(s->result));
+//     });
+// }
+
+// template <typename Range, typename Mapper, typename Initial, typename Reduce>
+// GCC6_CONCEPT( requires requires (Range range, Mapper mapper, Initial initial, Reduce reduce) {
+//      std::begin(range);
+//      std::end(range);
+//      mapper(*std::begin(range));
+//      requires is_future<std::remove_reference_t<decltype(mapper(*std::begin(range)))>>::value;
+//     { reduce(std::move(initial), mapper(*std::begin(range)).get0()) } -> std::same_as<Initial>;
+// } )
+// inline
+// future<Initial>
+// map_reduce(Range&& range, Mapper&& mapper, Initial initial, Reduce reduce) {
+//     return map_reduce(std::begin(range), std::end(range), std::forward<Mapper>(mapper),
+//             std::move(initial), std::move(reduce));
+// }
+
+// template <typename Result, typename Addend = Result>
+// class adder {
+// private:
+//     Result _result;
+// public:
+//     future<> operator()(const Addend& value) {
+//         _result += value;
+//         return make_ready_future<>();
+//     }
+//     Result get() && {
+//         return std::move(_result);
+//     }
+// };
 
 static inline future<> now() {
     return make_ready_future<>();
@@ -3472,430 +2924,6 @@ void enable_timer(steady_clock_type::time_point when){
 
 
 
-
-
-/// if sharded service inherits from this class sharded::stop() will wait
-/// untill all references to a service on each shard will dissapper before
-/// returning. It is still service's own responcibility to track its references
-/// in asyncronous code by calling shared_from_this() and keeping returned smart
-/// pointer as long as object is in use.
-template<typename T>
-class async_sharded_service{
-protected:
-    std::function<void()> _delete_cb;
-    ~async_sharded_service() {
-        if (_delete_cb) {
-            _delete_cb();
-        }
-    }
-    template <typename Service> friend class sharded;
-};
-/// Exception thrown when a \ref sharded object does not exist
-class no_sharded_instance_exception : public std::exception {
-public:
-    virtual const char* what() const noexcept override {
-        return "sharded instance does not exists";
-    }
-};
-
-
-
-
-/// \defgroup smp-module Multicore
-///
-/// \brief Support for exploiting multiple cores on a server.
-///
-/// Seastar supports multicore servers by using \i sharding.  Each logical
-/// core (lcore) runs a separate event loop, with its own memory allocator,
-/// TCP/IP stack, and other services.  Shards communicate by explicit message
-/// passing, rather than using locks and condition variables as with traditional
-/// threaded programming.
-
-/// \addtogroup smp-module
-/// @{
-/// Template helper to distribute a service across all logical cores.
-/// The \c sharded template manages a sharded service, by creating
-/// a copy of the service on each logical core, providing mechanisms to communicate
-/// with each shard's copy, and a way to stop the service.
-/// \tparam Service a class to be instantiated on each core.  Must expose
-///         a \c stop() method that returns a \c future<>, to be called when
-///         the service is stopped.
-
-template <typename Service>
-class sharded {
-    public:
-    struct entry {
-        std::shared_ptr<Service> service;
-        promise<> freed;
-    };
-    std::vector<entry> _instances;
-    void service_deleted() {
-        _instances[engine().cpu_id()].freed.set_value();
-    }
-    // template <typename U, bool async>
-    // // friend struct std::shared_ptr_make_helper;
-
-    /// Constructs an empty \c sharded object.  No instances of the service are
-    /// created.
-    sharded() {}
-    sharded(const sharded& other) = delete;
-    /// Moves a \c sharded object.
-    sharded(sharded&& other) = default;
-    sharded& operator=(const sharded& other) = delete;
-    /// Moves a \c sharded object.
-    sharded& operator=(sharded&& other) = default;
-    /// Destroyes a \c sharded object.  Must not be in a started state.
-    ~sharded();
-
-    /// Starts \c Service by constructing an instance on every logical core
-    /// with a copy of \c args passed to the constructor.
-    ///
-    /// \param args Arguments to be forwarded to \c Service constructor
-    /// \return a \ref future<> that becomes ready when all instances have been
-    ///         constructed.
-    template <typename... Args>
-    future<> start(Args&&... args);
-
-    /// Starts \c Service by constructing an instance on a single logical core
-    /// with a copy of \c args passed to the constructor.
-    ///
-    /// \param args Arguments to be forwarded to \c Service constructor
-    /// \return a \ref future<> that becomes ready when the instance has been
-    ///         constructed.
-    template <typename... Args>
-    future<> start_single(Args&&... args);
-
-    /// Stops all started instances and destroys them.
-    ///
-    /// For every started instance, its \c stop() method is called, and then
-    /// it is destroyed.
-    future<> stop();
-
-    // Invoke a method on all instances of @Service.
-    // The return value becomes ready when all instances have processed
-    // the message.
-    template <typename... Args>
-    future<> invoke_on_all(future<> (Service::*func)(Args...), Args... args);
-
-    /// Invoke a method on all \c Service instances in parallel.
-    ///
-    /// \param func member function to be called.  Must return \c void or
-    ///             \c future<>.
-    /// \param args arguments to be passed to \c func.
-    /// \return future that becomes ready when the method has been invoked
-    ///         on all instances.
-    template <typename... Args>
-    future<> invoke_on_all(void (Service::*func)(Args...), Args... args);
-
-    /// Invoke a callable on all instances of  \c Service.
-    ///
-    /// \param func a callable with the signature `void (Service&)`
-    ///             or `future<> (Service&)`, to be called on each core
-    ///             with the local instance as an argument.
-    /// \return a `future<>` that becomes ready when all cores have
-    ///         processed the message.
-    template <typename Func>
-    future<> invoke_on_all(Func&& func);
-
-    /// Invoke a method on all instances of `Service` and reduce the results using
-    /// `Reducer`.
-    ///
-    /// \see map_reduce(Iterator begin, Iterator end, Mapper&& mapper, Reducer&& r)
-    template <typename Reducer, typename Ret, typename... FuncArgs, typename... Args>
-    inline
-    auto
-    map_reduce(Reducer&& r, Ret (Service::*func)(FuncArgs...), Args&&... args)
-        -> typename reducer_traits<Reducer>::future_type
-    {
-        return ::map_reduce(boost::counting_iterator<unsigned>(0),
-                            boost::counting_iterator<unsigned>(_instances.size()),
-            [this, func, args = std::make_tuple(std::forward<Args>(args)...)] (unsigned c) mutable {
-                return smp::submit_to(c, [this, func, args] () mutable {
-                    return apply([this, func] (Args&&... args) mutable {
-                        auto inst = _instances[engine().cpu_id()].service;
-                        if (inst) {
-                            return ((*inst).*func)(std::forward<Args>(args)...);
-                        } else {
-                            throw no_sharded_instance_exception();
-                        }
-                    }, std::move(args));
-                });
-            }, std::forward<Reducer>(r));
-    }
-
-    /// Invoke a callable on all instances of `Service` and reduce the results using
-    /// Reducer
-    /// \see map_reduce(Iterator begin, Iterator end, Mapper&& mapper, Reducer&& r)
-    template <typename Reducer, typename Func>
-    inline
-    auto map_reduce(Reducer&& r, Func&& func) -> typename reducer_traits<Reducer>::future_type
-    {
-        return ::map_reduce(boost::counting_iterator<unsigned>(0),
-                            boost::counting_iterator<unsigned>(_instances.size()),
-            [this, &func] (unsigned c) mutable {
-                return smp::submit_to(c, [this, func] () mutable {
-                    auto inst = get_local_service();
-                    return func(*inst);
-                });
-            },std::forward<Reducer>(r));
-    }
-
-    /// Applies a map function to all shards, then reduces the output by calling a reducer function.
-    /// \param map callable with the signature `Value (Service&)` or
-    ///               `future<Value> (Service&)` (for some `Value` type).
-    ///               used as the second input to \c reduce
-    /// \param initial initial value used as the first input to \c reduce.
-    /// \param reduce binary function used to left-fold the return values of \c map
-    ///               into \c initial .
-    /// Each \c map invocation runs on the shard associated with the service.
-    /// \tparam  Mapper unary function taking `Service&` and producing some result.
-    /// \tparam  Initial any value type
-    /// \tparam  Reduce a binary function taking two Initial values and returning an Initial
-    /// \return  Result of applying `map` to each instance in parallel, reduced by calling
-    ///          `reduce()` on each adjacent pair of results.
-    template <typename Mapper, typename Initial, typename Reduce>
-    inline
-    future<Initial>
-    map_reduce0(Mapper map, Initial initial, Reduce reduce) {
-        auto wrapped_map = [this, map] (unsigned c) {
-            return smp::submit_to(c, [this, map] {
-                auto inst = get_local_service();
-                return map(*inst);
-            });
-        };
-        return ::map_reduce(smp::all_cpus().begin(), smp::all_cpus().end(),
-                            std::move(wrapped_map),
-                            std::move(initial),
-                            std::move(reduce));
-    }
-
-    /// Applies a map function to all shards, and return a vector of the result.
-    ///
-    /// \param mapper callable with the signature `Value (Service&)` or
-    ///               `future<Value> (Service&)` (for some `Value` type).
-    ///
-    /// Each \c map invocation runs on the shard associated with the service.
-    ///
-    /// \tparam  Mapper unary function taking `Service&` and producing some result.
-    /// \return  Result vector of applying `map` to each instance in parallel
-    template <typename Mapper, typename return_type = std::result_of_t<Mapper(Service&)>>
-    inline future<std::vector<return_type>> map(Mapper mapper) {
-        return do_with(std::vector<return_type>(),
-                [&mapper, this] (std::vector<return_type>& vec) mutable {
-            vec.resize(smp::count);
-            return parallel_for_each(boost::irange<unsigned>(0, _instances.size()), [this, &vec, mapper] (unsigned c) {
-                return smp::submit_to(c, [this, mapper] {
-                    auto inst = get_local_service();
-                    return mapper(*inst);
-                }).then([&vec, c] (auto res) {
-                    vec[c] = res;
-                });
-            }).then([&vec] {
-                return make_ready_future<std::vector<return_type>>(std::move(vec));
-            });
-        });
-    }
-
-    /// Invoke a method on a specific instance of `Service`.
-    ///
-    /// \param id shard id to call
-    /// \param func a method of `Service`
-    /// \param args arguments to be passed to `func`
-    /// \return result of calling `func(args)` on the designated instance
-    template <typename Ret, typename... FuncArgs, typename... Args, typename FutureRet = futurize_t<Ret>>
-    FutureRet
-    invoke_on(unsigned id, Ret (Service::*func)(FuncArgs...), Args&&... args) {
-        using futurator = futurize<Ret>;
-        return smp::submit_to(id, [this, func, args = std::make_tuple(std::forward<Args>(args)...)] () mutable {
-            auto inst = get_local_service();
-            return futurator::apply(std::mem_fn(func), std::tuple_cat(std::make_tuple<>(inst), std::move(args)));
-        });
-    }
-
-    /// Invoke a callable on a specific instance of `Service`.
-    ///
-    /// \param id shard id to call
-    /// \param func a callable with signature `Value (Service&)` or
-    ///        `future<Value> (Service&)` (for some `Value` type)
-    /// \return result of calling `func(instance)` on the designated instance
-    template <typename Func, typename Ret = futurize_t<std::result_of_t<Func(Service&)>>>
-    Ret
-    invoke_on(unsigned id, Func&& func) {
-        return smp::submit_to(id, [this, func = std::forward<Func>(func)] () mutable {
-            auto inst = get_local_service();
-            return func(*inst);
-        });
-    }
-
-    /// Gets a reference to the local instance.
-    Service& local();
-
-    /// Gets a shared pointer to the local instance.
-    std::shared_ptr<Service> local_shared();
-
-    /// Checks whether the local instance has been initialized.
-    bool local_is_initialized();
-
-private:
-    void track_deletion(std::shared_ptr<Service>& s, std::false_type) {
-        // do not wait for instance to be deleted since it is not going to notify us
-        service_deleted();
-    }
-
-    void track_deletion(std::shared_ptr<Service>& s, std::true_type) {
-        s->_delete_cb = std::bind(std::mem_fn(&sharded<Service>::service_deleted), this);
-    }
-
-    template <typename... Args>
-    std::shared_ptr<Service> create_local_service(Args&&... args) {
-        auto s = std::make_shared<Service>(std::forward<Args>(args)...);
-        track_deletion(s, std::is_base_of<async_sharded_service<Service>, Service>());
-        return s;
-    }
-
-    std::shared_ptr<Service> get_local_service() {
-        auto inst = _instances[engine().cpu_id()].service;
-        if (!inst) {
-            throw no_sharded_instance_exception();
-        }
-        return inst;
-    }
-};
-
-template <typename Service>
-sharded<Service>::~sharded() {
-	assert(_instances.empty());
-}
-
-template <typename Service>
-template <typename... Args>
-future<>
-sharded<Service>::start(Args&&... args) {
-    _instances.resize(smp::count);
-    return parallel_for_each(
-        boost::irange<unsigned>(0, _instances.size()),
-        [this, args = std::make_tuple(std::forward<Args>(args)...)] (unsigned c) mutable {
-            return smp::submit_to(c, [this, args] () mutable {
-                _instances[engine().cpu_id()].service = apply([this] (Args... args) {
-                    return create_local_service(std::forward<Args>(args)...);
-                }, args);
-            });
-    }).then_wrapped([this] (future<> f) {
-        try {
-            f.get();
-            return make_ready_future<>();
-        } catch (...) {
-            return this->stop().then([e = std::current_exception()] () mutable {
-                std::rethrow_exception(e);
-            });
-        }
-    });
-}
-
-template <typename Service>
-template <typename... Args>
-future<>
-sharded<Service>::start_single(Args&&... args) {
-    assert(_instances.empty());
-    _instances.resize(1);
-    return smp::submit_to(0, [this, args = std::make_tuple(std::forward<Args>(args)...)] () mutable {
-        _instances[0].service = apply([this] (Args... args) {
-            return create_local_service(std::forward<Args>(args)...);
-        }, args);
-    }).then_wrapped([this] (future<> f) {
-        try {
-            f.get();
-            return make_ready_future<>();
-        } catch (...) {
-            return this->stop().then([e = std::current_exception()] () mutable {
-                std::rethrow_exception(e);
-            });
-        }
-    });
-}
-
-template <typename Service>
-future<>
-sharded<Service>::stop() {
-    return parallel_for_each(boost::irange<unsigned>(0, _instances.size()), [this] (unsigned c) mutable {
-        return smp::submit_to(c, [this] () mutable {
-            auto inst = _instances[engine().cpu_id()].service;
-            if (!inst) {
-                return make_ready_future<>();
-            }
-            _instances[engine().cpu_id()].service = nullptr;
-            return inst->stop().then([this, inst] {
-                return _instances[engine().cpu_id()].freed.get_future();
-            });
-        });
-    }).then([this] {
-        _instances.clear();
-        _instances = std::vector<sharded<Service>::entry>();
-    });
-}
-
-template <typename Service>
-template <typename... Args>
-inline
-future<>
-sharded<Service>::invoke_on_all(future<> (Service::*func)(Args...), Args... args) {
-    return parallel_for_each(boost::irange<unsigned>(0, _instances.size()), [this, func, args...] (unsigned c) {
-        return smp::submit_to(c, [this, func, args...] {
-            auto inst = get_local_service();
-            return ((*inst).*func)(args...);
-        });
-    });
-}
-
-template <typename Service>
-template <typename... Args>
-inline
-future<>
-sharded<Service>::invoke_on_all(void (Service::*func)(Args...), Args... args) {
-    return parallel_for_each(boost::irange<unsigned>(0, _instances.size()), [this, func, args...] (unsigned c) {
-        return smp::submit_to(c, [this, func, args...] {
-            auto inst = get_local_service();
-            ((*inst).*func)(args...);
-        });
-    });
-}
-
-template <typename Service>
-template <typename Func>
-inline
-future<>
-sharded<Service>::invoke_on_all(Func&& func) {
-    static_assert(std::is_same<futurize_t<std::result_of_t<Func(Service&)>>, future<>>::value,
-                  "invoke_on_all()'s func must return void or future<>");
-    return parallel_for_each(boost::irange<unsigned>(0, _instances.size()), [this, &func] (unsigned c) {
-        return smp::submit_to(c, [this, func] {
-            auto inst = get_local_service();
-            return func(*inst);
-        });
-    });
-}
-
-template <typename Service>
-Service& sharded<Service>::local() {
-    assert(local_is_initialized());
-    return *_instances[engine().cpu_id()].service;
-}
-
-template <typename Service>
-std::shared_ptr<Service> sharded<Service>::local_shared() {
-    assert(local_is_initialized());
-    return _instances[engine().cpu_id()].service;
-}
-
-template <typename Service>
-inline bool sharded<Service>::local_is_initialized() {
-    return _instances.size() > engine().cpu_id() &&
-           _instances[engine().cpu_id()].service;
-}
-
-
-template <typename Service>
-using distributed = sharded<Service>;
 
 
 
@@ -4081,10 +3109,7 @@ bool reactor::queue_timer(steady_timer* tmr) {
     return _timers.insert(*tmr);
 }
 
-
-/*
-    del_timer什么时候调用?
-*/
+/* del_timer什么时候调用? */
 void reactor::del_timer(steady_timer* tmr) {
     if (tmr->_expired) {
         _expired_timers.erase(tmr->expired_it);  // 直接使用保存的迭代器
@@ -4102,50 +3127,6 @@ void reactor::del_timer(lowres_timer* tmr) {
     } else {
         _lowres_timers.remove(*tmr);
     }
-}
-
-
-
-template<typename Func>
-future<> smp::invoke_on_all(Func&& func) {
-        static_assert(std::is_same<future<>, typename futurize<std::result_of_t<Func()>>::type>::value, "bad Func signature");
-        return parallel_for_each(all_cpus(), [&func] (unsigned id) {
-            return smp::submit_to(id, Func(func));
-        });
-}
-
-
-
-
-template <typename Func>
-futurize_t<std::result_of_t<Func()>> smp::submit_to(unsigned t, Func&& func) {
-        using ret_type = std::result_of_t<Func()>;
-        if (t == engine().cpu_id()) {
-            try {
-                if (!is_future<ret_type>::value) {
-                    // Non-deferring function, so don't worry about func lifetime
-                    return futurize<ret_type>::apply(std::forward<Func>(func));
-                } else if (std::is_lvalue_reference<Func>::value) {
-                    // func is an lvalue, so caller worries about its lifetime
-                    return futurize<ret_type>::apply(func);
-                } else {
-                    // Deferring call on rvalue function, make sure to preserve it across call
-                    auto w = std::make_unique<std::decay_t<Func>>(std::move(func));
-                    auto ret = futurize<ret_type>::apply(*w);
-                    return ret.finally([w = std::move(w)] {});
-                }
-            } catch (...) {
-                // Consistently return a failed future rather than throwing, to simplify callers
-                return futurize<std::result_of_t<Func()>>::make_exception_future(std::current_exception());
-            }
-        } else {
-            // 这里是修复的地方
-            if (_qs != nullptr) {
-                return _qs[t][engine().cpu_id()].submit(std::forward<Func>(func));
-            } else {
-                return futurize<std::result_of_t<Func()>>::make_exception_future(std::make_exception_ptr(std::runtime_error("smp::_qs is null")));
-            }
-        }
 }
 
 
@@ -6684,431 +5665,12 @@ inline future<temporary_buffer<char>> data_source_impl::skip(uint64_t n)
     });
 }
 
-template<typename CharType>
-inline
-future<> output_stream<CharType>::write(const char_type* buf) {
-    return write(buf, strlen(buf));
-}
-
-// template<typename CharType>
-// template<typename StringChar, typename SizeType, SizeType MaxSize>
-// inline
-// future<> output_stream<CharType>::write(const std::basic_string<CharType>& s) {
-//     return write(reinterpret_cast<const CharType *>(s.data()), s.size());
-// }
-
-template<typename CharType>
-inline
-future<> output_stream<CharType>::write(const std::basic_string<CharType>& s) {
-     return write(reinterpret_cast<const CharType *>(s.data()), s.size());
-}
-
-template<typename CharType>
-future<> output_stream<CharType>::write(scattered_message<CharType> msg) {
-    return write(std::move(msg).release());
-}
-
-template<typename CharType>
-future<>
-output_stream<CharType>::zero_copy_put(net::packet p) {
-    // if flush is scheduled, disable it, so it will not try to write in parallel
-    _flush = false;
-    if (_flushing) {
-        // flush in progress, wait for it to end before continuing
-        return _in_batch.value().get_future().then([this, p = std::move(p)] () mutable {
-            return _fd.put(std::move(p));
-        });
-    } else {
-        return _fd.put(std::move(p));
-    }
-}
-
-// Writes @p in chunks of _size length. The last chunk is buffered if smaller.
-template <typename CharType>
-future<>
-output_stream<CharType>::zero_copy_split_and_put(net::packet p) {
-    return repeat([this, p = std::move(p)] () mutable {
-        if (p.len() < _size) {
-            if (p.len()) {
-                _zc_bufs = std::move(p);
-            } else {
-                _zc_bufs = net::packet::make_null_packet();
-            }
-            return make_ready_future<stop_iteration>(stop_iteration::yes);
-        }
-        auto chunk = p.share(0, _size);
-        p.trim_front(_size);
-        return zero_copy_put(std::move(chunk)).then([] {
-            return stop_iteration::no;
-        });
-    });
-}
-
-template<typename CharType>
-future<> output_stream<CharType>::write(net::packet p) {
-    static_assert(std::is_same<CharType, char>::value, "packet works on char");
-
-    if (p.len() != 0) {
-        assert(!_end && "Mixing buffered writes and zero-copy writes not supported yet");
-
-        if (_zc_bufs) {
-            _zc_bufs.append(std::move(p));
-        } else {
-            _zc_bufs = std::move(p);
-        }
-
-        if (_zc_bufs.len() >= _size) {
-            if (_trim_to_size) {
-                return zero_copy_split_and_put(std::move(_zc_bufs));
-            } else {
-                return zero_copy_put(std::move(_zc_bufs));
-            }
-        }
-    }
-    return make_ready_future<>();
-}
-
-template<typename CharType>
-future<> output_stream<CharType>::write(temporary_buffer<CharType> p) {
-    if (p.empty()) {
-        return make_ready_future<>();
-    }
-    assert(!_end && "Mixing buffered writes and zero-copy writes not supported yet");
-
-    return write(net::packet(std::move(p)));
-}
-
-template <typename CharType>
-future<temporary_buffer<CharType>>
-input_stream<CharType>::read_exactly_part(size_t n, tmp_buf out, size_t completed) {
-    if (available()) {
-        auto now = std::min(n - completed, available());
-        std::copy(_buf.get(), _buf.get() + now, out.get_write() + completed);
-        _buf.trim_front(now);
-        completed += now;
-    }
-    if (completed == n) {
-        return make_ready_future<tmp_buf>(std::move(out));
-    }
-
-    // _buf is now empty
-    return _fd.get().then([this, n, out = std::move(out), completed] (auto buf) mutable {
-        if (buf.size() == 0) {
-            _eof = true;
-            return make_ready_future<tmp_buf>(std::move(buf));
-        }
-        _buf = std::move(buf);
-        return this->read_exactly_part(n, std::move(out), completed);
-    });
-}
-
-template <typename CharType>
-future<temporary_buffer<CharType>>
-input_stream<CharType>::read_exactly(size_t n) {
-    if (_buf.size() == n) {
-        // easy case: steal buffer, return to caller
-        return make_ready_future<tmp_buf>(std::move(_buf));
-    } else if (_buf.size() > n) {
-        // buffer large enough, share it with caller
-        auto front = _buf.share(0, n);
-        _buf.trim_front(n);
-        return make_ready_future<tmp_buf>(std::move(front));
-    } else if (_buf.size() == 0) {
-        // buffer is empty: grab one and retry
-        return _fd.get().then([this, n] (auto buf) mutable {
-            if (buf.size() == 0) {
-                _eof = true;
-                return make_ready_future<tmp_buf>(std::move(buf));
-            }
-            _buf = std::move(buf);
-            return this->read_exactly(n);
-        });
-    } else {
-        // buffer too small: start copy/read loop
-        tmp_buf b(n);
-        return read_exactly_part(n, std::move(b), 0);
-    }
-}
-
-template <typename CharType> 
-template <typename Consumer>
-future<> input_stream<CharType>::consume(Consumer& consumer) {
-    return repeat([&consumer, this] {
-        if(_buf.empty() && !_eof) {
-            return _fd.get().then([this] (tmp_buf buf) {
-                _buf = std::move(buf);
-                _eof = _buf.empty();
-                return make_ready_future<stop_iteration>(stop_iteration::no);
-            });
-        }
-        future<unconsumed_remainder> unconsumed = consumer(std::move(_buf));
-        if (unconsumed.available()) {
-            unconsumed_remainder u = std::get<0>(unconsumed.get());
-            if (u) {
-                // consumer is done
-                _buf = std::move(u.value());
-                return make_ready_future<stop_iteration>(stop_iteration::yes);
-            }
-            if (_eof) {
-                return make_ready_future<stop_iteration>(stop_iteration::yes);
-            }
-            // If we're here, consumer consumed entire buffer and is ready for
-            // more now. So we do not return, and rather continue the loop.
-            // TODO: if we did too many iterations, schedule a call to
-            // consume() instead of continuing the loop.
-            return make_ready_future<stop_iteration>(stop_iteration::no);
-        } else {
-            // TODO: here we wait for the consumer to finish the previous
-            // buffer (fulfilling "unconsumed") before starting to read the
-            // next one. Consider reading ahead.
-            return unconsumed.then([this] (unconsumed_remainder u) {
-                if (u) {
-                    // consumer is done
-                    _buf = std::move(u.value());
-                    return make_ready_future<stop_iteration>(stop_iteration::yes);
-                } else {
-                    // consumer consumed entire buffer, and is ready for more
-                    return make_ready_future<stop_iteration>(stop_iteration::no);
-                }
-            });
-        }
-    });
-}
-
-template <typename CharType>
-future<temporary_buffer<CharType>>
-input_stream<CharType>::read_up_to(size_t n) {
-    using tmp_buf = temporary_buffer<CharType>;
-    if (_buf.empty()) {
-        if (_eof) {
-            return make_ready_future<tmp_buf>();
-        } else {
-            return _fd.get().then([this, n] (tmp_buf buf) {
-                _eof = buf.empty();
-                _buf = std::move(buf);
-                return read_up_to(n);
-            });
-        }
-    } else if (_buf.size() <= n) {
-        // easy case: steal buffer, return to caller
-        return make_ready_future<tmp_buf>(std::move(_buf));
-    } else {
-        // buffer is larger than n, so share its head with a caller
-        auto front = _buf.share(0, n);
-        _buf.trim_front(n);
-        return make_ready_future<tmp_buf>(std::move(front));
-    }
-}
-
-template <typename CharType>
-future<temporary_buffer<CharType>>
-input_stream<CharType>::read() {
-    using tmp_buf = temporary_buffer<CharType>;
-    if (_eof) {
-        return make_ready_future<tmp_buf>();
-    }
-    if (_buf.empty()) {
-        return _fd.get().then([this] (tmp_buf buf) {
-            _eof = buf.empty();
-            return make_ready_future<tmp_buf>(std::move(buf));
-        });
-    } else {
-        return make_ready_future<tmp_buf>(std::move(_buf));
-    }
-}
-
-template <typename CharType>
-future<>
-input_stream<CharType>::skip(uint64_t n) {
-    auto skip_buf = std::min(n, _buf.size());
-    _buf.trim_front(skip_buf);
-    n -= skip_buf;
-    if (!n) {
-        return make_ready_future<>();
-    }
-    return _fd.skip(n).then([this] (temporary_buffer<CharType> buffer) {
-        _buf = std::move(buffer);
-    });
-}
-
-// Writes @buf in chunks of _size length. The last chunk is buffered if smaller.
-template <typename CharType>
-future<>
-output_stream<CharType>::split_and_put(temporary_buffer<CharType> buf) {
-    assert(_end == 0);
-
-    return repeat([this, buf = std::move(buf)] () mutable {
-        if (buf.size() < _size) {
-            if (!_buf) {
-                _buf = _fd.allocate_buffer(_size);
-            }
-            std::copy(buf.get(), buf.get() + buf.size(), _buf.get_write());
-            _end = buf.size();
-            return make_ready_future<stop_iteration>(stop_iteration::yes);
-        }
-        auto chunk = buf.share(0, _size);
-        buf.trim_front(_size);
-        return put(std::move(chunk)).then([] {
-            return stop_iteration::no;
-        });
-    });
-}
-
-template <typename CharType>
-future<>
-output_stream<CharType>::write(const char_type* buf, size_t n) {
-    assert(!_zc_bufs && "Mixing buffered writes and zero-copy writes not supported yet");
-    auto bulk_threshold = _end ? (2 * _size - _end) : _size;
-    if (n >= bulk_threshold) {
-        if (_end) {
-            auto now = _size - _end;
-            std::copy(buf, buf + now, _buf.get_write() + _end);
-            _end = _size;
-            temporary_buffer<char> tmp = _fd.allocate_buffer(n - now);
-            std::copy(buf + now, buf + n, tmp.get_write());
-            _buf.trim(_end);
-            _end = 0;
-            return put(std::move(_buf)).then([this, tmp = std::move(tmp)]() mutable {
-                if (_trim_to_size) {
-                    return split_and_put(std::move(tmp));
-                } else {
-                    return put(std::move(tmp));
-                }
-            });
-        } else {
-            temporary_buffer<char> tmp = _fd.allocate_buffer(n);
-            std::copy(buf, buf + n, tmp.get_write());
-            if (_trim_to_size) {
-                return split_and_put(std::move(tmp));
-            } else {
-                return put(std::move(tmp));
-            }
-        }
-    }
-
-    if (!_buf) {
-        _buf = _fd.allocate_buffer(_size);
-    }
-
-    auto now = std::min(n, _size - _end);
-    std::copy(buf, buf + now, _buf.get_write() + _end);
-    _end += now;
-    if (now == n) {
-        return make_ready_future<>();
-    } else {
-        temporary_buffer<char> next = _fd.allocate_buffer(_size);
-        std::copy(buf + now, buf + n, next.get_write());
-        _end = n - now;
-        std::swap(next, _buf);
-        return put(std::move(next));
-    }
-}
 
 
 void add_to_flush_poller(output_stream<char>* os) {
     engine()._flush_batching.emplace_back(os);
 }
 
-template <typename CharType>
-future<>
-output_stream<CharType>::flush() {
-    if (!_batch_flushes) {
-        if (_end) {
-            _buf.trim(_end);
-            _end = 0;
-            return put(std::move(_buf)).then([this] {
-                return _fd.flush();
-            });
-        } else if (_zc_bufs) {
-            return zero_copy_put(std::move(_zc_bufs)).then([this] {
-                return _fd.flush();
-            });
-        }
-    } else {
-        if (_ex) {
-            // flush is a good time to deliver outstanding errors
-            return make_exception_future<>(std::move(_ex));
-        } else {
-            _flush = true;
-            if (!_in_batch) {
-                add_to_flush_poller(this);
-                _in_batch = promise<>();
-            }
-        }
-    }
-    return make_ready_future<>();
-}
-
-
-
-template <typename CharType>
-future<>
-output_stream<CharType>::put(temporary_buffer<CharType> buf) {
-    // if flush is scheduled, disable it, so it will not try to write in parallel
-    _flush = false;
-    if (_flushing) {
-        // flush in progress, wait for it to end before continuing
-        return _in_batch.value().get_future().then([this, buf = std::move(buf)] () mutable {
-            return _fd.put(std::move(buf));
-        });
-    } else {
-        return _fd.put(std::move(buf));
-    }
-}
-
-template <typename CharType>
-void output_stream<CharType>::poll_flush() {
-    if (!_flush) {
-        // flush was canceled, do nothing
-        _flushing = false;
-        _in_batch.value().set_value();
-        _in_batch = std::nullopt;
-        return;
-    }
-    auto f = make_ready_future();
-    _flush = false;
-    _flushing = true; // make whoever wants to write into the fd to wait for flush to complete
-
-    if (_end) {
-        // send whatever is in the buffer right now
-        _buf.trim(_end);
-        _end = 0;
-        f = _fd.put(std::move(_buf));
-    } else if(_zc_bufs) {
-        f = _fd.put(std::move(_zc_bufs));
-    }
-
-    f.then([this] {
-        return _fd.flush();
-    }).then_wrapped([this] (future<> f) {
-        try {
-            f.get();
-        } catch (...) {
-            _ex = std::current_exception();
-        }
-        // if flush() was called while flushing flush once more
-        poll_flush();
-    });
-}
-
-template <typename CharType>
-future<>
-output_stream<CharType>::close() {
-    return flush().finally([this] {
-        if (_in_batch) {
-            return _in_batch.value().get_future();
-        } else {
-            return make_ready_future();
-        }
-    }).then([this] {
-        // report final exception as close error
-        if (_ex) {
-            std::rethrow_exception(_ex);
-        }
-    }).finally([this] {
-        return _fd.close();
-    });
-}
 
 thread_pool::thread_pool(std::string name) : _worker_thread([this, name] { work(name); }), _notify(pthread_self()) {
     engine()._signals.handle_signal(SIGUSR1, [this] { inter_thread_wq.complete(); });
@@ -7367,7 +5929,7 @@ public:
         return _fd.getsockopt<int>(SOL_SOCKET, SO_KEEPALIVE);
     }
     void set_keepalive_parameters(file_desc& _fd, const keepalive_params& params) {
-        const tcp_keepalive_params& pms = std::get<tcp_keepalive_params>(params);
+        const tcp_keepalive_params& pms = params;
         _fd.setsockopt(IPPROTO_TCP, TCP_KEEPCNT, pms.count);
         _fd.setsockopt(IPPROTO_TCP, TCP_KEEPIDLE, int(pms.idle.count()));
         _fd.setsockopt(IPPROTO_TCP, TCP_KEEPINTVL, int(pms.interval.count()));
@@ -7381,39 +5943,47 @@ public:
     }
 };
 
-template <>
-class posix_connected_socket_operations<transport::SCTP> {
+// 弃用
+template <> class posix_connected_socket_operations<transport::SCTP> {
 public:
     void set_nodelay(file_desc& _fd, bool nodelay) {
-        _fd.setsockopt(SOL_SCTP, SCTP_NODELAY, int(nodelay));
+        // _fd.setsockopt(SOL_SCTP, SCTP_NODELAY, int(nodelay));
     }
     bool get_nodelay(file_desc& _fd) const {
-        return _fd.getsockopt<int>(SOL_SCTP, SCTP_NODELAY);
+        // return _fd.getsockopt<int>(SOL_SCTP, SCTP_NODELAY);
+        return true;
     }
     void set_keepalive(file_desc& _fd, bool keepalive) {
-        auto heartbeat = _fd.getsockopt<sctp_paddrparams>(SOL_SCTP, SCTP_PEER_ADDR_PARAMS);
-        if (keepalive) {
-            heartbeat.spp_flags |= SPP_HB_ENABLE;
-        } else {
-            heartbeat.spp_flags &= ~SPP_HB_ENABLE;
-        }
-        _fd.setsockopt(SOL_SCTP, SCTP_PEER_ADDR_PARAMS, heartbeat);
+        // auto heartbeat = _fd.getsockopt<sctp_paddrparams>(SOL_SCTP, SCTP_PEER_ADDR_PARAMS);
+        // if (keepalive) {
+        //     heartbeat.spp_flags |= SPP_HB_ENABLE;
+        // } else {
+        //     heartbeat.spp_flags &= ~SPP_HB_ENABLE;
+        // }
+        // _fd.setsockopt(SOL_SCTP, SCTP_PEER_ADDR_PARAMS, heartbeat);
     }
     bool get_keepalive(file_desc& _fd) const {
-        return _fd.getsockopt<sctp_paddrparams>(SOL_SCTP, SCTP_PEER_ADDR_PARAMS).spp_flags & SPP_HB_ENABLE;
+        // return _fd.getsockopt<sctp_paddrparams>(SOL_SCTP, SCTP_PEER_ADDR_PARAMS).spp_flags & SPP_HB_ENABLE;
+        return true;
     }
     void set_keepalive_parameters(file_desc& _fd, const keepalive_params& kpms) {
-        const sctp_keepalive_params& pms = std::get<sctp_keepalive_params>(kpms);
-        auto params = _fd.getsockopt<sctp_paddrparams>(SOL_SCTP, SCTP_PEER_ADDR_PARAMS);
-        params.spp_hbinterval = pms.interval.count() * 1000; // in milliseconds
-        params.spp_pathmaxrxt = pms.count;
-        _fd.setsockopt(SOL_SCTP, SCTP_PEER_ADDR_PARAMS, params);
+        // const sctp_keepalive_params& pms = std::get<sctp_keepalive_params>(kpms);
+        // auto params = _fd.getsockopt<sctp_paddrparams>(SOL_SCTP, SCTP_PEER_ADDR_PARAMS);
+        // params.spp_hbinterval = pms.interval.count() * 1000; // in milliseconds
+        // params.spp_pathmaxrxt = pms.count;
+        // _fd.setsockopt(SOL_SCTP, SCTP_PEER_ADDR_PARAMS, params);
     }
     keepalive_params get_keepalive_parameters(file_desc& _fd) const {
-        auto params = _fd.getsockopt<sctp_paddrparams>(SOL_SCTP, SCTP_PEER_ADDR_PARAMS);
-        return sctp_keepalive_params {
-            std::chrono::seconds(params.spp_hbinterval/1000), // in seconds
-            params.spp_pathmaxrxt
+        // auto params = _fd.getsockopt<sctp_paddrparams>(SOL_SCTP, SCTP_PEER_ADDR_PARAMS);
+        // return sctp_keepalive_params {
+            // std::chrono::seconds(params.spp_hbinterval/1000), // in seconds
+            // params.spp_pathmaxrxt
+        // };
+        // return nullptr;
+        return tcp_keepalive_params {
+            std::chrono::seconds(_fd.getsockopt<int>(IPPROTO_TCP, TCP_KEEPIDLE)),
+            std::chrono::seconds(_fd.getsockopt<int>(IPPROTO_TCP, TCP_KEEPINTVL)),
+            _fd.getsockopt<unsigned>(IPPROTO_TCP, TCP_KEEPCNT)
         };
     }
 };
@@ -7894,11 +6464,11 @@ bool connected_socket::get_keepalive() const {
     return _csi->get_keepalive();
 }
 
-void connected_socket::set_keepalive_parameters(const net::keepalive_params& p) {
+void connected_socket::set_keepalive_parameters(const keepalive_params& p) {
     _csi->set_keepalive_parameters(p);
 }
 
-net::keepalive_params connected_socket::get_keepalive_parameters() const {
+keepalive_params connected_socket::get_keepalive_parameters() const {
     return _csi->get_keepalive_parameters();
 }
 
@@ -9504,6 +8074,11 @@ memory_layout get_memory_layout() {
 }
 
 }
+
+
+
+
+
 
 // ipv4_addr::ipv4_addr(const net::inet_address& a, uint16_t port)
 //     : ipv4_addr([&a] {

@@ -26,6 +26,7 @@
 #include <memory>
 #include <unordered_map>
 #include "request.hh"
+#include "ragel.hh"
 #include "../../include/future/future_all12.hh"
 
 using namespace httpd;
